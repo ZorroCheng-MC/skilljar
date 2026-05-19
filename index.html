@@ -3,206 +3,304 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Anthropic Academy — Course Library</title>
+<title>CCA-F Study Hub — Anthropic Academy</title>
 <style>
   :root {
-    --bg: #0f172a;
-    --bg2: #1e293b;
-    --bg3: #162032;
-    --border: #2d3f55;
-    --accent: #7c3aed;
+    --bg:      #0f172a;
+    --bg2:     #1e293b;
+    --bg3:     #162032;
+    --bg4:     #0d1526;
+    --border:  #2d3f55;
+    --accent:  #7c3aed;
     --accent2: #a855f7;
-    --green: #10b981;
-    --red: #ef4444;
-    --text: #e2e8f0;
-    --text2: #94a3b8;
-    --text3: #64748b;
-    --code-bg: #0d1526;
+    --green:   #10b981;
+    --red:     #ef4444;
+    --amber:   #f59e0b;
+    --orange:  #f97316;
+    --blue:    #3b82f6;
+    --text:    #e2e8f0;
+    --text2:   #94a3b8;
+    --text3:   #64748b;
+    --sidebar-w: 248px;
+    --header-h:  58px;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-         background: var(--bg); color: var(--text); line-height: 1.6; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6;
+    min-height: 100vh;
+  }
   a { color: var(--accent2); text-decoration: none; }
   a:hover { text-decoration: underline; }
 
   /* ── Header ── */
   .site-header {
-    background: #0a0f1e;
-    border-bottom: 1px solid var(--border);
-    padding: 0 32px;
-    display: flex; align-items: center; gap: 0;
-    height: 60px; position: sticky; top: 0; z-index: 200;
+    position: fixed; top: 0; left: 0; right: 0; z-index: 300;
+    height: var(--header-h);
+    background: #0a0f1e; border-bottom: 1px solid var(--border);
+    padding: 0 20px; display: flex; align-items: center; gap: 0;
   }
   .site-logo {
     font-size: 15px; font-weight: 700; color: var(--text);
     letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px;
     white-space: nowrap;
   }
-  .site-logo .logo-icon {
+  .logo-icon {
     width: 28px; height: 28px; background: linear-gradient(135deg, #f97316, #ef4444);
     border-radius: 6px; display: flex; align-items: center; justify-content: center;
     font-size: 14px; font-weight: 900; color: #fff; flex-shrink: 0;
   }
-  .breadcrumb { font-size: 13px; color: var(--text3); margin-left: 16px; display: flex; align-items: center; gap: 6px; }
-  .breadcrumb a { color: var(--text2); }
-  .breadcrumb .sep { color: var(--text3); }
-  .header-meta { margin-left: auto; font-size: 12px; color: var(--text3); }
-
-  /* ── Tab navigation ── */
-  .tab-bar {
-    background: var(--bg2);
-    border-bottom: 1px solid var(--border);
-    padding: 0 32px;
-    display: flex; gap: 0; overflow-x: auto;
-    position: sticky; top: 60px; z-index: 100;
+  .header-sep { color: var(--text3); margin: 0 10px; font-size: 18px; font-weight: 200; }
+  .header-sub { font-size: 13px; color: var(--text2); }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .exam-badge {
+    font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px;
+    background: rgba(124,58,237,0.2); border: 1px solid var(--accent);
+    color: var(--accent2); white-space: nowrap;
   }
-  .tab-btn {
-    padding: 14px 22px; font-size: 14px; font-weight: 500;
-    color: var(--text2); background: none; border: none;
-    border-bottom: 2px solid transparent; cursor: pointer;
-    white-space: nowrap; transition: all 0.15s;
+  .header-date { font-size: 12px; color: var(--text3); white-space: nowrap; }
+
+  /* ── Layout ── */
+  .layout {
+    display: flex;
+    padding-top: var(--header-h);
+    min-height: 100vh;
   }
-  .tab-btn:hover { color: var(--text); }
-  .tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent); }
 
-  /* ── Tab content ── */
-  .tab-content { display: none; max-width: 960px; margin: 0 auto; padding: 36px 32px; }
-  .tab-content.active { display: block; }
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    flex-shrink: 0;
+    position: fixed;
+    top: var(--header-h);
+    left: 0;
+    bottom: 0;
+    overflow-y: auto;
+    background: #0a0f1e;
+    border-right: 1px solid var(--border);
+    padding: 16px 0 40px;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  /* ── Study Guide / Quiz markdown rendering ── */
-  .md-body h1 { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
-  .md-body h2 {
-    font-size: 20px; font-weight: 700; color: #c8a2f8;
+  .nav-group { margin-bottom: 4px; }
+  .nav-group-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+    color: var(--text3); text-transform: uppercase;
+    padding: 12px 18px 6px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 18px; font-size: 13px; color: var(--text2);
+    cursor: pointer; border-left: 2px solid transparent;
+    transition: all 0.15s; border-right: none;
+    text-decoration: none; user-select: none;
+  }
+  .nav-item:hover { color: var(--text); background: rgba(124,58,237,0.06); text-decoration: none; }
+  .nav-item.active {
+    color: var(--accent2); background: rgba(124,58,237,0.12);
+    border-left-color: var(--accent); font-weight: 500;
+  }
+  .nav-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .nav-pct {
+    margin-left: auto; font-size: 10px; font-weight: 600;
+    padding: 1px 6px; border-radius: 8px;
+    background: rgba(255,255,255,0.06); color: var(--text3);
+  }
+  .nav-item.active .nav-pct { color: var(--accent2); background: rgba(124,58,237,0.2); }
+
+  /* ── Main content ── */
+  .main-content {
+    flex: 1;
+    margin-left: var(--sidebar-w);
+    min-width: 0;
+  }
+  .section { display: none; max-width: 860px; margin: 0 auto; padding: 40px 36px 80px; }
+  .section.active { display: block; }
+
+  /* ── Typography ── */
+  .page-title {
+    font-size: 28px; font-weight: 800; color: var(--text);
+    margin-bottom: 8px; letter-spacing: -0.5px;
+  }
+  .page-subtitle { font-size: 15px; color: var(--text2); margin-bottom: 32px; }
+  .section-heading {
+    font-size: 19px; font-weight: 700; color: #c8a2f8;
     border-left: 3px solid var(--accent); padding-left: 12px;
     margin: 36px 0 16px;
   }
-  .md-body h3 {
-    font-size: 16px; font-weight: 600; color: var(--text);
-    margin: 24px 0 10px; padding-top: 4px;
+  .section-heading:first-of-type { margin-top: 0; }
+  .sub-heading {
+    font-size: 15px; font-weight: 600; color: var(--text);
+    margin: 20px 0 8px;
   }
-  .md-body p { color: var(--text); margin-bottom: 14px; }
-  .md-body em { color: var(--text2); }
-  .md-body strong { color: var(--text); }
-  .md-body hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
-  .md-body ul, .md-body ol { padding-left: 22px; margin-bottom: 14px; }
-  .md-body li { color: var(--text); margin-bottom: 4px; }
-  .md-body code {
-    background: var(--code-bg); color: #7dd3fc;
-    padding: 2px 6px; border-radius: 4px; font-size: 13px;
-    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-  }
-  .md-body pre {
-    background: var(--code-bg); border: 1px solid var(--border);
-    border-radius: 8px; padding: 16px; overflow-x: auto; margin-bottom: 16px;
-  }
-  .md-body pre code { background: none; padding: 0; color: #e2e8f0; }
-  .md-body table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 14px; }
-  .md-body th { background: var(--bg2); color: var(--accent2); padding: 8px 12px;
-                text-align: left; border: 1px solid var(--border); }
-  .md-body td { padding: 8px 12px; border: 1px solid var(--border); color: var(--text); }
-  .md-body tr:nth-child(even) td { background: var(--bg3); }
-  .md-body blockquote {
-    border-left: 3px solid var(--accent); padding: 8px 16px;
-    background: var(--bg2); border-radius: 0 6px 6px 0; margin-bottom: 14px;
+  p { color: var(--text); margin-bottom: 12px; }
+  ul, ol { padding-left: 20px; margin-bottom: 12px; }
+  li { color: var(--text); margin-bottom: 4px; }
+  strong { color: var(--text); }
+  em { color: var(--text2); }
+  code {
+    background: var(--bg4); color: #7dd3fc;
+    padding: 1px 6px; border-radius: 4px; font-size: 12.5px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
   }
 
-  /* ── Quiz ── */
-  .md-body li.correct {
-    background: rgba(16, 185, 129, 0.12);
-    border-left: 2px solid var(--green);
-    padding: 4px 10px; border-radius: 4px; list-style: none;
-    color: #6ee7b7; font-weight: 500;
-  }
-  .md-body li.incorrect { color: var(--text2); }
-  .md-body li.correct::before { content: ''; }
-
-  /* ── Videos tab ── */
-  .video-speed-bar {
-    display: flex; align-items: center; gap: 10px;
+  /* ── Info / callout cards ── */
+  .info-card {
     background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 10px; padding: 10px 16px;
-    margin-bottom: 28px; flex-wrap: wrap;
+    border-radius: 10px; padding: 18px 20px; margin-bottom: 16px;
   }
-  .speed-label { font-size: 13px; color: var(--text2); }
-  .speed-btn {
+  .info-card.highlight {
+    border-color: var(--accent); background: rgba(124,58,237,0.08);
+  }
+  .info-card.warn {
+    border-color: var(--amber); background: rgba(245,158,11,0.08);
+  }
+  .info-card.success {
+    border-color: var(--green); background: rgba(16,185,129,0.08);
+  }
+  .info-card-title {
+    font-size: 13px; font-weight: 700; color: var(--accent2);
+    margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+  }
+  .info-card.warn .info-card-title { color: var(--amber); }
+  .info-card.success .info-card-title { color: var(--green); }
+
+  /* ── Exam stats grid ── */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px; margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; text-align: center;
+  }
+  .stat-value { font-size: 26px; font-weight: 800; color: var(--accent2); }
+  .stat-label { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+  /* ── Domain bar chart ── */
+  .domain-bars { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+  .domain-bar-row { display: flex; align-items: center; gap: 10px; }
+  .domain-bar-label { font-size: 12px; color: var(--text2); width: 220px; flex-shrink: 0; }
+  .domain-bar-track {
+    flex: 1; height: 10px; background: var(--bg2); border-radius: 5px; overflow: hidden;
+  }
+  .domain-bar-fill { height: 100%; border-radius: 5px; }
+  .domain-bar-pct { font-size: 12px; font-weight: 700; width: 34px; text-align: right; }
+
+  /* ── Study Plan table ── */
+  .plan-table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-bottom: 20px; }
+  .plan-table th {
+    background: var(--bg2); color: var(--accent2); padding: 9px 12px;
+    text-align: left; border: 1px solid var(--border); font-size: 12px;
+    font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .plan-table td { padding: 9px 12px; border: 1px solid var(--border); color: var(--text); vertical-align: top; }
+  .plan-table tr:nth-child(even) td { background: var(--bg3); }
+
+  /* ── Priority badges ── */
+  .pri { display: inline-flex; align-items: center; gap: 4px; font-size: 11px;
+         font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+  .pri-must   { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+  .pri-imp    { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+  .pri-skim   { background: rgba(16,185,129,0.12); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
+  .pri-skip   { background: rgba(100,116,139,0.15); color: var(--text3); border: 1px solid var(--border); }
+
+  /* ── Domain section page ── */
+  .domain-header {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 20px; border-radius: 12px; margin-bottom: 28px;
+    border: 1px solid var(--border);
+  }
+  .domain-pct-circle {
+    width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 800; color: #fff;
+  }
+  .domain-header-text h2 { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .domain-header-text p { font-size: 13px; color: var(--text2); margin: 0; }
+  .domain-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+  .domain-tag {
+    font-size: 11px; padding: 2px 8px; border-radius: 8px;
     background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
-    padding: 4px 12px; border-radius: 20px; cursor: pointer;
-    font-size: 12px; transition: all 0.15s;
   }
-  .speed-btn:hover { background: #2a3a55; color: var(--text); }
-  .speed-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
-  .video-total { margin-left: auto; font-size: 12px; color: var(--text3); }
-  .chapter-section { margin-bottom: 36px; }
-  .chapter-title {
-    font-size: 17px; font-weight: 700; color: #c8a2f8;
-    border-left: 3px solid var(--accent); padding-left: 12px;
-    margin-bottom: 14px;
-  }
-  .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
-  .video-card {
-    background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 10px; overflow: hidden;
-  }
-  .video-title {
-    padding: 9px 13px; font-size: 13px; font-weight: 500; color: var(--text2);
-    background: var(--bg3); border-bottom: 1px solid var(--border);
-  }
-  .yt-wrap { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
-  .yt-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 
-  /* ── Notebooks tab ── */
-  .nb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 32px; }
-  .nb-card {
+  /* ── Topic cards ── */
+  .topic-card {
     background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px;
-    transition: border-color 0.15s;
+    border-radius: 10px; padding: 18px 20px; margin-bottom: 14px;
   }
-  .nb-card:hover { border-color: var(--accent); }
-  .nb-name { font-size: 13px; font-weight: 600; color: var(--text); word-break: break-all; }
-  .nb-links { display: flex; gap: 8px; flex-wrap: wrap; }
-  .nb-link {
-    font-size: 11px; padding: 3px 10px; border-radius: 12px;
-    border: 1px solid var(--border); color: var(--text2);
-    background: var(--bg3); transition: all 0.15s;
+  .topic-title {
+    font-size: 14px; font-weight: 700; color: var(--text);
+    margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
   }
-  .nb-link:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
-  .nb-link.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .nb-link.primary:hover { background: var(--accent2); }
-  .section-note {
-    background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 14px 18px; font-size: 13px; color: var(--text2);
-    margin-bottom: 24px;
+  .topic-num {
+    width: 22px; height: 22px; border-radius: 50%; background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; color: #fff; flex-shrink: 0;
   }
-  .section-title { font-size: 16px; font-weight: 700; color: var(--text); margin: 24px 0 12px; }
-  .file-list { display: flex; flex-direction: column; gap: 8px; }
-  .file-row {
-    display: flex; align-items: center; gap: 12px;
-    background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 10px 14px;
-  }
-  .file-icon { font-size: 18px; }
-  .file-name { font-size: 13px; color: var(--text); flex: 1; }
-  .file-link { font-size: 12px; color: var(--accent2); }
+  .topic-card ul { margin: 0; padding-left: 18px; }
+  .topic-card li { font-size: 13.5px; color: var(--text); margin-bottom: 5px; }
+  .topic-card li strong { color: #c8a2f8; }
 
-  /* ── Index page cards ── */
-  .index-hero { padding: 60px 32px 40px; text-align: center; }
-  .index-hero h1 { font-size: 36px; font-weight: 800; color: var(--text); margin-bottom: 12px; }
-  .index-hero p { font-size: 16px; color: var(--text2); max-width: 520px; margin: 0 auto; }
-  .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-                  gap: 20px; max-width: 1200px; margin: 0 auto; padding: 0 32px 60px; }
+  /* ── Key term pills ── */
+  .key-terms { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .key-term {
+    font-size: 11.5px; padding: 3px 10px; border-radius: 12px;
+    background: var(--bg4); border: 1px solid var(--border);
+    color: #7dd3fc; font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── Course cards ── */
+  .courses-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px; margin-bottom: 32px;
+  }
   .course-card {
     background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 10px;
+    border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px;
     text-decoration: none; transition: all 0.2s; color: inherit;
+    position: relative;
   }
-  .course-card:hover { border-color: var(--accent); transform: translateY(-2px);
-                       box-shadow: 0 8px 24px rgba(124,58,237,0.15); text-decoration: none; }
-  .card-emoji { font-size: 32px; }
-  .card-title { font-size: 16px; font-weight: 700; color: var(--text); }
-  .card-meta { font-size: 12px; color: var(--text3); display: flex; gap: 12px; flex-wrap: wrap; }
-  .card-tag { background: var(--bg3); border: 1px solid var(--border);
-              padding: 2px 8px; border-radius: 10px; color: var(--text2); }
+  .course-card:hover {
+    border-color: var(--accent); transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(124,58,237,0.15); text-decoration: none;
+  }
+  .course-card.skip-course { opacity: 0.45; }
+  .course-card.skip-course:hover { opacity: 0.65; }
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .card-emoji { font-size: 28px; }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--text); }
+  .card-domains { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+  .card-domain-tag {
+    font-size: 10px; padding: 2px 7px; border-radius: 8px;
+    background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3); color: #c4b5fd;
+    font-weight: 600;
+  }
+  .card-meta { font-size: 12px; color: var(--text3); display: flex; gap: 10px; flex-wrap: wrap; }
+  .card-note { font-size: 12px; color: var(--text2); font-style: italic; }
+
+  /* ── Checklist ── */
+  .checklist { list-style: none; padding: 0; margin-bottom: 16px; }
+  .checklist li {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid var(--border);
+    font-size: 13.5px; color: var(--text);
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .check-icon { font-size: 14px; flex-shrink: 0; margin-top: 2px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 720px) {
+    .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+    .sidebar.open { transform: translateX(0); }
+    .main-content { margin-left: 0; }
+    .section { padding: 24px 18px 60px; }
+  }
 </style>
 </head>
 <body>
@@ -212,17 +310,935 @@
     <div class="logo-icon">A</div>
     Anthropic Academy
   </div>
-  <div class="header-meta">9 courses</div>
+  <span class="header-sep">|</span>
+  <span class="header-sub">CCA-F Study Hub</span>
+  <div class="header-right">
+    <span class="exam-badge">Claude Certified Architect – Foundations</span>
+    <span class="header-date">Exam Prep 2026</span>
+  </div>
 </header>
 
-<div class="index-hero">
-  <h1>Course Library</h1>
-  <p>Study guides, quiz prep, video players, and hands-on notebooks — all offline, no login required.</p>
+<div class="layout">
+
+<!-- ══ Sidebar ══ -->
+<nav class="sidebar">
+
+  <div class="nav-group">
+    <div class="nav-group-label">Exam</div>
+    <a class="nav-item active" onclick="show('overview', this)">📋 Overview</a>
+    <a class="nav-item" onclick="show('study-plan', this)">📅 Study Plan</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Study Guide</div>
+    <a class="nav-item" onclick="show('d1', this)">
+      <span class="nav-dot" style="background:#f97316"></span>
+      D1 · Agentic Architecture
+      <span class="nav-pct">27%</span>
+    </a>
+    <a class="nav-item" onclick="show('d2', this)">
+      <span class="nav-dot" style="background:#a855f7"></span>
+      D2 · Tool Design & MCP
+      <span class="nav-pct">18%</span>
+    </a>
+    <a class="nav-item" onclick="show('d3', this)">
+      <span class="nav-dot" style="background:#3b82f6"></span>
+      D3 · Claude Code Config
+      <span class="nav-pct">20%</span>
+    </a>
+    <a class="nav-item" onclick="show('d4', this)">
+      <span class="nav-dot" style="background:#10b981"></span>
+      D4 · Prompt Engineering
+      <span class="nav-pct">20%</span>
+    </a>
+    <a class="nav-item" onclick="show('d5', this)">
+      <span class="nav-dot" style="background:#f59e0b"></span>
+      D5 · Context Management
+      <span class="nav-pct">15%</span>
+    </a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Resources</div>
+    <a class="nav-item" onclick="show('courses', this)">📚 Course Library</a>
+  </div>
+
+</nav>
+
+<!-- ══ Main Content ══ -->
+<main class="main-content">
+
+<!-- ─── Overview ─── -->
+<section id="section-overview" class="section active">
+  <div class="page-title">CCA-F Exam Overview</div>
+  <div class="page-subtitle">Claude Certified Architect – Foundations · Everything you need to pass on your first attempt</div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value">720</div>
+      <div class="stat-label">Pass score (out of 1000)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">$99</div>
+      <div class="stat-label">Exam fee · one attempt</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">5</div>
+      <div class="stat-label">Exam domains</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">4 / 6</div>
+      <div class="stat-label">Scenarios drawn at random</div>
+    </div>
+  </div>
+
+  <div class="info-card warn">
+    <div class="info-card-title">⚠ One Attempt Only</div>
+    The exam costs $99 and allows a single attempt. Target scoring <strong>900+</strong> on practice exams before registering. Refunds are not offered.
+  </div>
+
+  <div class="section-heading">Exam Domain Weights</div>
+
+  <div class="domain-bars">
+    <div class="domain-bar-row">
+      <div class="domain-bar-label">D1 · Agentic Architecture & Orchestration</div>
+      <div class="domain-bar-track"><div class="domain-bar-fill" style="width:27%;background:#f97316"></div></div>
+      <div class="domain-bar-pct" style="color:#f97316">27%</div>
+    </div>
+    <div class="domain-bar-row">
+      <div class="domain-bar-label">D3 · Claude Code Configuration</div>
+      <div class="domain-bar-track"><div class="domain-bar-fill" style="width:20%;background:#3b82f6"></div></div>
+      <div class="domain-bar-pct" style="color:#3b82f6">20%</div>
+    </div>
+    <div class="domain-bar-row">
+      <div class="domain-bar-label">D4 · Prompt Engineering & Structured Output</div>
+      <div class="domain-bar-track"><div class="domain-bar-fill" style="width:20%;background:#10b981"></div></div>
+      <div class="domain-bar-pct" style="color:#10b981">20%</div>
+    </div>
+    <div class="domain-bar-row">
+      <div class="domain-bar-label">D2 · Tool Design & MCP Integration</div>
+      <div class="domain-bar-track"><div class="domain-bar-fill" style="width:18%;background:#a855f7"></div></div>
+      <div class="domain-bar-pct" style="color:#a855f7">18%</div>
+    </div>
+    <div class="domain-bar-row">
+      <div class="domain-bar-label">D5 · Context Management & Reliability</div>
+      <div class="domain-bar-track"><div class="domain-bar-fill" style="width:15%;background:#f59e0b"></div></div>
+      <div class="domain-bar-pct" style="color:#f59e0b">15%</div>
+    </div>
+  </div>
+
+  <div class="section-heading">Preparation Checklist</div>
+  <ul class="checklist">
+    <li><span class="check-icon">📖</span>Complete all 🔴 Must-study courses: <em>Claude Code in Action</em>, <em>Building with the Claude API</em>, <em>MCP Advanced Topics</em></li>
+    <li><span class="check-icon">📖</span>Review foundation courses: <em>Introduction to MCP</em> and <em>Claude Code 101</em></li>
+    <li><span class="check-icon">🔍</span>Read the sample questions (exam guide p.26) and prep exercises (p.33)</li>
+    <li><span class="check-icon">📝</span>Review the in-scope topics list (p.38) and out-of-scope list (p.39)</li>
+    <li><span class="check-icon">🧪</span>Take the practice exam — score <strong>900+ / 1000</strong> before booking</li>
+    <li><span class="check-icon">🔬</span>Study the tech appendix (p.37) for exact API schemas and parameter names</li>
+    <li><span class="check-icon">💻</span>Run through hands-on exercises in the Bedrock/Vertex notebooks (prompt eng sections only)</li>
+    <li><span class="check-icon">✅</span>Book exam only after sustained 900+ scores on practice runs</li>
+  </ul>
+
+  <div class="section-heading">Quick Reference Links</div>
+  <div class="info-card">
+    <div class="info-card-title">📄 Official Exam Materials</div>
+    <ul>
+      <li><a href="https://sharehub.zorro.hk/attachments/pdfs/cca-f-exam-guide.pdf" target="_blank">CCA-F Exam Guide PDF</a> — sample questions p.26, prep exercises p.33, tech appendix p.37</li>
+      <li><a href="https://sharehub.zorro.hk/cca-f-study-guide.html" target="_blank">Interactive CCA-F Study Guide</a> — all 5 domains with expandable topics</li>
+      <li><a href="https://zorrocheng-mc.github.io/skilljar/" target="_blank">GitHub Pages — this site</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ─── Study Plan ─── -->
+<section id="section-study-plan" class="section">
+  <div class="page-title">Study Plan</div>
+  <div class="page-subtitle">Allocate study time by exam domain weight — focus hardest on D1 (27%) and D3+D4 (20% each)</div>
+
+  <div class="info-card highlight">
+    <div class="info-card-title">📌 Strategy</div>
+    <p style="margin:0;font-size:13.5px">Start with the <strong>🔴 Must</strong> courses in priority order. Each course covers 1–2 exam domains directly. Skip ⚪ courses entirely — they are below exam level or outside scope.</p>
+  </div>
+
+  <div class="section-heading">Course Priority & Domain Coverage</div>
+  <table class="plan-table">
+    <thead>
+      <tr>
+        <th>Priority</th>
+        <th>Course</th>
+        <th>Domains</th>
+        <th>Est. Time</th>
+        <th>Focus Note</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="pri pri-must">🔴 Must</span></td>
+        <td><a href="claude-code-in-action/index.html">⚡ Claude Code in Action</a></td>
+        <td>D1 · D3</td>
+        <td>~4 hrs</td>
+        <td>Hooks, Agent SDK, custom commands — highest exam weight</td>
+      </tr>
+      <tr>
+        <td><span class="pri pri-must">🔴 Must</span></td>
+        <td><a href="building-with-claude-api/index.html">🔧 Building with the Claude API</a></td>
+        <td>D4 · D5</td>
+        <td>~5 hrs</td>
+        <td>Prompt eng, tool use, structured output, context windows</td>
+      </tr>
+      <tr>
+        <td><span class="pri pri-must">🔴 Must</span></td>
+        <td><a href="mcp-advanced/index.html">🚀 MCP Advanced Topics</a></td>
+        <td>D2</td>
+        <td>~2 hrs</td>
+        <td>Tool descriptions, error patterns, tool_choice — entire D2</td>
+      </tr>
+      <tr>
+        <td><span class="pri pri-imp">🟡 Important</span></td>
+        <td><a href="intro-to-mcp/index.html">🔌 Introduction to MCP</a></td>
+        <td>D2</td>
+        <td>~1.5 hrs</td>
+        <td>Foundation before MCP Advanced; MCP server config</td>
+      </tr>
+      <tr>
+        <td><span class="pri pri-imp">🟡 Important</span></td>
+        <td><a href="claude-code-101/index.html">💻 Claude Code 101</a></td>
+        <td>D3</td>
+        <td>~1.5 hrs</td>
+        <td>Foundation before Claude Code in Action; CLAUDE.md basics</td>
+      </tr>
+      <tr>
+        <td><span class="pri pri-skim">🟢 Skim</span></td>
+        <td><a href="claude-bedrock/index.html">☁️ Claude with Amazon Bedrock</a></td>
+        <td>D4</td>
+        <td>~1 hr</td>
+        <td>Prompt eng &amp; tool use sections only — skip AWS infra chapters</td>
+      </tr>
+      <tr>
+        <td><span class="pri pri-skim">🟢 Skim</span></td>
+        <td><a href="claude-vertex/index.html">🌐 Claude with Google Vertex AI</a></td>
+        <td>D4</td>
+        <td>~1 hr</td>
+        <td>Prompt eng &amp; RAG sections only — skip GCP infra chapters</td>
+      </tr>
+      <tr>
+        <td><span class="pri pri-skip">⚪ Skip</span></td>
+        <td><a href="claude-101/index.html">🎓 Claude 101</a></td>
+        <td>—</td>
+        <td>—</td>
+        <td>Below exam level — no exam-testable content</td>
+      </tr>
+      <tr>
+        <td><span class="pri pri-skip">⚪ Skip</span></td>
+        <td><a href="claude-cowork/index.html">🤝 Introduction to Claude Cowork</a></td>
+        <td>—</td>
+        <td>—</td>
+        <td>Not in any exam domain</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-heading">Time Allocation by Domain</div>
+  <table class="plan-table">
+    <thead>
+      <tr>
+        <th>Domain</th>
+        <th>Weight</th>
+        <th>Recommended Time</th>
+        <th>Primary Course(s)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span style="color:#f97316;font-weight:700">D1</span> Agentic Architecture & Orchestration</td>
+        <td style="font-weight:700;color:#f97316">27%</td>
+        <td>~4 hrs</td>
+        <td>Claude Code in Action</td>
+      </tr>
+      <tr>
+        <td><span style="color:#3b82f6;font-weight:700">D3</span> Claude Code Configuration & Workflows</td>
+        <td style="font-weight:700;color:#3b82f6">20%</td>
+        <td>~3 hrs</td>
+        <td>Claude Code in Action + Claude Code 101</td>
+      </tr>
+      <tr>
+        <td><span style="color:#10b981;font-weight:700">D4</span> Prompt Engineering & Structured Output</td>
+        <td style="font-weight:700;color:#10b981">20%</td>
+        <td>~3 hrs</td>
+        <td>Building with the Claude API</td>
+      </tr>
+      <tr>
+        <td><span style="color:#a855f7;font-weight:700">D2</span> Tool Design & MCP Integration</td>
+        <td style="font-weight:700;color:#a855f7">18%</td>
+        <td>~2.5 hrs</td>
+        <td>MCP Advanced Topics + Intro to MCP</td>
+      </tr>
+      <tr>
+        <td><span style="color:#f59e0b;font-weight:700">D5</span> Context Management & Reliability</td>
+        <td style="font-weight:700;color:#f59e0b">15%</td>
+        <td>~2 hrs</td>
+        <td>Building with the Claude API</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="info-card success">
+    <div class="info-card-title">✅ Known Gap: Agent SDK Multi-Agent Patterns (D1)</div>
+    <p style="margin:0;font-size:13.5px">The Claude Code in Action SDK chapter videos were still processing at scrape time. Watch the SDK lessons directly on Skilljar to fill the Agent SDK multi-agent patterns gap in D1. This is a high-weight domain (27%) so don't skip this.</p>
+  </div>
+</section>
+
+<!-- ─── D1 ─── -->
+<section id="section-d1" class="section">
+  <div class="domain-header" style="background:rgba(249,115,22,0.07);border-color:rgba(249,115,22,0.3)">
+    <div class="domain-pct-circle" style="background:linear-gradient(135deg,#f97316,#ef4444)">27%</div>
+    <div class="domain-header-text">
+      <h2>D1: Agentic Architecture & Orchestration</h2>
+      <p>The highest-weighted domain — understand how agents perceive, reason, and act; multi-agent coordination patterns; and hooks for deterministic control.</p>
+      <div class="domain-tags">
+        <span class="domain-tag">⚡ Claude Code in Action</span>
+        <span class="domain-tag">🔧 Building with Claude API</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-heading">Core Topics</div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">1</span>Agentic Control Flow</div>
+    <ul>
+      <li><strong>The agentic loop:</strong> perception → reasoning → action, repeated until task completion or stop condition</li>
+      <li><strong>Tool calls</strong> are the primary mechanism for taking actions in the environment (file edits, bash commands, web searches)</li>
+      <li>Agents decide <em>when</em> to call tools, <em>which</em> tool to call, and <em>how</em> to use results</li>
+      <li><strong>Stop conditions:</strong> task complete, max iterations reached, confidence below threshold, human review required</li>
+      <li>Understand <strong>computer use</strong> vs. standard structured tools — computer use is for GUI interaction, standard tools for APIs/files</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">agentic loop</span>
+      <span class="key-term">tool_use block</span>
+      <span class="key-term">tool_result</span>
+      <span class="key-term">stop_reason</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">2</span>Multi-Agent Orchestration</div>
+    <ul>
+      <li><strong>Coordinator agent:</strong> receives the high-level task, breaks it into subtasks, delegates to subagents, synthesizes results</li>
+      <li><strong>Subagent:</strong> receives a scoped subtask, executes with its own tool set, returns a structured result</li>
+      <li><strong>Patterns:</strong> fan-out (parallel subagents), sequential chain, hierarchical tree</li>
+      <li>Fan-out enables parallelism but requires the coordinator to merge potentially conflicting results</li>
+      <li>Subagents should have <strong>minimal required permissions</strong> — least-privilege principle</li>
+      <li><strong>Claude SDK:</strong> <code>anthropic.beta.messages.batches</code> for async multi-agent workloads; direct API calls for orchestration</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">coordinator</span>
+      <span class="key-term">subagent</span>
+      <span class="key-term">fan-out</span>
+      <span class="key-term">Agent SDK</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">3</span>Hooks for Deterministic Enforcement</div>
+    <ul>
+      <li><strong>PreToolUse:</strong> runs before any tool call; can block the call or modify parameters; return <code>{"decision":"block","reason":"..."}</code> to deny</li>
+      <li><strong>PostToolUse:</strong> runs after a tool returns; can inspect results; inject additional context into the next turn</li>
+      <li><strong>Stop:</strong> fires when the model signals it wants to stop; use to persist state or trigger cleanup</li>
+      <li><strong>SubagentStop:</strong> fires when a subagent finishes; allows coordinator to collect and process results</li>
+      <li>Hooks receive structured JSON via <strong>stdin</strong>; must return JSON on <strong>stdout</strong></li>
+      <li>Hook scripts run as shell processes — keep them fast (&lt;200ms) to avoid latency</li>
+      <li>Use hooks for: audit logging, cost guardrails, safety filters, enforcing code review gates</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">PreToolUse</span>
+      <span class="key-term">PostToolUse</span>
+      <span class="key-term">Stop</span>
+      <span class="key-term">SubagentStop</span>
+      <span class="key-term">stdin/stdout JSON</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">4</span>Session & Memory Management</div>
+    <ul>
+      <li>Sessions are stateless by default — each API call is independent unless you pass prior messages</li>
+      <li><strong>In-context memory:</strong> include conversation history in the messages array (limited by context window)</li>
+      <li><strong>External memory:</strong> write summaries to files or databases; load relevant facts at session start</li>
+      <li><strong>Session files:</strong> write task state to disk at each turn so progress survives restarts</li>
+      <li>Use the <strong>system prompt</strong> to inject persistent facts, user preferences, and project context</li>
+      <li><strong>Rolling summary:</strong> compress old turns into a summary block to stay within context limits</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">messages[]</span>
+      <span class="key-term">system prompt</span>
+      <span class="key-term">session files</span>
+      <span class="key-term">rolling summary</span>
+    </div>
+  </div>
+
+  <div class="info-card warn">
+    <div class="info-card-title">⚠ Study Gap — Agent SDK Lessons</div>
+    The SDK & Wrap Up chapter in <em>Claude Code in Action</em> covers multi-agent patterns directly testable in D1. Those videos were still processing at scrape time — watch them directly on Skilljar to fill this gap.
+  </div>
+</section>
+
+<!-- ─── D2 ─── -->
+<section id="section-d2" class="section">
+  <div class="domain-header" style="background:rgba(168,85,247,0.07);border-color:rgba(168,85,247,0.3)">
+    <div class="domain-pct-circle" style="background:linear-gradient(135deg,#a855f7,#7c3aed)">18%</div>
+    <div class="domain-header-text">
+      <h2>D2: Tool Design & MCP Integration</h2>
+      <p>Writing effective tool definitions, structured error handling, tool_choice control, and configuring MCP servers in Claude Code.</p>
+      <div class="domain-tags">
+        <span class="domain-tag">🚀 MCP Advanced Topics</span>
+        <span class="domain-tag">🔌 Introduction to MCP</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-heading">Core Topics</div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">1</span>Writing Effective Tool Descriptions</div>
+    <ul>
+      <li>The <strong>description field</strong> is the most important part of a tool definition — Claude reads it to decide when to call the tool</li>
+      <li>Be specific: state the purpose, what inputs are required, what the tool returns, and <em>when not to use it</em></li>
+      <li>Include examples of ideal inputs in the description when the format is non-obvious</li>
+      <li>Match description length to tool complexity — simple tools need short descriptions; complex tools need more detail</li>
+      <li>Parameter descriptions should specify valid ranges, formats, and constraints</li>
+      <li>Avoid vague descriptions like "does X stuff" — be precise about behavior and side effects</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">name</span>
+      <span class="key-term">description</span>
+      <span class="key-term">input_schema</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">2</span>Structured Error Responses</div>
+    <ul>
+      <li>Return errors as <strong>structured tool results</strong>, not Python exceptions — use <code>isError: true</code> in the tool_result block</li>
+      <li>Include an <strong>error code</strong> (machine-readable) and a <strong>human-readable message</strong> in every error response</li>
+      <li>Provide <strong>actionable guidance</strong> — tell the model what to do next, not just what went wrong</li>
+      <li>Distinguish error types: validation errors, auth errors, rate limits, transient failures</li>
+      <li>For transient errors, include a <code>retry_after</code> hint so the model knows when to retry</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">isError: true</span>
+      <span class="key-term">tool_result</span>
+      <span class="key-term">error_code</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">3</span>Tool Distribution & tool_choice</div>
+    <ul>
+      <li><code>tool_choice: "auto"</code> — default; model decides whether to use a tool</li>
+      <li><code>tool_choice: "any"</code> — model must use at least one tool (prevents pure-text responses)</li>
+      <li><code>tool_choice: {"type":"tool","name":"..."}</code> — forces a specific tool call (useful for structured output)</li>
+      <li>Limit the <strong>number of tools exposed</strong> to what the model actually needs — too many tools increase cost and confusion</li>
+      <li>Group related tools; remove or gate tools not relevant to the current task</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">tool_choice</span>
+      <span class="key-term">"auto"</span>
+      <span class="key-term">"any"</span>
+      <span class="key-term">"tool"</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">4</span>MCP Server Configuration</div>
+    <ul>
+      <li>MCP servers are configured in <code>claude_desktop_config.json</code> (desktop) or <code>.claude/settings.json</code> (project)</li>
+      <li><strong>Transport types:</strong> <code>stdio</code> (subprocess, recommended for local servers) vs. <code>SSE</code> (HTTP, for remote servers)</li>
+      <li>Each server defines its own tools — Claude sees them alongside built-in tools</li>
+      <li>Servers can expose <strong>resources</strong> (read-only data) and <strong>prompts</strong> (reusable templates) in addition to tools</li>
+      <li>Auth: pass credentials via environment variables in the server config; never hardcode in config files</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">claude_desktop_config.json</span>
+      <span class="key-term">stdio</span>
+      <span class="key-term">SSE</span>
+      <span class="key-term">resources</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">5</span>Built-in Claude Code Tools</div>
+    <ul>
+      <li><strong>Read:</strong> reads a file by absolute path; returns line-numbered content</li>
+      <li><strong>Write:</strong> creates or overwrites a file; always read first before overwriting</li>
+      <li><strong>Edit / MultiEdit:</strong> performs exact string replacements; safer than Write for partial changes</li>
+      <li><strong>Bash:</strong> runs shell commands; use for git, npm, grep, and other CLI operations</li>
+      <li><strong>Glob:</strong> finds files matching a pattern; returns matching paths</li>
+      <li><strong>Grep:</strong> searches file contents for a pattern; returns matching lines with context</li>
+      <li>Know which tool to prefer: Read &gt; cat, Edit &gt; sed, Grep &gt; manual search</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">Read</span>
+      <span class="key-term">Write</span>
+      <span class="key-term">Edit</span>
+      <span class="key-term">Bash</span>
+      <span class="key-term">Glob</span>
+      <span class="key-term">Grep</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── D3 ─── -->
+<section id="section-d3" class="section">
+  <div class="domain-header" style="background:rgba(59,130,246,0.07);border-color:rgba(59,130,246,0.3)">
+    <div class="domain-pct-circle" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">20%</div>
+    <div class="domain-header-text">
+      <h2>D3: Claude Code Configuration & Workflows</h2>
+      <p>Mastering CLAUDE.md hierarchy, custom commands, plan mode, permission management, and CI/CD integration.</p>
+      <div class="domain-tags">
+        <span class="domain-tag">⚡ Claude Code in Action</span>
+        <span class="domain-tag">💻 Claude Code 101</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-heading">Core Topics</div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">1</span>CLAUDE.md Hierarchy</div>
+    <ul>
+      <li><strong>Global:</strong> <code>~/.claude/CLAUDE.md</code> — applies to all projects on the machine</li>
+      <li><strong>Project root:</strong> <code>.claude/CLAUDE.md</code> or <code>CLAUDE.md</code> in the repo root — applies to the whole project</li>
+      <li><strong>Directory-level:</strong> <code>CLAUDE.md</code> in any subdirectory — applies only when working in that subtree</li>
+      <li>More specific (deeper) files take precedence and can <strong>override or extend</strong> parent instructions</li>
+      <li>Use CLAUDE.md for: coding standards, preferred libraries, forbidden patterns, project context, tool restrictions</li>
+      <li>Instructions in CLAUDE.md are injected into the system prompt at session start</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">~/.claude/CLAUDE.md</span>
+      <span class="key-term">.claude/CLAUDE.md</span>
+      <span class="key-term">directory CLAUDE.md</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">2</span>Path-Specific Glob Rules</div>
+    <ul>
+      <li>Use <strong>glob-pattern section headers</strong> in CLAUDE.md to scope instructions to specific files</li>
+      <li>Example: <code>[*.test.ts]</code> section applies only when editing TypeScript test files</li>
+      <li>Useful for: test-file conventions, migration file rules, auto-generated file warnings</li>
+      <li>Glob patterns follow standard shell glob syntax; <code>**</code> matches any depth</li>
+      <li>Multiple sections can match — all matching sections apply (most specific wins on conflicts)</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">[*.test.ts]</span>
+      <span class="key-term">glob patterns</span>
+      <span class="key-term">**</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">3</span>Custom Slash Commands & Skills</div>
+    <ul>
+      <li>Create <code>.claude/commands/</code> directory; each <code>.md</code> file becomes a <code>/commandname</code> slash command</li>
+      <li>Commands are Markdown files — they can contain instructions, templates, checklists</li>
+      <li>Use <code>$ARGUMENTS</code> placeholder to accept user-provided arguments in commands</li>
+      <li><strong>Skills</strong> are more powerful commands that can invoke the full Claude Code tool loop</li>
+      <li>Commands are local to the project; share via version control for team consistency</li>
+      <li>Examples: <code>/review</code> for PR review checklist, <code>/test</code> to run test suites, <code>/deploy</code> to run a deploy sequence</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">.claude/commands/</span>
+      <span class="key-term">$ARGUMENTS</span>
+      <span class="key-term">/commandname</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">4</span>Plan Mode vs Direct Execution</div>
+    <ul>
+      <li><strong>Plan mode:</strong> Claude presents a step-by-step plan before executing any actions; user can approve, edit, or reject</li>
+      <li>Toggle plan mode: <code>Shift+Tab</code> in the REPL, or use <code>/plan</code> slash command</li>
+      <li>Use plan mode for: complex multi-step tasks, destructive operations, unclear requirements</li>
+      <li><strong>Direct execution:</strong> Claude acts immediately without a planning step — faster for simple tasks</li>
+      <li>In plan mode, Claude cannot make tool calls until the plan is approved — a safety guardrail</li>
+      <li>The <code>--dangerously-skip-permissions</code> flag bypasses all permission prompts — only for CI/CD automation</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">plan mode</span>
+      <span class="key-term">Shift+Tab</span>
+      <span class="key-term">/plan</span>
+      <span class="key-term">--print</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">5</span>Claude Code in CI/CD Pipelines</div>
+    <ul>
+      <li>Use <strong>non-interactive mode:</strong> <code>claude --print "task description"</code> — outputs result to stdout and exits</li>
+      <li>Set <code>ANTHROPIC_API_KEY</code> environment variable; never hardcode credentials</li>
+      <li>Use <code>--allowedTools</code> to restrict which tools CI can invoke — principle of least privilege</li>
+      <li>Use <code>--dangerously-skip-permissions</code> in fully automated CI pipelines where no human can approve prompts</li>
+      <li>Pipe task descriptions from files: <code>claude --print "$(cat task.txt)"</code></li>
+      <li>Exit codes: 0 = success, non-zero = error; parse stdout for structured results</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">--print</span>
+      <span class="key-term">ANTHROPIC_API_KEY</span>
+      <span class="key-term">--allowedTools</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── D4 ─── -->
+<section id="section-d4" class="section">
+  <div class="domain-header" style="background:rgba(16,185,129,0.07);border-color:rgba(16,185,129,0.3)">
+    <div class="domain-pct-circle" style="background:linear-gradient(135deg,#10b981,#059669)">20%</div>
+    <div class="domain-header-text">
+      <h2>D4: Prompt Engineering & Structured Output</h2>
+      <p>Forcing structured output via tools, few-shot examples, validation-retry loops, and the Message Batches API.</p>
+      <div class="domain-tags">
+        <span class="domain-tag">🔧 Building with the Claude API</span>
+        <span class="domain-tag">☁️ Bedrock (prompt eng sections)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-heading">Core Topics</div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">1</span>Structured Output via tool_use</div>
+    <ul>
+      <li>Force structured JSON output by defining a <strong>tool with a JSON schema</strong> and setting <code>tool_choice</code> to that tool</li>
+      <li>The model must respond with a valid <code>tool_use</code> block matching the schema — not a free-text response</li>
+      <li>JSON schema supports: required fields, enum values, nested objects, arrays, descriptions per field</li>
+      <li>Use <code>additionalProperties: false</code> to prevent the model from adding extra fields</li>
+      <li>Validate the output against your schema programmatically and retry with feedback if it fails</li>
+      <li>Alternative: ask for JSON in the prompt with <code>"Respond with valid JSON only"</code> — less reliable but simpler</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">tool_use</span>
+      <span class="key-term">input_schema</span>
+      <span class="key-term">tool_choice</span>
+      <span class="key-term">additionalProperties</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">2</span>Few-Shot Prompting</div>
+    <ul>
+      <li>Provide <strong>input/output example pairs</strong> in the prompt to demonstrate desired format and style</li>
+      <li>Include <strong>diverse examples</strong> covering edge cases — don't just show the happy path</li>
+      <li>Format consistently: use a clear delimiter between examples (e.g., <code>---</code> or XML-like tags)</li>
+      <li>Few-shot examples work best when the task has a clear pattern that can be demonstrated</li>
+      <li>For complex tasks, 3–5 examples often saturate gains; more rarely helps significantly</li>
+      <li>Interleave examples in <code>user</code>/<code>assistant</code> message turns for conversational tasks</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">few-shot</span>
+      <span class="key-term">in-context examples</span>
+      <span class="key-term">input/output pairs</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">3</span>Explicit Criteria & Rubrics</div>
+    <ul>
+      <li>Define <strong>clear acceptance criteria</strong> in the system prompt — what makes a good output vs. a bad one</li>
+      <li>Use <strong>checklists and rubrics</strong> so the model can self-evaluate before responding</li>
+      <li>Specify format, length, tone, level of detail, and structure explicitly</li>
+      <li>For classification tasks, enumerate all valid labels and their definitions</li>
+      <li>Ask the model to <strong>explain its reasoning</strong> (chain-of-thought) for tasks where traceability matters</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">acceptance criteria</span>
+      <span class="key-term">rubric</span>
+      <span class="key-term">chain-of-thought</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">4</span>Validation-Retry Loops</div>
+    <ul>
+      <li>Check model output against <strong>programmatic criteria</strong> (schema validation, regex, business rules)</li>
+      <li>If validation fails, send a new message with <strong>specific feedback</strong>: what was wrong and what to fix</li>
+      <li>Include the failed output in the feedback so the model can see exactly what it produced</li>
+      <li>Cap retries at <strong>3–5 attempts</strong> to avoid infinite loops; log failures for monitoring</li>
+      <li>For structured output: re-inject the JSON schema in the retry message as a reminder</li>
+      <li>Track retry counts — high retry rates signal prompt quality issues to investigate</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">retry loop</span>
+      <span class="key-term">validation feedback</span>
+      <span class="key-term">max_retries</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">5</span>Message Batches API</div>
+    <ul>
+      <li>Process up to <strong>10,000 requests asynchronously</strong> in a single batch — ideal for bulk operations</li>
+      <li>Batches are <strong>50% cheaper</strong> than real-time API calls — use for non-time-sensitive workloads</li>
+      <li>Submit a batch, get a <code>batch_id</code>, then poll <code>/v1/messages/batches/{id}</code> for completion</li>
+      <li>Each request in the batch can have different models, prompts, and parameters</li>
+      <li>Results are returned as a JSONL file once the batch completes (can take minutes to hours)</li>
+      <li>Use for: dataset labeling, bulk content generation, offline evaluation pipelines</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">batches API</span>
+      <span class="key-term">batch_id</span>
+      <span class="key-term">JSONL results</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── D5 ─── -->
+<section id="section-d5" class="section">
+  <div class="domain-header" style="background:rgba(245,158,11,0.07);border-color:rgba(245,158,11,0.3)">
+    <div class="domain-pct-circle" style="background:linear-gradient(135deg,#f59e0b,#d97706)">15%</div>
+    <div class="domain-header-text">
+      <h2>D5: Context Management & Reliability</h2>
+      <p>Preserving critical information across long sessions, escalation decisions, error propagation in multi-agent systems, and human review patterns.</p>
+      <div class="domain-tags">
+        <span class="domain-tag">🔧 Building with the Claude API</span>
+        <span class="domain-tag">⚡ Claude Code in Action</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-heading">Core Topics</div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">1</span>Preserving Critical Info Across Long Sessions</div>
+    <ul>
+      <li>Claude's <strong>context window is finite</strong> — long sessions degrade if important info scrolls out of range</li>
+      <li>Explicitly <strong>summarize key decisions</strong> at the end of each major task phase: "Summary: we decided X because Y"</li>
+      <li>Load critical facts into the <strong>system prompt</strong> — it's always in context and never truncated</li>
+      <li>Use <strong>external memory</strong> (files, vector databases) for facts that must survive across separate sessions</li>
+      <li><strong>Rolling window:</strong> when approaching context limits, compress old turns into a structured summary and truncate the raw history</li>
+      <li>Prioritize: task state &gt; constraints &gt; history when deciding what to keep in context</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">context window</span>
+      <span class="key-term">system prompt</span>
+      <span class="key-term">rolling summary</span>
+      <span class="key-term">external memory</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">2</span>Escalation Decision-Making</div>
+    <ul>
+      <li>Define <strong>escalation criteria</strong> explicitly in the system prompt — don't rely on the model to infer them</li>
+      <li>Always escalate on: <em>ambiguous destructive actions</em>, <em>conflicting instructions</em>, <em>missing required context</em></li>
+      <li>Use <strong>confidence thresholds</strong> — if the model's confidence in its interpretation is below a threshold, pause and ask</li>
+      <li>Implement <strong>interrupt hooks</strong> (Stop hook) to create human review checkpoints in automated pipelines</li>
+      <li>Log escalation events with full context so humans can quickly understand why the model stopped</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">escalation criteria</span>
+      <span class="key-term">confidence threshold</span>
+      <span class="key-term">Stop hook</span>
+      <span class="key-term">human-in-the-loop</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">3</span>Error Propagation in Multi-Agent Systems</div>
+    <ul>
+      <li>Errors in subagents must <strong>propagate cleanly</strong> to the coordinator — don't silently swallow failures</li>
+      <li>Use <strong>structured error types</strong> (not plain strings) so coordinators can handle them programmatically</li>
+      <li>Coordinator should decide: <em>retry the subagent</em>, <em>use a fallback</em>, or <em>escalate to human</em></li>
+      <li>Partial failures in fan-out: decide whether to proceed with partial results or abort the whole task</li>
+      <li><strong>Idempotent tool calls</strong> — design tools so retrying them is safe; avoid side effects on failure</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">error propagation</span>
+      <span class="key-term">structured error</span>
+      <span class="key-term">idempotent</span>
+      <span class="key-term">fallback</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">4</span>Human Review & Confidence Calibration</div>
+    <ul>
+      <li>Build <strong>explicit review checkpoints</strong> into long agentic workflows — don't run end-to-end without oversight</li>
+      <li>Ask the model to <strong>output a confidence score</strong> with its answer; flag low-confidence outputs for review</li>
+      <li>Use <strong>PostToolUse hooks</strong> to inspect tool results and inject human approval requests when needed</li>
+      <li>For high-stakes actions (deleting data, sending emails, making purchases), require explicit human confirmation</li>
+      <li>Track <strong>error rates and retry rates</strong> as proxy metrics for reliability — spikes indicate prompt or tool issues</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">review checkpoint</span>
+      <span class="key-term">confidence score</span>
+      <span class="key-term">PostToolUse</span>
+      <span class="key-term">human confirmation</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Courses ─── -->
+<section id="section-courses" class="section">
+  <div class="page-title">Course Library</div>
+  <div class="page-subtitle">9 courses — all content offline, no Skilljar login required. Ordered by exam relevance.</div>
+
+  <div class="section-heading">🔴 Must Study</div>
+  <div class="courses-grid">
+
+    <a class="course-card" href="claude-code-in-action/index.html">
+      <div class="card-top">
+        <div class="card-emoji">⚡</div>
+        <span class="pri pri-must">🔴 Must</span>
+      </div>
+      <div class="card-title">Claude Code in Action</div>
+      <div class="card-domains">
+        <span class="card-domain-tag">D1 Agentic</span>
+        <span class="card-domain-tag">D3 Claude Code</span>
+      </div>
+      <div class="card-meta"><span>🎬 15 videos</span><span>📝 8 questions</span></div>
+      <div class="card-note">Hooks, Agent SDK, custom commands — highest exam weight</div>
+    </a>
+
+    <a class="course-card" href="building-with-claude-api/index.html">
+      <div class="card-top">
+        <div class="card-emoji">🔧</div>
+        <span class="pri pri-must">🔴 Must</span>
+      </div>
+      <div class="card-title">Building with the Claude API</div>
+      <div class="card-domains">
+        <span class="card-domain-tag">D4 Prompt Eng</span>
+        <span class="card-domain-tag">D5 Context</span>
+      </div>
+      <div class="card-meta"><span>🎬 74 videos</span><span>📝 64 questions</span><span>📓 27 notebooks</span></div>
+      <div class="card-note">Tool use, structured output, batches, context management</div>
+    </a>
+
+    <a class="course-card" href="mcp-advanced/index.html">
+      <div class="card-top">
+        <div class="card-emoji">🚀</div>
+        <span class="pri pri-must">🔴 Must</span>
+      </div>
+      <div class="card-title">MCP Advanced Topics</div>
+      <div class="card-domains">
+        <span class="card-domain-tag">D2 Tool & MCP</span>
+      </div>
+      <div class="card-meta"><span>🎬 8 videos</span><span>📝 7 questions</span></div>
+      <div class="card-note">Tool descriptions, error patterns, tool_choice — entire D2</div>
+    </a>
+
+  </div>
+
+  <div class="section-heading">🟡 Important — Foundation</div>
+  <div class="courses-grid">
+
+    <a class="course-card" href="intro-to-mcp/index.html">
+      <div class="card-top">
+        <div class="card-emoji">🔌</div>
+        <span class="pri pri-imp">🟡 Important</span>
+      </div>
+      <div class="card-title">Introduction to MCP</div>
+      <div class="card-domains">
+        <span class="card-domain-tag">D2 Tool & MCP</span>
+      </div>
+      <div class="card-meta"><span>🎬 11 videos</span><span>📝 7 questions</span></div>
+      <div class="card-note">Foundation for MCP Advanced; MCP server config</div>
+    </a>
+
+    <a class="course-card" href="claude-code-101/index.html">
+      <div class="card-top">
+        <div class="card-emoji">💻</div>
+        <span class="pri pri-imp">🟡 Important</span>
+      </div>
+      <div class="card-title">Claude Code 101</div>
+      <div class="card-domains">
+        <span class="card-domain-tag">D3 Claude Code</span>
+      </div>
+      <div class="card-meta"><span>🎬 12 videos</span><span>📝 7 questions</span></div>
+      <div class="card-note">Foundation for Claude Code in Action; CLAUDE.md basics</div>
+    </a>
+
+  </div>
+
+  <div class="section-heading">🟢 Skim — Prompt Engineering Sections Only</div>
+  <div class="courses-grid">
+
+    <a class="course-card" href="claude-bedrock/index.html">
+      <div class="card-top">
+        <div class="card-emoji">☁️</div>
+        <span class="pri pri-skim">🟢 Skim</span>
+      </div>
+      <div class="card-title">Claude with Amazon Bedrock</div>
+      <div class="card-domains">
+        <span class="card-domain-tag">D4 Prompt Eng</span>
+      </div>
+      <div class="card-meta"><span>🎬 71 videos</span><span>📝 45 questions</span></div>
+      <div class="card-note">Prompt eng &amp; tool use sections only — skip AWS infra</div>
+    </a>
+
+    <a class="course-card" href="claude-vertex/index.html">
+      <div class="card-top">
+        <div class="card-emoji">🌐</div>
+        <span class="pri pri-skim">🟢 Skim</span>
+      </div>
+      <div class="card-title">Claude with Google Vertex AI</div>
+      <div class="card-domains">
+        <span class="card-domain-tag">D4 Prompt Eng</span>
+      </div>
+      <div class="card-meta"><span>🎬 81 videos</span><span>📝 52 questions</span></div>
+      <div class="card-note">Prompt eng &amp; RAG sections only — skip GCP infra</div>
+    </a>
+
+  </div>
+
+  <div class="section-heading">⚪ Skip — Not Exam-Relevant</div>
+  <div class="courses-grid">
+
+    <a class="course-card skip-course" href="claude-101/index.html">
+      <div class="card-top">
+        <div class="card-emoji">🎓</div>
+        <span class="pri pri-skip">⚪ Skip</span>
+      </div>
+      <div class="card-title">Claude 101</div>
+      <div class="card-meta"><span>🎬 4 videos</span></div>
+      <div class="card-note">Below exam level — general Claude intro only</div>
+    </a>
+
+    <a class="course-card skip-course" href="claude-cowork/index.html">
+      <div class="card-top">
+        <div class="card-emoji">🤝</div>
+        <span class="pri pri-skip">⚪ Skip</span>
+      </div>
+      <div class="card-title">Introduction to Claude Cowork</div>
+      <div class="card-meta"><span>🎬 7 videos</span></div>
+      <div class="card-note">Not covered in any exam domain</div>
+    </a>
+
+  </div>
+</section>
+
+</main>
 </div>
 
-<div class="courses-grid">
-  <a class="course-card" href="building-with-claude-api/index.html"><div class="card-emoji">🔧</div><div class="card-title">Building with the Claude API</div><div class="card-meta"><span class="card-tag">🎬 74 videos</span><span class="card-tag">📝 64 questions</span><span class="card-tag">📓 27 notebooks</span></div></a><a class="course-card" href="claude-101/index.html"><div class="card-emoji">🎓</div><div class="card-title">Claude 101</div><div class="card-meta"><span class="card-tag">🎬 4 videos</span></div></a><a class="course-card" href="claude-code-101/index.html"><div class="card-emoji">💻</div><div class="card-title">Claude Code 101</div><div class="card-meta"><span class="card-tag">🎬 12 videos</span><span class="card-tag">📝 7 questions</span></div></a><a class="course-card" href="claude-cowork/index.html"><div class="card-emoji">🤝</div><div class="card-title">Introduction to Claude Cowork</div><div class="card-meta"><span class="card-tag">🎬 7 videos</span></div></a><a class="course-card" href="claude-code-in-action/index.html"><div class="card-emoji">⚡</div><div class="card-title">Claude Code in Action</div><div class="card-meta"><span class="card-tag">🎬 15 videos</span><span class="card-tag">📝 8 questions</span></div></a><a class="course-card" href="intro-to-mcp/index.html"><div class="card-emoji">🔌</div><div class="card-title">Introduction to MCP</div><div class="card-meta"><span class="card-tag">🎬 11 videos</span><span class="card-tag">📝 7 questions</span></div></a><a class="course-card" href="mcp-advanced/index.html"><div class="card-emoji">🚀</div><div class="card-title">MCP Advanced Topics</div><div class="card-meta"><span class="card-tag">🎬 8 videos</span><span class="card-tag">📝 7 questions</span></div></a><a class="course-card" href="claude-bedrock/index.html"><div class="card-emoji">☁️</div><div class="card-title">Claude with Amazon Bedrock</div><div class="card-meta"><span class="card-tag">🎬 71 videos</span><span class="card-tag">📝 45 questions</span></div></a><a class="course-card" href="claude-vertex/index.html"><div class="card-emoji">🌐</div><div class="card-title">Claude with Google Vertex AI</div><div class="card-meta"><span class="card-tag">🎬 81 videos</span><span class="card-tag">📝 52 questions</span></div></a>
-</div>
+<script>
+function show(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  var section = document.getElementById('section-' + id);
+  if (section) section.classList.add('active');
+  if (el) el.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// Support direct URL hashes e.g. index.html#d1
+(function() {
+  var hash = window.location.hash.replace('#', '');
+  if (hash) {
+    var el = document.querySelector('.nav-item[onclick*="' + hash + '"]');
+    if (el) show(hash, el);
+  }
+})();
+</script>
 
 </body>
 </html>
