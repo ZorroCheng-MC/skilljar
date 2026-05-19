@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude with Amazon Bedrock — Anthropic Academy</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --bg2: #1e293b;
+    --bg3: #162032;
+    --border: #2d3f55;
+    --accent: #7c3aed;
+    --accent2: #a855f7;
+    --green: #10b981;
+    --red: #ef4444;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --code-bg: #0d1526;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         background: var(--bg); color: var(--text); line-height: 1.6; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Header ── */
+  .site-header {
+    background: #0a0f1e;
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; align-items: center; gap: 0;
+    height: 60px; position: sticky; top: 0; z-index: 200;
+  }
+  .site-logo {
+    font-size: 15px; font-weight: 700; color: var(--text);
+    letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px;
+    white-space: nowrap;
+  }
+  .site-logo .logo-icon {
+    width: 28px; height: 28px; background: linear-gradient(135deg, #f97316, #ef4444);
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 900; color: #fff; flex-shrink: 0;
+  }
+  .breadcrumb { font-size: 13px; color: var(--text3); margin-left: 16px; display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: var(--text2); }
+  .breadcrumb .sep { color: var(--text3); }
+  .header-meta { margin-left: auto; font-size: 12px; color: var(--text3); }
+
+  /* ── Tab navigation ── */
+  .tab-bar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; gap: 0; overflow-x: auto;
+    position: sticky; top: 60px; z-index: 100;
+  }
+  .tab-btn {
+    padding: 14px 22px; font-size: 14px; font-weight: 500;
+    color: var(--text2); background: none; border: none;
+    border-bottom: 2px solid transparent; cursor: pointer;
+    white-space: nowrap; transition: all 0.15s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent); }
+
+  /* ── Tab content ── */
+  .tab-content { display: none; max-width: 960px; margin: 0 auto; padding: 36px 32px; }
+  .tab-content.active { display: block; }
+
+  /* ── Study Guide / Quiz markdown rendering ── */
+  .md-body h1 { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+  .md-body h2 {
+    font-size: 20px; font-weight: 700; color: #c8a2f8;
+    border-left: 3px solid var(--accent); padding-left: 12px;
+    margin: 36px 0 16px;
+  }
+  .md-body h3 {
+    font-size: 16px; font-weight: 600; color: var(--text);
+    margin: 24px 0 10px; padding-top: 4px;
+  }
+  .md-body p { color: var(--text); margin-bottom: 14px; }
+  .md-body em { color: var(--text2); }
+  .md-body strong { color: var(--text); }
+  .md-body hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  .md-body ul, .md-body ol { padding-left: 22px; margin-bottom: 14px; }
+  .md-body li { color: var(--text); margin-bottom: 4px; }
+  .md-body code {
+    background: var(--code-bg); color: #7dd3fc;
+    padding: 2px 6px; border-radius: 4px; font-size: 13px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  }
+  .md-body pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px; overflow-x: auto; margin-bottom: 16px;
+  }
+  .md-body pre code { background: none; padding: 0; color: #e2e8f0; }
+  .md-body table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 14px; }
+  .md-body th { background: var(--bg2); color: var(--accent2); padding: 8px 12px;
+                text-align: left; border: 1px solid var(--border); }
+  .md-body td { padding: 8px 12px; border: 1px solid var(--border); color: var(--text); }
+  .md-body tr:nth-child(even) td { background: var(--bg3); }
+  .md-body blockquote {
+    border-left: 3px solid var(--accent); padding: 8px 16px;
+    background: var(--bg2); border-radius: 0 6px 6px 0; margin-bottom: 14px;
+  }
+
+  /* ── Quiz ── */
+  .md-body li.correct {
+    background: rgba(16, 185, 129, 0.12);
+    border-left: 2px solid var(--green);
+    padding: 4px 10px; border-radius: 4px; list-style: none;
+    color: #6ee7b7; font-weight: 500;
+  }
+  .md-body li.incorrect { color: var(--text2); }
+  .md-body li.correct::before { content: ''; }
+
+  /* ── Videos tab ── */
+  .video-speed-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 16px;
+    margin-bottom: 28px; flex-wrap: wrap;
+  }
+  .speed-label { font-size: 13px; color: var(--text2); }
+  .speed-btn {
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
+    padding: 4px 12px; border-radius: 20px; cursor: pointer;
+    font-size: 12px; transition: all 0.15s;
+  }
+  .speed-btn:hover { background: #2a3a55; color: var(--text); }
+  .speed-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .video-total { margin-left: auto; font-size: 12px; color: var(--text3); }
+  .chapter-section { margin-bottom: 36px; }
+  .chapter-title {
+    font-size: 17px; font-weight: 700; color: #c8a2f8;
+    border-left: 3px solid var(--accent); padding-left: 12px;
+    margin-bottom: 14px;
+  }
+  .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
+  .video-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+  }
+  .video-title {
+    padding: 9px 13px; font-size: 13px; font-weight: 500; color: var(--text2);
+    background: var(--bg3); border-bottom: 1px solid var(--border);
+  }
+  .yt-wrap { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
+  .yt-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  /* ── Notebooks tab ── */
+  .nb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 32px; }
+  .nb-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px;
+    transition: border-color 0.15s;
+  }
+  .nb-card:hover { border-color: var(--accent); }
+  .nb-name { font-size: 13px; font-weight: 600; color: var(--text); word-break: break-all; }
+  .nb-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nb-link {
+    font-size: 11px; padding: 3px 10px; border-radius: 12px;
+    border: 1px solid var(--border); color: var(--text2);
+    background: var(--bg3); transition: all 0.15s;
+  }
+  .nb-link:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+  .nb-link.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .nb-link.primary:hover { background: var(--accent2); }
+  .section-note {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 18px; font-size: 13px; color: var(--text2);
+    margin-bottom: 24px;
+  }
+  .section-title { font-size: 16px; font-weight: 700; color: var(--text); margin: 24px 0 12px; }
+  .file-list { display: flex; flex-direction: column; gap: 8px; }
+  .file-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+  }
+  .file-icon { font-size: 18px; }
+  .file-name { font-size: 13px; color: var(--text); flex: 1; }
+  .file-link { font-size: 12px; color: var(--accent2); }
+
+  /* ── Index page cards ── */
+  .index-hero { padding: 60px 32px 40px; text-align: center; }
+  .index-hero h1 { font-size: 36px; font-weight: 800; color: var(--text); margin-bottom: 12px; }
+  .index-hero p { font-size: 16px; color: var(--text2); max-width: 520px; margin: 0 auto; }
+  .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                  gap: 20px; max-width: 1200px; margin: 0 auto; padding: 0 32px 60px; }
+  .course-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 10px;
+    text-decoration: none; transition: all 0.2s; color: inherit;
+  }
+  .course-card:hover { border-color: var(--accent); transform: translateY(-2px);
+                       box-shadow: 0 8px 24px rgba(124,58,237,0.15); text-decoration: none; }
+  .card-emoji { font-size: 32px; }
+  .card-title { font-size: 16px; font-weight: 700; color: var(--text); }
+  .card-meta { font-size: 12px; color: var(--text3); display: flex; gap: 12px; flex-wrap: wrap; }
+  .card-tag { background: var(--bg3); border: 1px solid var(--border);
+              padding: 2px 8px; border-radius: 10px; color: var(--text2); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-logo">
+    <div class="logo-icon">A</div>
+    Anthropic Academy
+  </div>
+  <div class="breadcrumb">
+    <span class="sep">›</span>
+    <a href="../index.html">All Courses</a>
+    <span class="sep">›</span>
+    <span>☁️ Claude with Amazon Bedrock</span>
+  </div>
+  <div class="header-meta">71 videos · 45 quiz questions</div>
+</header>
+
+<div class="tab-bar" id="tabBar">
+  <button class="tab-btn active" data-tab="study">📚 Study Guide</button>
+  <button class="tab-btn" data-tab="quiz">📝 Quiz</button>
+  <button class="tab-btn" data-tab="videos">🎬 Videos</button>
+  
+</div>
+
+<div id="tab-study" class="tab-content active">
+  <div class="md-body"><h1 id="claude-with-amazon-bedrock-study-guide">Claude with Amazon Bedrock — Study Guide</h1>
+<p><em>Full course notes compiled from all lessons.</em></p>
+<hr />
+<h2 id="introduction">Introduction</h2>
+<h3 id="introduction-to-the-course">Introduction to the course</h3>
+<p><em>Video lesson — no text notes.</em></p>
+<h3 id="overview-of-claude-models">Overview of Claude Models</h3>
+<p>Claude has three model families optimized for different priorities:</p>
+<p>Opus = highest intelligence model for complex, multi-step tasks requiring deep reasoning and planning. Trade-off: higher cost and latency.</p>
+<p>Sonnet = balanced model with good intelligence, speed, and cost efficiency. Strong coding abilities and precise code editing. Best for most practical use cases.</p>
+<p>Haiku = fastest model optimized for speed and cost efficiency. No reasoning capabilities like Opus/Sonnet. Best for real-time user interactions and high-volume processing.</p>
+<p>Selection framework: Intelligence priority → Opus. Speed priority → Haiku. Balanced requirements → Sonnet.</p>
+<p>Common approach = use multiple models in same application based on specific task requirements rather than single model selection.</p>
+<p>All models share core capabilities: text generation, coding, image analysis. Main difference is optimization focus.</p>
+<h2 id="accessing-claude-with-the-api">Accessing Claude with the API</h2>
+<h3 id="accessing-the-api">Accessing the API</h3>
+<p>API Access Flow = 5-step process from user input to response display</p>
+<p>Step 1: Client sends user text to developer's server (never access Anthropic API directly from client apps to keep API key secret)</p>
+<p>Step 2: Server makes request to Anthropic API using SDK (Python, TypeScript, JavaScript, Go, Ruby) or plain HTTP. Required parameters = API key + model name + messages list + max_tokens limit</p>
+<p>Step 3: Text generation process has 4 stages:<br />
+- Tokenization = breaking input into tokens (words/word parts/symbols/spaces)<br />
+- Embedding = converting tokens to number lists representing all possible word meanings<br />
+- Contextualization = adjusting embeddings based on neighboring tokens to determine precise meaning<br />
+- Generation = output layer produces probabilities for next word, model selects using probability + randomness, adds selected word, repeats process</p>
+<p>Step 4: Model stops when max_tokens reached or special end_of_sequence token generated</p>
+<p>Step 5: API returns response with generated text + usage counts + stop_reason to server, server sends to client for display</p>
+<p>Token = text chunk (word/part/symbol)<br />
+Embedding = numerical representation of word meanings<br />
+Contextualization = meaning refinement using neighboring words<br />
+Max_tokens = generation length limit<br />
+Stop_reason = why model stopped generating</p>
+<h3 id="making-a-request">Making a request</h3>
+<p>Making API Request to Anthropic = Process involving 4 setup steps and understanding message structure</p>
+<p>Setup Steps:<br />
+1. Install packages = pip install anthropic python-dotenv in Jupyter notebook<br />
+2. Store API key = Create .env file with ANTHROPIC_API_KEY="your_key" (ignore in version control)<br />
+3. Load environment variable = Use python-dotenv to securely load API key<br />
+4. Create client = Initialize anthropic client and define model variable (claude-3-sonnet)</p>
+<p>API Request Structure:<br />
+- Function = client.messages.create()<br />
+- Required arguments = model, max_tokens, messages<br />
+- Model = Name of Claude model to use<br />
+- Max_tokens = Safety limit for generation length (not target length)<br />
+- Messages = List containing conversation exchanges</p>
+<p>Message Types:<br />
+- User message = {"role": "user", "content": "your text"} (human-authored content)<br />
+- Assistant message = Contains model-generated responses</p>
+<p>Response Access:<br />
+- Full response = Contains metadata and nested structure<br />
+- Text only = message.content[0].text extracts just generated text</p>
+<p>Example request structure: client.messages.create(model=model, max_tokens=1000, messages=[{"role": "user", "content": "What is quantum computing?"}])</p>
+<h3 id="multi-turn-conversations">Multi-Turn conversations</h3>
+<p>Multi-Turn Conversations = conversations with multiple back-and-forth exchanges that maintain context.</p>
+<p>Key limitation: Anthropic API stores no messages. Each request is independent with no memory of previous exchanges.</p>
+<p>Solution requires two steps:<br />
+1. Manually maintain message list in code<br />
+2. Send entire conversation history with every follow-up request</p>
+<p>Message structure = list of dictionaries with "role" (user/assistant) and "content" fields.</p>
+<p>Conversation flow:<br />
+- Send initial user message<br />
+- Receive assistant response<br />
+- Append assistant response to message history<br />
+- Add new user message to history<br />
+- Send complete history for context-aware follow-up</p>
+<p>Helper functions needed:<br />
+- add_user_message(messages, text) = appends user message to history<br />
+- add_assistant_message(messages, text) = appends assistant response to history<br />
+- chat(messages) = sends message history to API and returns response</p>
+<p>Without message history = responses lack context and continuity. With complete history = Claude maintains conversation context and provides relevant follow-ups.</p>
+<h3 id="chat-bot-exercise">Chat bot exercise</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="system-prompts">System prompts</h3>
+<p>System Prompts = technique to customize Claude's response style and tone by assigning it a specific role or behavior pattern.</p>
+<p>Implementation = pass system prompt as plain string to create function using system keyword argument.</p>
+<p>Purpose = control how Claude responds rather than what it responds. Example: math tutor role makes Claude give hints instead of direct answers.</p>
+<p>Structure = first line typically assigns role ("You are a patient math tutor"), followed by specific behavioral instructions.</p>
+<p>Key principle = system prompts guide response approach, not content. Same question gets different treatment based on assigned role.</p>
+<p>Technical implementation = create params dictionary, conditionally add system key if prompt provided, pass params to create function with ** unpacking. Handle None case by excluding system parameter entirely.</p>
+<p>Use case example = Math tutor that gives guidance/hints rather than complete solutions, encouraging student thinking over direct answers.</p>
+<h3 id="system-prompt-exercise">System prompt exercise</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="temperature">Temperature</h3>
+<p>Temperature = parameter (0-1) that controls randomness in Claude's text generation by influencing token selection probabilities.</p>
+<p>Text generation process: Input text → tokenization → probability assignment to possible next tokens → token selection based on probabilities → repeat.</p>
+<p>Temperature effects:<br />
+- Temperature 0 = deterministic output, always selects highest probability token<br />
+- Higher temperature = increases chance of selecting lower probability tokens, more creative/unexpected outputs</p>
+<p>Usage guidelines:<br />
+- Low temperature (near 0) = data extraction, factual tasks requiring consistency<br />
+- High temperature (near 1) = creative tasks like brainstorming, writing, jokes, marketing</p>
+<p>Implementation: Add temperature parameter to model API calls. Higher values don't guarantee different outputs, just increase probability of variation.</p>
+<p>Key insight: Temperature directly manipulates the probability distribution of next token selection, making high-probability tokens more/less dominant in the selection process.</p>
+<h3 id="streaming">Streaming</h3>
+<p>Response Streaming = technique to display AI responses chunk-by-chunk as they're generated instead of waiting for complete response.</p>
+<p>Problem solved: AI responses can take 10-30 seconds. Users expect immediate feedback, not just spinners.</p>
+<p>How it works:<br />
+1. Server sends user message to Claude<br />
+2. Claude immediately sends initial response (no text, just acknowledgment)<br />
+3. Stream of events follows, each containing text chunks<br />
+4. Server forwards chunks to frontend for real-time display</p>
+<p>Event types:<br />
+- message_start = initial acknowledgment<br />
+- content_block_start = text generation begins<br />
+- content_block_delta = contains actual text chunks (most important)<br />
+- content_block_stop/message_stop = generation complete</p>
+<p>Implementation:<br />
+Basic: client.messages.create(stream=True) returns event iterator<br />
+Simplified: client.messages.stream() with text_stream property extracts just text<br />
+Final message: stream.get_final_message() assembles all chunks for storage</p>
+<p>Key benefits: Better UX through immediate response visibility, complete message capture for database storage.</p>
+<h3 id="controlling-model-output">Controlling model output</h3>
+<p><strong>Controlling Model Output = Two key techniques beyond prompt modification</strong></p>
+<p><strong>Pre-filling Assistant Messages = Manually adding assistant message at end of conversation to steer response direction</strong></p>
+<p>How it works:<br />
+- Assemble messages list with user prompt + manual assistant message<br />
+- Claude sees assistant message as already authored content<br />
+- Claude continues response from exact end of pre-filled text<br />
+- Response gets steered toward pre-filled direction</p>
+<p>Key point: Claude continues from exact endpoint of pre-fill, not complete sentences. Must stitch together pre-fill + generated response.</p>
+<p>Example: Pre-fill "Coffee is better because" → Claude continues with justification for coffee</p>
+<p><strong>Stop Sequences = Force Claude to halt generation when specific string appears</strong></p>
+<p>How it works:<br />
+- Provide stop sequence string in chat function<br />
+- When Claude generates that exact string, response immediately stops<br />
+- Generated stop sequence text not included in final output</p>
+<p>Example: Prompt "count 1 to 10" + stop sequence "five" → Output stops at "four, " (five not included)</p>
+<p>Refinement: Stop sequence ", five" → Clean output "one, two, three, four"</p>
+<p>Both techniques provide precise control over response direction and length without changing core prompts.</p>
+<h3 id="structured-data">Structured data</h3>
+<p>Structured Data Generation = technique using assistant message prefilling + stop sequences to get raw output without Claude's natural explanatory headers/footers.</p>
+<p>Problem = Claude automatically adds markdown formatting, headers, commentary when generating JSON/code/structured content. Users often want just the raw data for copy/paste functionality.</p>
+<p>Solution Pattern:<br />
+1. User message = request for structured data<br />
+2. Assistant message prefill = opening delimiter (e.g., "```json")<br />
+3. Stop sequence = closing delimiter (e.g., "```")</p>
+<p>How it works = Claude sees prefilled message, assumes it already started response, generates only the requested content, stops when hitting delimiter.</p>
+<p>Result = Raw structured data output with no extra formatting or commentary.</p>
+<p>Application = Works for any structured data type (JSON, Python code, lists, etc.), not just JSON. Use whenever you need clean, parseable output without explanatory text.</p>
+<p>Key benefit = Output can be directly used/copied without manual selection or parsing of unwanted text.</p>
+<h3 id="structured-data-exercise">Structured data exercise</h3>
+<p>Structured Data Generation = technique using assistant message prefilling + stop sequences to get raw output without Claude's natural explanatory headers/footers.</p>
+<p>Problem = Claude automatically adds markdown formatting, headers, commentary when generating JSON/code/structured content. Users often want just the raw data for copy/paste functionality.</p>
+<p>Solution Pattern:<br />
+1. User message = request for structured data<br />
+2. Assistant message prefill = opening delimiter (e.g., "```json")<br />
+3. Stop sequence = closing delimiter (e.g., "```")</p>
+<p>How it works = Claude sees prefilled message, assumes it already started response, generates only the requested content, stops when hitting delimiter.</p>
+<p>Result = Raw structured data output with no extra formatting or commentary.</p>
+<p>Application = Works for any structured data type (JSON, Python code, lists, etc.), not just JSON. Use whenever you need clean, parseable output without explanatory text.</p>
+<p>Key benefit = Output can be directly used/copied without manual selection or parsing of unwanted text.</p>
+<h2 id="prompt-evaluation">Prompt Evaluation</h2>
+<h3 id="prompt-evaluation_1">Prompt evaluation</h3>
+<p>Prompt Engineering = techniques for writing/editing prompts to help Claude understand requests and desired responses.</p>
+<p>Prompt Evaluation = automated testing of prompts using objective metrics to measure effectiveness.</p>
+<p>Three paths after writing a prompt:<br />
+1. Test once/twice, deploy to production (trap)<br />
+2. Test with custom inputs, minor tweaks for corner cases (trap)<br />
+3. Run through evaluation pipeline for objective scoring (recommended)</p>
+<p>Key takeaway: Engineers commonly under-test prompts. Use evaluation pipelines to get objective performance scores before iterating and deploying prompts.</p>
+<h3 id="a-typical-eval-workflow">A typical eval workflow</h3>
+<p>Typical Eval Workflow = 6-step iterative process for prompt improvement</p>
+<p>Step 1: Write initial prompt draft - create baseline prompt to optimize</p>
+<p>Step 2: Create evaluation dataset - collection of test inputs (can be 3 examples or thousands, hand-written or LLM-generated)</p>
+<p>Step 3: Generate prompt variations - interpolate each dataset input into prompt template</p>
+<p>Step 4: Get LLM responses - feed each prompt variation to Claude, collect outputs</p>
+<p>Step 5: Grade responses - use grader system to score each response (e.g. 1-10 scale), average scores for overall prompt performance</p>
+<p>Step 6: Iterate - modify prompt based on scores, repeat entire process, compare versions</p>
+<p>Key points: No standard methodology exists. Many open-source/paid tools available. Can start simple with custom implementation. Grading complexity varies. Objective scoring enables systematic prompt improvement through A/B comparison.</p>
+<h3 id="generating-test-datasets">Generating test datasets</h3>
+<p>Custom prompt evaluation workflow = build prompt + generate test dataset + evaluate performance</p>
+<p>Goal = AWS code assistance prompt that outputs only Python, JSON config, or regex without explanations</p>
+<p>Dataset generation approaches = manual assembly or automated with Claude (use faster models like Haiku for generation)</p>
+<p>Dataset structure = array of JSON objects with task property describing user requests</p>
+<p>Generation process = prompt Claude to create test cases → use pre-filling with assistant message "```json" → set stop sequence "```" → parse response as JSON → save to file</p>
+<p>Key implementation = generate_dataset() function that sends prompt to Claude, gets structured JSON response of test tasks, saves to dataset.json file for later evaluation use</p>
+<p>Test dataset enables systematic evaluation by running prompt against multiple input scenarios to measure performance consistency.</p>
+<h3 id="running-the-eval">Running the eval</h3>
+<p>Eval execution process = merging test cases with prompts, running through LLM, and grading outputs.</p>
+<p>Test case = individual record from dataset (JSON object).</p>
+<p>Three core functions:<br />
+- run_prompt = merges test case with prompt, sends to Claude, returns output<br />
+- run_test_case = calls run_prompt, grades result, returns summary dictionary <br />
+- run_eval = loops through dataset, calls run_test_case for each, assembles results</p>
+<p>Basic prompt structure = "Please solve the following task: [test_case_task]" (v1 starting point).</p>
+<p>Current limitations = no output formatting instructions, hardcoded scoring (score=10), verbose Claude responses.</p>
+<p>Runtime = ~31 seconds with Haiku model for full dataset execution.</p>
+<p>Output format = array of objects containing Claude output, original test case, and score.</p>
+<p>Next step = implement proper grading system to replace hardcoded scores.</p>
+<p>Eval pipeline core = dataset + prompt + LLM + grader, with minimal code complexity.</p>
+<h3 id="model-based-grading">Model based grading</h3>
+<p>Model Based Grading = evaluation system that takes model outputs and assigns objective scores (typically 1-10 scale, 10 = highest quality)</p>
+<p>Three grader types:<br />
+- Code graders = programmatic checks (length, word presence, syntax validation, readability scores)<br />
+- Model graders = additional API call to evaluate original model output, highly flexible for quality/instruction-following assessment<br />
+- Human graders = person evaluates responses, most flexible but time-consuming and tedious</p>
+<p>Key requirements: Must return objective signal (usually numerical score). Define evaluation criteria upfront.</p>
+<p>Implementation pattern for model graders:<br />
+- Create detailed prompt requesting strengths/weaknesses/reasoning/score (not just score alone to avoid default middling scores)<br />
+- Use JSON response format with pre-filled assistant message and stop sequences<br />
+- Parse returned JSON for score and reasoning<br />
+- Calculate average scores across test cases for final metric</p>
+<p>Model graders offer high flexibility but may be inconsistent. Still provides objective baseline for prompt optimization.</p>
+<h3 id="code-based-grading">Code based grading</h3>
+<p>Code Based Grading = automated validation system for LLM outputs containing code, JSON, or regex</p>
+<p>Core Implementation:<br />
+- validate_json() = attempts JSON parsing, returns 10 if valid, 0 if error<br />
+- validate_python() = attempts AST parsing, returns 10 if valid, 0 if error<br />
+- validate_regex() = attempts regex compilation, returns 10 if valid, 0 if error</p>
+<p>Dataset Requirements:<br />
+- Must include "format" key specifying expected output type (JSON/Python/RegEx)<br />
+- Updated via prompt template modification for automated dataset generation</p>
+<p>Prompt Engineering:<br />
+- Instruct model to respond only with raw code/JSON/regex<br />
+- No comments, explanations, or commentary<br />
+- Use pre-filled Assistant message with ```code``` blocks<br />
+- Add stop sequences to extract clean output</p>
+<p>Scoring System:<br />
+- Final score = (model_score + syntax_score) / 2<br />
+- Combines semantic evaluation with syntax validation<br />
+- Enables measurement of both correctness and technical validity</p>
+<p>Key Limitation = requires known expected format for proper validator selection</p>
+<h3 id="exercise-on-prompt-evals">Exercise on prompt evals</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h2 id="prompt-engineering">Prompt Engineering</h2>
+<h3 id="prompt-engineering_1">Prompt engineering</h3>
+<p>Prompt Engineering = improving prompts to get more reliable, higher-quality outputs from language models.</p>
+<p>Module Structure: Start with initial poor prompt → Apply prompt engineering techniques step-by-step → Evaluate improvements after each technique → Observe performance gains over time.</p>
+<p>Example Goal: Generate one-day meal plan for athletes based on height, weight, physical goal, dietary restrictions.</p>
+<p>Technical Setup:<br />
+- Updated eval pipeline with flexible prompt evaluator class<br />
+- Supports concurrency (adjust max_concurrent_tasks based on rate limits)<br />
+- generate_dataset() method creates test cases with specified inputs<br />
+- run_prompt() function processes each test case individually</p>
+<p>Key Components:<br />
+- prompt_input_spec = dictionary defining required prompt inputs<br />
+- extra_criteria = additional validation requirements for model grading<br />
+- output.html = formatted evaluation report showing test case results and scores</p>
+<p>Process: Write initial prompt → Interpolate test case inputs → Run evaluation → Apply engineering techniques → Re-evaluate → Repeat until satisfactory performance.</p>
+<p>Initial Results: Expect poor scores (example: 2.32) with basic prompts, especially when using less capable models. Scores improve as techniques are applied.</p>
+<h3 id="being-clear-and-direct">Being clear and direct</h3>
+<p>Being Clear and Direct = Use simple, direct language with action verbs in the first line of prompts to specify the exact task.</p>
+<p>First line importance = Most critical part of prompt that sets the foundation for AI response.</p>
+<p>Structure = Action verb + clear task description + output specifications.</p>
+<p>Examples:<br />
+- "Write three paragraphs about how solar panels work"<br />
+- "Identify three countries that use geothermal energy and for each include generation stats"<br />
+- "Generate a one day meal plan for an athlete that meets their dietary restrictions"</p>
+<p>Key components = Action verb at start + direct task statement + expected output details.</p>
+<p>Result = Improved prompt performance (example showed score increase from 2.32 to 3.92).</p>
+<h3 id="being-specific">Being specific</h3>
+<p>Being Specific = adding guidelines or steps to direct model output in particular direction</p>
+<p>Two types of guidelines:<br />
+Type A (Attributes) = list qualities/attributes desired in output (length, structure, format)<br />
+Type B (Steps) = provide specific steps for model to follow in reasoning process</p>
+<p>Type A controls output characteristics. Type B controls how model arrives at answer.</p>
+<p>Both techniques often combined in professional prompts.</p>
+<p>When to use:<br />
+- Type A (attributes): recommended for almost all prompts<br />
+- Type B (steps): use for complex problems where you want model to consider broader perspective or additional viewpoints it might not naturally consider</p>
+<p>Example improvement: meal planning prompt score jumped from 3.92 to 7.86 when guidelines added, demonstrating significant quality improvement through specificity.</p>
+<h3 id="structure-with-xml-tags">Structure with XML tags</h3>
+<p>XML Tags for Prompt Structure = Using XML tags to organize and delineate different content sections within prompts to improve AI comprehension.</p>
+<p>Purpose = When interpolating large amounts of content into prompts, XML tags help AI models distinguish between different types of information and understand text grouping.</p>
+<p>Implementation = Wrap content sections in descriptive XML tags like  or  rather than dumping unstructured text.</p>
+<p>Tag naming = Use descriptive, specific tag names (e.g., "sales_records" better than "data") to provide context about content nature.</p>
+<p>Example use case = Debugging prompt with mixed code and documentation becomes clearer when separated into  and  tags.</p>
+<p>Benefits = Makes prompt structure obvious to AI, reduces confusion about content boundaries, improves output quality even for smaller content blocks.</p>
+<p>Application = Can wrap any interpolated content like  even when content is short, to clarify it's external input requiring consideration.</p>
+<h3 id="providing-examples">Providing examples</h3>
+<p>One-shot/Multi-shot prompting = providing examples in prompts to guide model behavior. One-shot = single example, multi-shot = multiple examples.</p>
+<p>Implementation: Structure examples with XML tags containing sample input and ideal output. Always wrap examples clearly to distinguish from actual prompt content.</p>
+<p>Key applications:<br />
+- Corner case handling (sarcasm detection, edge scenarios)<br />
+- Complex output formatting (JSON structures, specific formats)<br />
+- Clarifying expected response quality/style</p>
+<p>Best practices:<br />
+- Add context for corner cases ("be especially careful with sarcasm")<br />
+- Include reasoning explaining why output is ideal<br />
+- Use highest-scoring examples from prompt evaluations as templates<br />
+- Place examples after main instructions/guidelines</p>
+<p>Effectiveness boost: Combine examples with explanations of what makes them ideal to reinforce desired output characteristics.</p>
+<h3 id="exercise-on-prompting">Exercise on prompting</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h2 id="tool-use">Tool Use</h2>
+<h3 id="introducing-tool-use">Introducing tool use</h3>
+<p>Tool use = method for Claude to access external information beyond training data.</p>
+<p>Default limitation: Claude only knows information from training data, lacks current/real-time information.</p>
+<p>Tool use flow:<br />
+1. Send initial request to Claude + instructions for external data access<br />
+2. Claude evaluates if external data needed, requests specific information<br />
+3. Server runs code to fetch requested data from external sources<br />
+4. Send follow-up request to Claude with retrieved data<br />
+5. Claude generates final response using original prompt + external data</p>
+<p>Weather example: User asks current weather → Claude requests weather data → Server calls weather API → Claude receives weather data → Claude provides informed weather response.</p>
+<p>Key concept: Tools enable Claude to augment responses with live/current information by orchestrating external data retrieval between Claude's requests.</p>
+<h3 id="tool-functions">Tool functions</h3>
+<p>Tool Functions = Python functions executed automatically when Claude needs extra information to help users.</p>
+<p>Key characteristics:<br />
+- Plain Python functions called by Claude when it determines additional data is needed<br />
+- Must use descriptive function names and argument names<br />
+- Should validate inputs and raise errors with meaningful messages<br />
+- Error messages are visible to Claude, allowing it to retry with corrected parameters</p>
+<p>Best practices:<br />
+1. Well-named functions and arguments<br />
+2. Input validation with immediate error raising for invalid inputs<br />
+3. Meaningful error messages that guide correction</p>
+<p>Example implementation pattern:<br />
+```<br />
+def get_current_datetime(date_format="%Y%m%d %H:%M:%S"):<br />
+    if not date_format:<br />
+        raise ValueError("date format cannot be empty")<br />
+    return datetime.now().strftime(date_format)<br />
+```</p>
+<p>Tool function workflow: Claude identifies need for information → calls tool function → receives result or error → may retry with corrections if error occurred.</p>
+<p>Purpose: Extend Claude's capabilities beyond its training data by providing access to real-time information like current datetime, weather, etc.</p>
+<h3 id="json-schema-for-tools">JSON Schema for tools</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="handling-tool-use-responses">Handling tool use responses</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="running-tool-functions">Running tool functions</h3>
+<p>Tool Functions = Python functions executed automatically when Claude needs extra information to help users.</p>
+<p>Key characteristics:<br />
+- Plain Python functions called by Claude when it determines additional data is needed<br />
+- Must use descriptive function names and argument names<br />
+- Should validate inputs and raise errors with meaningful messages<br />
+- Error messages are visible to Claude, allowing it to retry with corrected parameters</p>
+<p>Best practices:<br />
+1. Well-named functions and arguments<br />
+2. Input validation with immediate error raising for invalid inputs<br />
+3. Meaningful error messages that guide correction</p>
+<p>Example implementation pattern:<br />
+```<br />
+def get_current_datetime(date_format="%Y%m%d %H:%M:%S"):<br />
+    if not date_format:<br />
+        raise ValueError("date format cannot be empty")<br />
+    return datetime.now().strftime(date_format)<br />
+```</p>
+<p>Tool function workflow: Claude identifies need for information → calls tool function → receives result or error → may retry with corrections if error occurred.</p>
+<p>Purpose: Extend Claude's capabilities beyond its training data by providing access to real-time information like current datetime, weather, etc.</p>
+<h3 id="sending-tool-results">Sending tool results</h3>
+<p>Tool Results = Results from executed tool functions sent back to Claude in follow-up requests.</p>
+<p>Process: Execute tool function requested by Claude → Create tool result block → Send follow-up request with full conversation history.</p>
+<p>Tool Result Block Structure:<br />
+- tool_use_id = Matches ID from original tool use block to pair requests with results<br />
+- content = Tool function output converted to string (usually JSON)<br />
+- is_error = Boolean flag for function execution errors (default false)</p>
+<p>Tool Use ID Purpose = Links multiple tool requests to correct results when Claude makes simultaneous tool calls. Each tool use gets unique ID, tool results must reference matching IDs.</p>
+<p>Follow-up Request Requirements:<br />
+- Include complete message history (original user message + assistant tool use message + new user message with tool result)<br />
+- Must include original tool schemas even if not using tools again<br />
+- Tool result block goes in user message, not assistant message</p>
+<p>Conversation Flow: User request → Claude assistant response (text + tool use blocks) → Server executes tool → User message with tool result block → Claude final response with integrated results.</p>
+<h3 id="multi-turn-conversations-with-tools">Multi-Turn conversations with tools</h3>
+<p>Multi-Turn Conversations = conversations with multiple back-and-forth exchanges that maintain context.</p>
+<p>Key limitation: Anthropic API stores no messages. Each request is independent with no memory of previous exchanges.</p>
+<p>Solution requires two steps:<br />
+1. Manually maintain message list in code<br />
+2. Send entire conversation history with every follow-up request</p>
+<p>Message structure = list of dictionaries with "role" (user/assistant) and "content" fields.</p>
+<p>Conversation flow:<br />
+- Send initial user message<br />
+- Receive assistant response<br />
+- Append assistant response to message history<br />
+- Add new user message to history<br />
+- Send complete history for context-aware follow-up</p>
+<p>Helper functions needed:<br />
+- add_user_message(messages, text) = appends user message to history<br />
+- add_assistant_message(messages, text) = appends assistant response to history<br />
+- chat(messages) = sends message history to API and returns response</p>
+<p>Without message history = responses lack context and continuity. With complete history = Claude maintains conversation context and provides relevant follow-ups.</p>
+<h3 id="adding-multiple-tools">Adding multiple tools</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="batch-tool-use">Batch tool use</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="structured-data-with-tools">Structured data with tools</h3>
+<p>Structured Data Generation = technique using assistant message prefilling + stop sequences to get raw output without Claude's natural explanatory headers/footers.</p>
+<p>Problem = Claude automatically adds markdown formatting, headers, commentary when generating JSON/code/structured content. Users often want just the raw data for copy/paste functionality.</p>
+<p>Solution Pattern:<br />
+1. User message = request for structured data<br />
+2. Assistant message prefill = opening delimiter (e.g., "```json")<br />
+3. Stop sequence = closing delimiter (e.g., "```")</p>
+<p>How it works = Claude sees prefilled message, assumes it already started response, generates only the requested content, stops when hitting delimiter.</p>
+<p>Result = Raw structured data output with no extra formatting or commentary.</p>
+<p>Application = Works for any structured data type (JSON, Python code, lists, etc.), not just JSON. Use whenever you need clean, parseable output without explanatory text.</p>
+<p>Key benefit = Output can be directly used/copied without manual selection or parsing of unwanted text.</p>
+<h3 id="flexible-tool-extraction">Flexible tool extraction</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="the-text-editor-tool">The text editor tool</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h2 id="rag-and-agentic-search">RAG and Agentic Search</h2>
+<h3 id="introducing-retrieval-augmented-generation">Introducing Retrieval Augmented Generation</h3>
+<p>RAG = Retrieval Augmented Generation technique for querying large documents using language models.</p>
+<p>Problem: How to extract specific information from large documents (100-1000+ pages) using Claude without hitting context limits.</p>
+<p>Option 1 (Direct approach): Place entire document text directly into prompt.<br />
+- Limitations: Hard token limits, decreased effectiveness with longer prompts, higher costs, slower processing</p>
+<p>Option 2 (RAG approach): Two-step process<br />
+- Step 1: Break document into small chunks<br />
+- Step 2: For user questions, find most relevant chunks and include only those in prompt</p>
+<p>RAG benefits: Model focuses on relevant content, scales to large/multiple documents, smaller prompts, lower costs, faster processing</p>
+<p>RAG downsides: More complexity, requires preprocessing, needs search mechanism to find relevant chunks, no guarantee chunks contain complete context, multiple chunking strategies possible (equal portions vs header-based)</p>
+<p>Key challenge: Defining relevance and optimal chunking strategy for specific use cases.</p>
+<p>RAG trades simplicity for scalability and efficiency but requires careful implementation and evaluation.</p>
+<h3 id="text-chunking-strategies">Text chunking strategies</h3>
+<p>Text Chunking Strategies = process of dividing documents into smaller pieces for RAG pipelines</p>
+<p>Core Problem: Chunking quality directly impacts RAG performance. Poor chunking leads to irrelevant context retrieval (e.g., medical "bug" text retrieved for software engineering query about bugs).</p>
+<p>Three Main Strategies:</p>
+<ol>
+<li>Size-Based Chunking = dividing text into equal-length strings</li>
+<li>Pros: Easy to implement, most common in production</li>
+<li>Cons: Cut-off words, lacks context</li>
+<li>Solution: Overlap strategy = include characters from neighboring chunks to preserve context</li>
+<li>
+<p>Trade-off: Creates text duplication but improves chunk meaning</p>
+</li>
+<li>
+<p>Structure-Based Chunking = dividing based on document structure (headers, paragraphs, sections)</p>
+</li>
+<li>Best for structured documents (markdown, HTML)</li>
+<li>Limitation: Requires guaranteed document formatting</li>
+<li>
+<p>Example: Split on markdown headers (##) to create section-based chunks</p>
+</li>
+<li>
+<p>Semantic-Based Chunking = using NLP to group related sentences/sections</p>
+</li>
+<li>Most advanced technique</li>
+<li>Groups consecutive sentences based on semantic similarity</li>
+<li>Complex implementation</li>
+</ol>
+<p>Key Implementation Notes:<br />
+- Chunk by character = most reliable fallback, works with any document type<br />
+- Chunk by sentence = good middle ground if sentence detection works reliably<br />
+- Chunk by section = optimal results but requires structured input<br />
+- Strategy choice depends on document type guarantees and use case requirements</p>
+<p>Rule: No universal best chunking method - depends on document structure guarantees and specific use case.</p>
+<h3 id="text-embeddings">Text embeddings</h3>
+<p>Text Embeddings = numerical representation of text meaning generated by embedding models</p>
+<p>Embedding Model = takes text input, outputs long list of numbers (range -1 to +1)</p>
+<p>Embedding Numbers = scores representing unknown qualities/features of input text. Each number theoretically scores different aspects (happiness, topic relevance, etc.) but actual meaning is unknown to users.</p>
+<p>Semantic Search = uses text embeddings to find text chunks related to user questions in RAG pipelines. Solves the search problem of matching user queries to relevant document chunks.</p>
+<p>RAG Pipeline Process = extract text chunks → user submits query → find related chunks using semantic search → add relevant chunks as context to prompt</p>
+<p>Implementation = Anthropic recommends Voyage AI for embedding generation. Requires separate account/API key. Free to start, easy integration via SDK.</p>
+<p>Key Insight = Embeddings enable semantic similarity matching rather than keyword matching, allowing better understanding of text relationships for retrieval tasks.</p>
+<h3 id="the-full-rag-flow">The full RAG flow</h3>
+<p>RAG Flow = 7-step process combining text chunking, embeddings, and vector search to retrieve relevant context for LLM queries.</p>
+<p>Step 1: Text Chunking = Split source documents into separate text pieces<br />
+Step 2: Generate Embeddings = Convert text chunks into numerical vectors using embedding models<br />
+Step 3: Normalization = Scale vector magnitudes to 1.0 (handled automatically by embedding APIs)<br />
+Step 4: Vector Database Storage = Store embeddings in specialized database optimized for numerical vector operations<br />
+Step 5: Query Processing = Convert user question into embedding using same model<br />
+Step 6: Similarity Search = Find most similar stored embeddings using cosine similarity calculation<br />
+Step 7: Prompt Assembly = Combine user question with retrieved relevant text chunks, send to LLM</p>
+<p>Key Math Concepts:<br />
+- Cosine Similarity = cosine of angle between vectors, returns values -1 to 1, closer to 1 means more similar<br />
+- Cosine Distance = 1 minus cosine similarity, values closer to 0 mean higher similarity<br />
+- Vector Database = performs similarity calculations to find closest matching embeddings</p>
+<p>Process Flow: Pre-processing (steps 1-4) → User Query → Real-time retrieval (steps 5-7) → LLM Response</p>
+<h3 id="implementing-the-rag-flow">Implementing the RAG flow</h3>
+<p>RAG Flow Implementation = practical walkthrough of 5-step retrieval-augmented generation process</p>
+<p>Step 1: Text Chunking = split document into sections using chunk_by_section function on report.MD file</p>
+<p>Step 2: Embedding Generation = create vector representations for each chunk using generate_embedding function (supports single string or list of strings input)</p>
+<p>Step 3: Vector Store Population = create vector index instance, loop through chunk-embedding pairs using zip(), store each pair with store.add_vector(embedding, {content: chunk}). Store original text with embeddings for meaningful retrieval results.</p>
+<p>Step 4: Query Processing = user asks question "what did software engineering department do last year", generate embedding for user query</p>
+<p>Step 5: Similarity Search = use store.search(user_embedding, 2) to find 2 most relevant chunks, returns results with cosine distances (0.71 for section two, 0.72 for methodology section)</p>
+<p>Key Components:<br />
+- Vector Index Class = custom vector database implementation<br />
+- Cosine Distance = similarity metric between query and stored embeddings<br />
+- Metadata Storage = storing original text content alongside embeddings enables meaningful retrieval</p>
+<p>Workflow complete but has limitations requiring further improvements.</p>
+<h3 id="bm25-lexical-search">BM25 lexical search</h3>
+<p>BM25 = Best Match 25, a lexical search algorithm commonly used in RAG pipelines to complement semantic search.</p>
+<p>Problem with semantic search alone = Can miss exact term matches, returning irrelevant results even when specific terms appear frequently in certain documents.</p>
+<p>Hybrid search approach = Combines semantic search (embeddings/vector database) with lexical search (BM25) in parallel, then merges results for better balance.</p>
+<p>BM25 algorithm steps:<br />
+1. Tokenize user query into separate terms (remove punctuation, split on spaces)<br />
+2. Count frequency of each term across all text chunks/documents<br />
+3. Assign relative importance to terms based on usage frequency (rare terms = higher importance, common terms like "a" = lower importance)<br />
+4. Rank text chunks by how often they contain higher-weighted terms</p>
+<p>Key insight = Frequently used terms across corpus are less important for search relevance than rare, specific terms.</p>
+<p>BM25 advantages = Better at finding exact term matches, prioritizes documents containing rare/specific search terms, complements semantic search weaknesses.</p>
+<p>Implementation = Both semantic and lexical search systems use similar APIs (add_document, search functions) making them easy to combine.</p>
+<p>Next step = Merge results from both search systems to get benefits of semantic understanding plus exact term matching.</p>
+<h3 id="a-multi-search-rag-pipeline">A multi-search RAG pipeline</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="reranking-results">Reranking results</h3>
+<p>Reranking = post-processing step that uses LLM to reorder search results by relevance after initial retrieval.</p>
+<p>Process: Run vector + BM25 search → merge results → pass to LLM with prompt asking to rank documents by relevance → get reordered results.</p>
+<p>Implementation details: Use document IDs instead of full text for efficiency. LLM receives user query + candidate documents + instruction to return most relevant docs in decreasing order. Assistant message pre-fill + stop sequence ensures structured JSON output.</p>
+<p>Tradeoffs: Increases search accuracy by leveraging LLM's understanding of semantic relevance. Increases latency due to additional LLM call. Particularly effective when initial retrieval methods miss nuanced query intent (e.g., "ENG team" vs "engineering team").</p>
+<p>Example improvement: Query "What did engineering team do with incident 2023?" correctly prioritized software engineering section over cybersecurity section after reranking, despite hybrid search initially ranking it lower.</p>
+<h3 id="contextual-retrieval">Contextual retrieval</h3>
+<p>Contextual Retrieval = technique to improve RAG pipeline accuracy by adding context to document chunks before embedding.</p>
+<p>Problem: When documents are split into chunks, individual chunks lose context from the original document, reducing retrieval accuracy.</p>
+<p>Solution: Pre-processing step that adds contextual information to each chunk before inserting into retriever database.</p>
+<p>Process:<br />
+1. Take individual chunk + original source document<br />
+2. Send to LLM (Claude) with prompt asking to generate situating context<br />
+3. LLM generates brief context explaining chunk's relationship to larger document<br />
+4. Join generated context with original chunk = "contextualized chunk"<br />
+5. Use contextualized chunk as input to vector/BM25 indexes</p>
+<p>Large Document Handling: If source document too large for single prompt, use selective context strategy:<br />
+- Include starter chunks (1-3) from document beginning for summary/abstract<br />
+- Include chunks immediately before target chunk for local context<br />
+- Skip middle chunks that provide less relevant context</p>
+<p>Implementation: add_context function takes text chunk + source text, generates context via LLM, concatenates context with original chunk, returns contextualized version.</p>
+<p>Benefit: Chunks retain ties to larger document structure and cross-references, improving retrieval accuracy for complex documents with interconnected sections.</p>
+<h2 id="features-of-claude">Features of Claude</h2>
+<h3 id="extended-thinking">Extended thinking</h3>
+<p>Extended Thinking = Claude feature that allows reasoning time before generating final response</p>
+<p>Key mechanics:<br />
+- Displays separate thinking process visible to users<br />
+- Increases accuracy for complex tasks but adds cost (charged for thinking tokens) and latency<br />
+- Thinking budget = minimum 1024 tokens allocated for thinking phase<br />
+- Max tokens must exceed thinking budget (e.g., budget 1024 requires max_tokens ≥ 1025)</p>
+<p>When to use:<br />
+- Enable after prompt optimization fails to achieve desired accuracy<br />
+- Use prompt evals to determine necessity</p>
+<p>Response structure:<br />
+- Thinking block = contains reasoning text + cryptographic signature<br />
+- Text block = final response<br />
+- Signature = prevents tampering with thinking text (safety measure)</p>
+<p>Special cases:<br />
+- Redacted thinking blocks = encrypted thinking text flagged by safety systems<br />
+- Provided for conversation continuity without losing context<br />
+- Can force redacted blocks using test string: "entropic magic string triggered redacted thinking [special characters]"</p>
+<p>Implementation:<br />
+- Set thinking=true and thinking_budget parameter<br />
+- Ensure max_tokens &gt; thinking_budget for adequate response generation capacity</p>
+<h3 id="image-support">Image support</h3>
+<p>Claude Vision Capabilities = ability to process images within user messages for analysis, comparison, counting, and description tasks.</p>
+<p>Image Limitations:<br />
+- Max 100 images per request<br />
+- Size/dimension restrictions apply<br />
+- Images consume tokens (charged based on pixel height/width calculation)</p>
+<p>Image Block Structure = special block type within user messages that holds either raw image data (base64) or URL reference to online image. Multiple image blocks allowed per message.</p>
+<p>Critical Success Factor = strong prompting techniques required for accurate results. Simple prompts often fail.</p>
+<p>Prompting Techniques for Images:<br />
+- Step-by-step analysis instructions<br />
+- One-shot/multi-shot examples (alternating image and text pairs)<br />
+- Clear guidelines and verification steps<br />
+- Structured analysis frameworks</p>
+<p>Example Use Case = automated fire risk assessment from satellite imagery analyzing tree density, property access, roof overhang, and assigning numerical risk scores.</p>
+<p>Implementation = base64 encode image data, create message with image block (type: image, source: base64, media_type, data) followed by text block containing detailed prompt instructions.</p>
+<p>Key Takeaway = image accuracy depends entirely on prompt sophistication, not just image quality.</p>
+<h3 id="pdf-support">PDF support</h3>
+<p>PDF Support in Claude:</p>
+<p>Claude can read PDF files directly using similar code to image processing. </p>
+<p>Key implementation changes:<br />
+- File type = "document" instead of "image"<br />
+- Media type = "application/pdf" instead of "image/png"<br />
+- Variable naming = file_bytes instead of image_bytes</p>
+<p>Claude PDF capabilities = read text + images + charts + tables + mixed content extraction</p>
+<p>PDF processing = one-stop solution for comprehensive document analysis</p>
+<p>Usage pattern = same as image input but with document-specific parameters</p>
+<h3 id="citations">Citations</h3>
+<p>Citations = feature allowing Claude to reference source documents and show where information comes from</p>
+<p>Citation types:<br />
+- citation_page_location = for PDF documents, shows document index/title/start page/end page/cited text<br />
+- citation_char_location = for plain text, shows character position in text block</p>
+<p>Implementation:<br />
+- Add "citations": {"enabled": true} to request<br />
+- Add "title" field to identify source document<br />
+- Works with both PDF files and plain text sources</p>
+<p>Response structure = content becomes list of text blocks, some containing citations arrays with location data</p>
+<p>Purpose = transparency for users to verify Claude's information sources and check accuracy of interpretations</p>
+<p>UI benefit = enables citation popups/overlays showing source document, page numbers, and exact cited text when users hover over referenced content</p>
+<p>Key use case = ensuring users can investigate how Claude builds responses from source materials rather than appearing to speak from memory alone</p>
+<h3 id="prompt-caching">Prompt caching</h3>
+<p>Prompt Caching = feature that speeds up Claude's responses and reduces text generation costs by reusing computational work from previous requests.</p>
+<p>Normal request flow: User sends message → Claude processes input (creates internal data structures, performs calculations) → Claude generates output → Claude discards all processing work → Ready for next request.</p>
+<p>Problem: When follow-up requests contain identical input messages, Claude must repeat all the same computational work it just threw away, creating inefficiency.</p>
+<p>Solution: Prompt caching stores the results of input message processing in temporary cache instead of discarding. When identical input appears in subsequent requests, Claude retrieves cached work rather than reprocessing, dramatically speeding response generation.</p>
+<p>Key benefit: Reuses previous computational work to avoid redundant processing of repeated content.</p>
+<h3 id="rules-of-prompt-caching">Rules of prompt caching</h3>
+<p>Prompt Caching = feature that speeds up Claude's responses and reduces text generation costs by reusing computational work from previous requests.</p>
+<p>Normal request flow: User sends message → Claude processes input (creates internal data structures, performs calculations) → Claude generates output → Claude discards all processing work → Ready for next request.</p>
+<p>Problem: When follow-up requests contain identical input messages, Claude must repeat all the same computational work it just threw away, creating inefficiency.</p>
+<p>Solution: Prompt caching stores the results of input message processing in temporary cache instead of discarding. When identical input appears in subsequent requests, Claude retrieves cached work rather than reprocessing, dramatically speeding response generation.</p>
+<p>Key benefit: Reuses previous computational work to avoid redundant processing of repeated content.</p>
+<h3 id="prompt-caching-in-action">Prompt caching in action</h3>
+<p>Prompt Caching = feature that speeds up Claude's responses and reduces text generation costs by reusing computational work from previous requests.</p>
+<p>Normal request flow: User sends message → Claude processes input (creates internal data structures, performs calculations) → Claude generates output → Claude discards all processing work → Ready for next request.</p>
+<p>Problem: When follow-up requests contain identical input messages, Claude must repeat all the same computational work it just threw away, creating inefficiency.</p>
+<p>Solution: Prompt caching stores the results of input message processing in temporary cache instead of discarding. When identical input appears in subsequent requests, Claude retrieves cached work rather than reprocessing, dramatically speeding response generation.</p>
+<p>Key benefit: Reuses previous computational work to avoid redundant processing of repeated content.</p>
+<h2 id="model-context-protocol">Model Context Protocol</h2>
+<h3 id="introducing-mcp">Introducing MCP</h3>
+<p>MCP = Model Context Protocol, communication layer providing Claude with context and tools without requiring developers to write tedious code.</p>
+<p>Architecture: MCP client connects to MCP server. Server contains tools, resources, and prompts as internal components.</p>
+<p>Problem solved: Eliminates burden of authoring/maintaining numerous tool schemas and functions for service integrations. Example: GitHub chatbot would require implementing tools for repositories, pull requests, issues, projects - significant developer effort.</p>
+<p>Solution: MCP server handles tool definition and execution instead of your application server. MCP servers = interfaces to outside services, wrapping functionality into ready-to-use tools.</p>
+<p>Key benefits: Developers avoid writing tool schemas and function implementations themselves.</p>
+<p>Common questions:<br />
+- Who creates MCP servers? Anyone, often service providers make official implementations (AWS, etc.)<br />
+- vs direct API calls? MCP eliminates need to author tool schemas/functions yourself<br />
+- vs tool use? MCP and tool use are complementary - MCP handles WHO does the work (server vs developer), both still involve tools</p>
+<p>Core value: Shifts integration burden from application developers to MCP server maintainers.</p>
+<h3 id="mcp-clients">MCP clients</h3>
+<p>MCP Client = communication interface between your server and MCP server, provides access to server's tools</p>
+<p>Transport agnostic = client/server can communicate via multiple protocols (stdio, HTTP, WebSockets)</p>
+<p>Common setup = client and server on same machine using standard input/output</p>
+<p>Communication = message exchange defined by MCP spec</p>
+<p>Key message types:<br />
+- list tools request = client asks server for available tools<br />
+- list tools result = server responds with tool list<br />
+- call tool request = client asks server to run tool with arguments<br />
+- call tool result = server responds with tool execution result</p>
+<p>Typical flow:<br />
+1. User queries server<br />
+2. Server requests tool list from MCP client<br />
+3. MCP client sends list tools request to MCP server<br />
+4. MCP server responds with list tools result<br />
+5. Server sends query + tools to Claude<br />
+6. Claude requests tool execution<br />
+7. Server asks MCP client to run tool<br />
+8. MCP client sends call tool request to MCP server<br />
+9. MCP server executes tool (e.g. GitHub API call)<br />
+10. Results flow back through chain: MCP server → MCP client → server → Claude → user</p>
+<p>Purpose = enables servers to delegate tool execution to specialized MCP servers while maintaining Claude integration</p>
+<h3 id="project-setup">Project setup</h3>
+<p>CLI-based chatbot project = teaches MCP client-server interaction through hands-on implementation</p>
+<p>Project components:<br />
+- MCP client = connects to custom MCP server<br />
+- MCP server = provides 2 tools (read document, update document)<br />
+- Document collection = fake documents stored in memory only</p>
+<p>Key distinction: Normal projects implement either client OR server, not both. This project implements both for educational purposes.</p>
+<p>Setup process:<br />
+1. Download CLI_project.zip starter code<br />
+2. Extract and open in code editor<br />
+3. Follow readme.md setup directions<br />
+4. Add API key to .env file<br />
+5. Install dependencies (with/without UV)<br />
+6. Run project: "uv run main.py" or "python main.py"<br />
+7. Test with chat prompt</p>
+<p>Expected outcome = working chat interface that responds to basic queries, ready for MCP feature additions.</p>
+<h3 id="defining-tools-with-mcp">Defining tools with MCP</h3>
+<p>MCP server implementation using Python SDK creates tools through decorators rather than manual JSON schemas.</p>
+<p>MCP Python SDK = Official package that auto-generates tool JSON schemas from Python function definitions using @mcp.tool decorator.</p>
+<p>Tool definition syntax = @mcp.tool(name="tool_name", description="description") + function with typed parameters using Field() for argument descriptions.</p>
+<p>Two tools implemented:<br />
+1. read_doc_contents = Takes doc_id string, returns document content from in-memory docs dictionary<br />
+2. edit_document = Takes doc_id, old_string, new_string parameters, performs find/replace on document content</p>
+<p>Error handling = Check if doc_id exists in docs dictionary, raise ValueError if not found.</p>
+<p>Key advantage = SDK eliminates manual JSON schema writing, generates schemas automatically from Python function signatures and decorators.</p>
+<p>Required imports = Field from pydantic for parameter descriptions, mcp package for server and tool decorators.</p>
+<p>Implementation pattern = Decorator defines tool metadata, function parameters define tool arguments with types and descriptions, function body contains tool logic.</p>
+<h3 id="the-server-inspector">The server inspector</h3>
+<p>MCP Inspector = in-browser debugger for testing MCP servers without connecting to applications</p>
+<p>Access: Run `mcp dev [server_file.py]` in terminal → opens server on port → navigate to provided URL in browser</p>
+<p>Interface: Left sidebar has connect button → top menu shows resources/prompts/tools sections → tools section lists available tools → click tool to open right panel for manual testing</p>
+<p>Testing workflow: Connect to server → navigate to tools → select specific tool → input required parameters → click run tool → verify output</p>
+<p>Key features: Live development testing, manual tool invocation, parameter input forms, success/failure feedback, no need for full application integration</p>
+<p>Note: UI actively changing during development, core functionality remains similar</p>
+<p>Example usage: Test document tools by inputting document IDs, verify read operations, test edit operations, chain operations to verify changes</p>
+<p>Primary benefit: Debug MCP server implementations efficiently during development phase</p>
+<h3 id="implementing-a-client">Implementing a client</h3>
+<p>MCP Client Implementation:</p>
+<p>MCP Client = wrapper class around client session for resource cleanup and connection management to MCP server</p>
+<p>Client Session = actual connection to MCP server from MCP Python SDK, requires resource cleanup on close</p>
+<p>Client Purpose = exposes MCP server functionality to rest of codebase, enables reaching out to server for tool lists and tool execution</p>
+<p>Key Functions:<br />
+- list_tools() = await self.session.list_tools(), return result.tools<br />
+- call_tool() = await self.session.call_tool(tool_name, tool_input)</p>
+<p>Usage Flow = client gets tool definitions to send to Claude, then executes tools when Claude requests them</p>
+<p>Common Pattern = wrap client session in larger class for resource management rather than use session directly</p>
+<p>Testing = can run client file directly with testing harness to verify server connection and tool retrieval</p>
+<p>Integration = other code in project calls client functions to interact with MCP server, enabling Claude to inspect/edit documents through defined tools</p>
+<h3 id="defining-resources">Defining resources</h3>
+<p>MCP Resources = mechanism allowing MCP servers to expose data to clients for read operations</p>
+<p>Resource Types = 2 types: direct (static URI like "docs://documents") and templated (parameterized URI like "docs://documents/{doc_id}")</p>
+<p>URI = address/identifier for accessing specific resource, defined when creating resource</p>
+<p>Resource Flow = client sends read resource request with URI → server matches URI to function → server executes function → returns data in read resource result</p>
+<p>Implementation = use @mcp.resource decorator with URI and MIME type parameters</p>
+<p>MIME Types = hint to client about returned data format (application/json for structured data, text/plain for plain text)</p>
+<p>Templated Resources = URI parameters automatically parsed by SDK and passed as keyword arguments to handler function</p>
+<p>Resource vs Tools = resources provide data proactively (fetch document contents when @ mentioned), tools perform actions reactively (when Claude decides to call them)</p>
+<p>Data Return = SDK automatically serializes returned data to strings, client responsible for deserialization</p>
+<p>Testing = MCP inspector can list direct resources separately from templated resources, allows testing individual resource calls</p>
+<h3 id="accessing-resources">Accessing resources</h3>
+<p>MCP Resource Access Implementation:</p>
+<p>Resource Reading Function = client-side function to request and parse resources from MCP server</p>
+<p>Function Parameters = URI (resource identifier)</p>
+<p>Implementation Steps:<br />
+- Import json module + AnyURL from pydantic<br />
+- Call await self.session.read_resource(AnyURL(uri))<br />
+- Extract first element from result.contents[0]<br />
+- Check resource.mime_type for parsing strategy</p>
+<p>Content Parsing Logic:<br />
+- If mime_type == "application/json" → return json.loads(resource.text)<br />
+- Otherwise → return resource.text (plain text)</p>
+<p>Server Response Structure = result.contents list with first element containing type/mime_type metadata</p>
+<p>Resource Integration = MCP client functions called by other application components to fetch document contents for prompts</p>
+<p>End Result = Document contents automatically included in Claude prompts without requiring tool calls</p>
+<p>Key Point = Resources expose server information directly to clients through structured request/response pattern</p>
+<h3 id="defining-prompts">Defining prompts</h3>
+<p>MCP Prompts = Pre-defined, tested prompt templates that MCP servers expose to client applications for specialized tasks.</p>
+<p>Purpose = Instead of users writing ad-hoc prompts, server authors create high-quality, evaluated prompts tailored to their server's domain.</p>
+<p>Implementation = Use @mcpserver.prompt decorator with name/description, define function that returns list of messages (user/assistant messages that can be sent directly to Claude).</p>
+<p>Example Use Case = Document formatting prompt that takes document ID, instructs Claude to read document using tools, reformat to markdown, and save changes.</p>
+<p>Key Benefits = Server-specific expertise, pre-tested quality, reusable across client applications, better results than user-generated prompts.</p>
+<p>Message Structure = Returns base.UserMessage objects containing the formatted prompt text with interpolated parameters.</p>
+<p>Client Integration = Prompts appear as autocomplete options (slash commands) in client applications, prompt user for required parameters, then execute the pre-built prompt workflow.</p>
+<h3 id="prompts-in-the-client">Prompts in the client</h3>
+<p>MCP Client Prompt Implementation:</p>
+<p>List prompts = await self.session.list_prompts(), return result.prompts<br />
+Get prompt = await self.session.get_prompt(prompt_name, arguments), return result.messages</p>
+<p>Prompt workflow:<br />
+1. Define prompt in MCP server with expected arguments (e.g., document_id)<br />
+2. Client calls get_prompt with prompt name + arguments dictionary<br />
+3. Arguments passed as keyword arguments to prompt function<br />
+4. Function interpolates arguments into prompt text<br />
+5. Returns messages array for direct feeding to LLM</p>
+<p>Key concept: Prompts are server-defined templates that clients can invoke with specific arguments to generate contextualized instructions for LLMs. Arguments flow from client call → prompt function → interpolated prompt text → LLM consumption.</p>
+<h3 id="mcp-review">MCP review</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h2 id="anthropic-apps-and-agents">Anthropic Apps and Agents</h2>
+<h3 id="agents-overview">Agents overview</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="claude-code-setup">Claude Code setup</h3>
+<p>Claude Code = terminal-based coding assistant program that helps with code-related tasks</p>
+<p>Core capabilities = search/read/edit files + advanced tools (web fetching, terminal access) + MCP client support for expanded functionality via MCP servers</p>
+<p>Setup process:<br />
+1. Install Node.js (check with "npm help" command)<br />
+2. Run npm install to install Claude Code<br />
+3. Execute "claude" command in terminal to login to Anthropic account</p>
+<p>Full setup guide = docs.anthropic.com</p>
+<p>MCP client functionality = can consume tools from MCP servers to extend capabilities beyond basic file operations</p>
+<h3 id="claude-code-in-action">Claude Code in action</h3>
+<p>Claude Code = AI coding assistant that functions as a collaborative engineer on projects, not just a code generator.</p>
+<p>Key capabilities: project setup, feature design, code writing, testing, deployment, error fixing in production.</p>
+<p>Setup workflow:<br />
+- Download project, open in editor<br />
+- Run `claude` command to launch<br />
+- Ask Claude to read README and execute setup directions<br />
+- Run `init` command = Claude scans codebase for architecture/coding style, creates claude.md file<br />
+- claude.md = automatically included context for future requests</p>
+<p>Memory types: Project (shared), Local, User memory files.</p>
+<p>Context management:<br />
+- Use # symbol to add specific notes to memory<br />
+- Can manually edit claude.md or rerun init to update<br />
+- Claude can handle Git operations (staging, committing)</p>
+<p>Effective prompting strategies:</p>
+<p>Method 1 - Three-step workflow:<br />
+1. Identify relevant files, ask Claude to analyze them<br />
+2. Describe feature, ask Claude to plan solution (no code yet)<br />
+3. Ask Claude to implement the plan</p>
+<p>Method 2 - Test-driven development:<br />
+1. Provide relevant context<br />
+2. Ask Claude to suggest tests for the feature<br />
+3. Select and implement chosen tests<br />
+4. Ask Claude to write code until tests pass</p>
+<p>Core principle: Claude Code = effort multiplier. More detailed instructions = significantly better results. Treat as collaborative engineer, not just code generator.</p>
+<h3 id="enhancements-with-mcp-servers">Enhancements with MCP servers</h3>
+<p>Claude Code = AI assistant with embedded MCP (Model Context Protocol) client that can connect to MCP servers to expand functionality.</p>
+<p>MCP Server Integration = Connect external tools/services to Claude Code via command: `claude mcp add [server-name] [startup-command]`</p>
+<p>Example Implementation = Document processing server exposing "Document Path to Markdown" tool, allowing Claude Code to read PDF/Word documents by running `uv run main.py`</p>
+<p>Dynamic Capability Expansion = MCP servers add new functions to Claude Code in real-time without core modifications.</p>
+<p>Common Use Cases = Production monitoring (Sentry), project management (Jira), communication (Slack), custom development workflow tools.</p>
+<p>Key Benefit = Significant flexibility increase for development workflows through modular server connections.</p>
+<p>Setup Process = 1) Create MCP server with tools, 2) Add server to Claude Code with name and startup command, 3) Restart Claude Code to access new capabilities.</p>
+<h3 id="parallelizing-claude-code">Parallelizing Claude Code</h3>
+<p>Parallelizing Claude Code = running multiple Claude instances simultaneously to complete different tasks in parallel</p>
+<p>Core Problem = multiple Claude instances modifying same files simultaneously creates conflicts and invalid code</p>
+<p>Solution = Git work trees providing isolated workspaces per Claude instance</p>
+<p>Git Work Trees = feature creating complete project copies in separate directories, each corresponding to different Git branches</p>
+<p>Workflow = create work tree → assign task to Claude instance → work in isolation → commit changes → merge back to main branch</p>
+<p>Custom Commands = automating work tree creation/management through .claude/commands directory with markdown files containing prompts</p>
+<p>Command Structure = .claude/commands/filename.md with $ARGUMENTS placeholder for dynamic values</p>
+<p>Parallel Execution Benefits = single developer commanding virtual team of software engineers, major productivity scaling limited only by engineer's management capacity</p>
+<p>Merge Conflicts = Claude automatically resolves conflicts during branch merging process</p>
+<p>Cleanup = Claude handles work tree removal after feature completion</p>
+<p>Key Advantage = scales to unlimited parallel instances based on developer's capacity to manage simultaneous tasks</p>
+<h3 id="automated-debugging">Automated debugging</h3>
+<p>Automated Debugging = using AI (Claude) to automatically detect, analyze, and fix production errors without manual intervention.</p>
+<p>Core Workflow:<br />
+1. GitHub Action runs daily to check production environment<br />
+2. Fetches CloudWatch logs from last 24 hours<br />
+3. Claude identifies errors, deduplicates them<br />
+4. Claude analyzes each error and generates fixes<br />
+5. Creates pull request with proposed solutions</p>
+<p>Key Components:<br />
+- GitHub Actions for scheduling/automation<br />
+- AWS CLI for log retrieval<br />
+- Claude Code for error analysis and code fixes<br />
+- CloudWatch for production error monitoring</p>
+<p>Benefits:<br />
+- Catches production-only errors (issues not present in development)<br />
+- Reduces manual log hunting and debugging time<br />
+- Provides context-aware fixes with explanations<br />
+- Creates reviewable pull requests for changes</p>
+<p>Common Use Case: Configuration errors between environments (invalid model IDs, API keys, etc. that work locally but fail in production)</p>
+<p>Implementation Requirements: Repository access, cloud logging service, AI coding assistant, CI/CD pipeline integration.</p>
+<h3 id="computer-use">Computer Use</h3>
+<p>Computer Use = Claude's ability to interact with computer interfaces through visual observation and control actions.</p>
+<p>Key capabilities:<br />
+- Takes screenshots of applications/browsers<br />
+- Clicks buttons, types text, navigates interfaces<br />
+- Follows multi-step instructions autonomously<br />
+- Performs QA testing and automation tasks</p>
+<p>How it works:<br />
+- Runs in isolated Docker container environment<br />
+- User provides instructions via chat interface<br />
+- Claude observes screen visually and executes actions<br />
+- Generates reports on task completion/results</p>
+<p>Primary use cases:<br />
+- Automated QA testing of web applications<br />
+- UI interaction testing across different scenarios<br />
+- Time-saving for repetitive computer tasks<br />
+- Bug identification through systematic testing</p>
+<p>Setup requirement = Reference implementation available for local testing</p>
+<p>Example workflow: User describes testing requirements → Claude navigates to application → Executes test cases → Reports pass/fail results with detailed findings</p>
+<h3 id="how-computer-use-works">How Computer Use works</h3>
+<p>Computer Use = Claude's ability to interact with computer interfaces through visual observation and control actions.</p>
+<p>Key capabilities:<br />
+- Takes screenshots of applications/browsers<br />
+- Clicks buttons, types text, navigates interfaces<br />
+- Follows multi-step instructions autonomously<br />
+- Performs QA testing and automation tasks</p>
+<p>How it works:<br />
+- Runs in isolated Docker container environment<br />
+- User provides instructions via chat interface<br />
+- Claude observes screen visually and executes actions<br />
+- Generates reports on task completion/results</p>
+<p>Primary use cases:<br />
+- Automated QA testing of web applications<br />
+- UI interaction testing across different scenarios<br />
+- Time-saving for repetitive computer tasks<br />
+- Bug identification through systematic testing</p>
+<p>Setup requirement = Reference implementation available for local testing</p>
+<p>Example workflow: User describes testing requirements → Claude navigates to application → Executes test cases → Reports pass/fail results with detailed findings</p>
+<h3 id="qualities-of-agents">Qualities of agents</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="course-wrap-up">Course wrap up</h3>
+<p><em>Video lesson — no text notes.</em></p></div>
+</div>
+
+<div id="tab-quiz" class="tab-content">
+  <div class="md-body"><h1 id="claude-with-amazon-bedrock-quiz-guide">Claude with Amazon Bedrock — Quiz Guide</h1>
+<p><em>All quiz questions with answer choices (correct answer marked with ✓).</em></p>
+<hr />
+<h2 id="accessing-claude-with-the-api">Accessing Claude with the API</h2>
+<h3 id="quiz-on-working-with-the-api">Quiz on working with the API</h3>
+<p><strong>1. You're building a chat app that talks to Claude. Where should you put your API key?</strong></p>
+<ul>
+<li class="incorrect">A) In the user's browser</li>
+<li class="incorrect">B) On your secure server</li>
+<li class="incorrect">C) In your website's JavaScript code</li>
+<li class="incorrect">D) In a public GitHub repository</li>
+</ul>
+<p><strong>2. What is the primary purpose of a system prompt when working with Claude?</strong></p>
+<ul>
+<li class="incorrect">A) To authenticate API requests to the Anthropic service</li>
+<li class="incorrect">B) To provide instructions that customize Claude's tone, style, and approach</li>
+<li class="incorrect">C) To limit the number of tokens Claude can generate in a response</li>
+<li class="incorrect">D) To store the conversation history between multiple requests</li>
+</ul>
+<p><strong>3. Your users complain that your chat app feels slow because they wait 20 seconds staring at a loading spinner, then a bunch generated text suddenly appears. What feature should you add to fix this?</strong></p>
+<ul>
+<li class="incorrect">A) Shorter prompts</li>
+<li class="incorrect">B) Response streaming</li>
+<li class="incorrect">C) Multiple chatbots</li>
+<li class="incorrect">D) Faster internet connection</li>
+</ul>
+<p><strong>4. You want Claude to generate only clean JSON code without any explanations or markdown formatting. Which combination of techniques works best?</strong></p>
+<ul>
+<li class="incorrect">A) Request shorter responses</li>
+<li class="incorrect">B) Ask nicely in the prompt</li>
+<li class="incorrect">C) Use high temperature and long prompts</li>
+<li class="incorrect">D) Prefill with "{" and use "```" as a stop sequence</li>
+</ul>
+<p><strong>5. You're building a chatbot to answer factual questions about your company. You want consistent, reliable answers every time. What temperature setting should you use?</strong></p>
+<ul>
+<li class="incorrect">A) 0.1 (low temperature)</li>
+<li class="incorrect">B) It doesn't matter</li>
+<li class="incorrect">C) 0.8 (high temperature)</li>
+<li class="incorrect">D) 1.0 (high temperature)</li>
+</ul>
+<p><strong>6. Claude reads your message "I love quantum physics." What happens first?</strong></p>
+<ul>
+<li class="incorrect">A) Claude breaks the text into smaller pieces called tokens</li>
+<li class="incorrect">B) Claude researches quantum physics</li>
+<li class="incorrect">C) Claude writes a response immediately</li>
+<li class="incorrect">D) Claude translates it to another language</li>
+</ul>
+<p><strong>7. You ask Claude "What's the best programming language?" but you want it to specifically argue for Python. What technique helps you control this?</strong></p>
+<ul>
+<li class="incorrect">A) Use a higher temperature setting</li>
+<li class="incorrect">B) Ask the question multiple times</li>
+<li class="incorrect">C) Make the text bigger</li>
+<li class="incorrect">D) Add an assistant message starting with "Python is the best because"</li>
+</ul>
+<h2 id="prompt-evaluation">Prompt Evaluation</h2>
+<h3 id="quiz-on-prompt-evaluations">Quiz on prompt evaluations</h3>
+<p><strong>1. You've learned techniques for writing better prompts, but now you want to measure how well they actually work. What do you need?</strong></p>
+<ul>
+<li class="incorrect">A) More prompt engineering techniques</li>
+<li class="incorrect">B) Prompt evaluation methods</li>
+<li class="incorrect">C) More training data</li>
+<li class="incorrect">D) A faster AI model</li>
+</ul>
+<p><strong>2. You need test cases for your prompt evaluation but don't want to write them all by hand. What's a good alternative?</strong></p>
+<ul>
+<li class="incorrect">A) Ask users to create test cases</li>
+<li class="incorrect">B) Only test with one example</li>
+<li class="incorrect">C) Skip testing and deploy immediately</li>
+<li class="incorrect">D) Use Claude to generate test cases automatically</li>
+</ul>
+<p><strong>3. You write a prompt and test it twice with your own inputs. It looks good, so you deploy it. What's the main risk?</strong></p>
+<ul>
+<li class="incorrect">A) The prompt will work too slowly</li>
+<li class="incorrect">B) The prompt will become too expensive</li>
+<li class="incorrect">C) The AI model will stop working</li>
+<li class="incorrect">D) Users might provide unexpected inputs that break it</li>
+</ul>
+<p><strong>4. In a typical evaluation workflow, what happens right after you feed your prompts through Claude?</strong></p>
+<ul>
+<li class="incorrect">A) You change the prompt and start over</li>
+<li class="incorrect">B) You feed the responses through a grader</li>
+<li class="incorrect">C) You create a new dataset</li>
+<li class="incorrect">D) You deploy the prompt to production</li>
+</ul>
+<h2 id="prompt-engineering">Prompt Engineering</h2>
+<h3 id="quiz-on-prompt-engineering">Quiz on prompt engineering</h3>
+<p><strong>1. You're giving your AI a long document to analyze along with your instructions. What would help the AI understand your prompt better?</strong></p>
+<ul>
+<li class="incorrect">A) Put everything in one big paragraph</li>
+<li class="incorrect">B) Write the document in all capital letters</li>
+<li class="incorrect">C) Use XML tags like <code>&lt;document&gt;</code> and <code>&lt;instructions&gt;</code></li>
+<li class="incorrect">D) Separate sections with lots of blank lines</li>
+</ul>
+<p><strong>2. You want your AI to write a book review. Which approach would be more helpful?</strong></p>
+<ul>
+<li class="incorrect">A) "Write a book review that's 300 words, includes plot summary, mentions two characters, and gives a rating"</li>
+<li class="incorrect">B) "Write a book review that's good and interesting"</li>
+<li class="incorrect">C) "Tell me what you think about books in general"</li>
+<li class="incorrect">D) "Write something about the book I just read"</li>
+</ul>
+<p><strong>3. You want to improve a prompt that isn't working well. What should you do first after writing your initial prompt?</strong></p>
+<ul>
+<li class="incorrect">A) Test it and measure how well it performs</li>
+<li class="incorrect">B) Add more examples immediately</li>
+<li class="incorrect">C) Rewrite it completely from scratch</li>
+<li class="incorrect">D) Make it longer and more detailed</li>
+</ul>
+<p><strong>4. Your evaluation report shows your prompt scored poorly on "missing calorie information" across multiple test cases. What does this tell you?</strong></p>
+<ul>
+<li class="incorrect">A) You should ignore this feedback and try something else</li>
+<li class="incorrect">B) You need to specifically tell your prompt to include calorie information</li>
+<li class="incorrect">C) The test cases are too hard</li>
+<li class="incorrect">D) The evaluation system is broken</li>
+</ul>
+<p><strong>5. You want your AI to detect sarcasm in social media posts, but it keeps missing sarcastic comments. What would help most?</strong></p>
+<ul>
+<li class="incorrect">A) Tell it to "try harder" to find sarcasm</li>
+<li class="incorrect">B) Use bigger fonts in your prompt</li>
+<li class="incorrect">C) Show it examples of sarcastic posts with correct labels</li>
+<li class="incorrect">D) Ask it to guess when posts might be sarcastic</li>
+</ul>
+<p><strong>6. Why is the first line of your prompt considered the most important part?</strong></p>
+<ul>
+<li class="incorrect">A) It determines which AI model will be used</li>
+<li class="incorrect">B) It determines how fast the AI will respond</li>
+<li class="incorrect">C) It sets the stage for everything that follows and should be clear and direct</li>
+<li class="incorrect">D) It controls the length of the AI's response</li>
+</ul>
+<h2 id="tool-use">Tool Use</h2>
+<h3 id="quiz-on-tool-use">Quiz on tool use</h3>
+<p><strong>1. When Claude wants to use a tool, it sends back a response that's different from usual. What does this response contain?</strong></p>
+<ul>
+<li class="incorrect">A) Error messages only</li>
+<li class="incorrect">B) Both text blocks and tool use blocks</li>
+<li class="incorrect">C) Only tool requests with no text</li>
+<li class="incorrect">D) Only text like normal</li>
+</ul>
+<p><strong>2. You want to create a tool that gets the current time. What type of code do you need to write?</strong></p>
+<ul>
+<li class="incorrect">A) A regular Python function</li>
+<li class="incorrect">B) A web page</li>
+<li class="incorrect">C) A database query</li>
+<li class="incorrect">D) A complex AI algorithm</li>
+</ul>
+<p><strong>3. A user asks Claude "What day will it be 30 days from today?" To answer this, Claude needs to use multiple tools. What happens?</strong></p>
+<ul>
+<li class="incorrect">A) Claude asks the user to do the math</li>
+<li class="incorrect">B) Claude uses one tool and guesses the rest</li>
+<li class="incorrect">C) Claude calls tools in sequence - first getting today's date, then adding 30 days</li>
+<li class="incorrect">D) Claude gives up and says it can't help</li>
+</ul>
+<p><strong>4. Sarah asks Claude "What's the weather like today?" but Claude says it doesn't have current weather data. What would solve this problem?</strong></p>
+<ul>
+<li class="incorrect">A) Waiting for Claude to update itself</li>
+<li class="incorrect">B) Giving Claude access to tools that fetch current data</li>
+<li class="incorrect">C) Asking Claude to guess the weather</li>
+<li class="incorrect">D) Training Claude on more weather information</li>
+</ul>
+<p><strong>5. You're building a chat app with Claude. A user asks for today's stock prices, but Claude responds "I don't have access to current stock information." What's the core problem?</strong></p>
+<ul>
+<li class="incorrect">A) The user asked the wrong question</li>
+<li class="incorrect">B) Claude is broken</li>
+<li class="incorrect">C) Claude only knows information from its training data</li>
+<li class="incorrect">D) Claude needs to be restarted</li>
+</ul>
+<p><strong>6. You want to give Claude the ability to search the web for current information. What do you need to implement?</strong></p>
+<ul>
+<li class="incorrect">A) Just a simple schema - Claude handles the searching</li>
+<li class="incorrect">B) Your own search engine</li>
+<li class="incorrect">C) A complex web scraping system</li>
+<li class="incorrect">D) Permission from Google</li>
+</ul>
+<p><strong>7. You've written a Python function for Claude to use. What else do you need so Claude knows how to call it?</strong></p>
+<ul>
+<li class="incorrect">A) Permission from Claude</li>
+<li class="incorrect">B) A JSON schema describing the function</li>
+<li class="incorrect">C) A special license</li>
+<li class="incorrect">D) A user manual</li>
+</ul>
+<h2 id="rag-and-agentic-search">RAG and Agentic Search</h2>
+<h3 id="quiz-on-retrieval-augmented-generation">Quiz on Retrieval Augmented Generation</h3>
+<p><strong>1. You're setting up a system to handle large documents. Instead of using everything at once, you break documents into smaller pieces and search for relevant ones. What is this approach called?</strong></p>
+<ul>
+<li class="incorrect">A) The chunking approach</li>
+<li class="incorrect">B) File splitting</li>
+<li class="incorrect">C) Text summarization</li>
+<li class="incorrect">D) Document compression</li>
+</ul>
+<p><strong>2. You try to include a massive 800-page document directly in your Claude prompt. What problems will you likely face?</strong></p>
+<ul>
+<li class="incorrect">A) There are hard limits on text length, reduced effectiveness, and higher costs</li>
+<li class="incorrect">B) The document will be perfectly processed</li>
+<li class="incorrect">C) Claude will work faster than normal</li>
+<li class="incorrect">D) Only the cost will increase slightly</li>
+</ul>
+<p><strong>3. You have an 800-page financial report and want to ask Claude specific questions about it. What does RAG help you do?</strong></p>
+<ul>
+<li class="incorrect">A) Ask only yes/no questions</li>
+<li class="incorrect">B) Put the entire document into each prompt</li>
+<li class="incorrect">C) Summarize the whole document first</li>
+<li class="incorrect">D) Find and include only the relevant sections for each question</li>
+</ul>
+<p><strong>4. You send the text "The cat is happy" to an embedding model. What do you get back?</strong></p>
+<ul>
+<li class="incorrect">A) A summary of the text</li>
+<li class="incorrect">B) A translation in another language</li>
+<li class="incorrect">C) A list of keywords</li>
+<li class="incorrect">D) A long list of numbers</li>
+</ul>
+<p><strong>5. What problem does contextual retrieval solve in RAG systems?</strong></p>
+<ul>
+<li class="incorrect">A) It makes search queries run faster</li>
+<li class="incorrect">B) It reduces the storage space needed for embeddings</li>
+<li class="incorrect">C) It addresses the issue of chunks losing their connection to broader document context when documents are split</li>
+<li class="incorrect">D) It eliminates the need for vector databases</li>
+</ul>
+<p><strong>6. You have search results from both semantic search and BM25 search. They use different scoring systems. How do you combine them into one ranked list?</strong></p>
+<ul>
+<li class="incorrect">A) Use Reciprocal Rank Fusion (RRF) based on rank positions</li>
+<li class="incorrect">B) Take the average of both scores</li>
+<li class="incorrect">C) Add the scores together directly</li>
+<li class="incorrect">D) Use only the semantic search results</li>
+</ul>
+<p><strong>7. What is the purpose of re-ranking in RAG pipelines?</strong></p>
+<ul>
+<li class="incorrect">A) To compress the vector database for faster searches</li>
+<li class="incorrect">B) To generate better embeddings for text chunks</li>
+<li class="incorrect">C) To use an LLM to intelligently reorder search results after initial retrieval</li>
+<li class="incorrect">D) To split documents into more appropriate chunk sizes</li>
+</ul>
+<p><strong>8. You're searching for a specific incident ID like "INC-2023-Q4-011" in your documents. Semantic search isn't finding it well. What additional search method would help?</strong></p>
+<ul>
+<li class="incorrect">A) Bigger vector database</li>
+<li class="incorrect">B) BM25 lexical search for exact term matching</li>
+<li class="incorrect">C) Longer embeddings</li>
+<li class="incorrect">D) More chunks</li>
+</ul>
+<h2 id="features-of-claude">Features of Claude</h2>
+<h3 id="quiz-on-features-of-claude">Quiz on features of Claude</h3>
+<p><strong>1. When Extended Thinking is enabled, what two parts will Claude's response contain?</strong></p>
+<ul>
+<li class="incorrect">A) A summary block and a detail block</li>
+<li class="incorrect">B) A thinking block and a text block</li>
+<li class="incorrect">C) A draft block and a final block</li>
+<li class="incorrect">D) A question block and an answer block</li>
+</ul>
+<p><strong>2. You ask Claude "How many marbles are in this image?" but get the wrong count. What's the best way to improve accuracy?</strong></p>
+<ul>
+<li class="incorrect">A) Ask the question in all capital letters</li>
+<li class="incorrect">B) Send a higher quality image</li>
+<li class="incorrect">C) Upload the image multiple times</li>
+<li class="incorrect">D) Provide detailed counting steps and methodology</li>
+</ul>
+<p><strong>3. What's the minimum amount of content needed for caching to work?</strong></p>
+<ul>
+<li class="incorrect">A) Any amount of text</li>
+<li class="incorrect">B) 500 tokens</li>
+<li class="incorrect">C) 1024 tokens</li>
+<li class="incorrect">D) 2000 tokens</li>
+</ul>
+<p><strong>4. You want to cache your tool definitions. Where should you place the cache breakpoint?</strong></p>
+<ul>
+<li class="incorrect">A) On the last tool in your list</li>
+<li class="incorrect">B) On the middle tool in your list</li>
+<li class="incorrect">C) On every tool in your list</li>
+<li class="incorrect">D) On the first tool in your list</li>
+</ul>
+<p><strong>5. How does prompt caching work?</strong></p>
+<ul>
+<li class="incorrect">A) It makes Claude remember conversations forever</li>
+<li class="incorrect">B) It prevents Claude from making mistakes</li>
+<li class="incorrect">C) It reuses computational work from previous requests</li>
+<li class="incorrect">D) It translates messages into different languages</li>
+</ul>
+<p><strong>6. You're building an app where users ask questions about documents. What's the main benefit of enabling citations?</strong></p>
+<ul>
+<li class="incorrect">A) It reduces the cost of each request</li>
+<li class="incorrect">B) It shows users exactly where information came from</li>
+<li class="incorrect">C) It makes Claude's responses longer</li>
+<li class="incorrect">D) It makes the app run faster</li>
+</ul>
+<h2 id="model-context-protocol">Model Context Protocol</h2>
+<h3 id="quiz-on-model-context-protocol">Quiz on Model Context Protocol</h3>
+<p><strong>1. User-controlled workflows that are triggered through UI interactions like button clicks or slash commands. This definition describes which MCP primitive?</strong></p>
+<ul>
+<li class="incorrect">A) Resources</li>
+<li class="incorrect">B) Sessions</li>
+<li class="incorrect">C) Tools</li>
+<li class="incorrect">D) Prompts</li>
+</ul>
+<p><strong>2. What does "transport agnostic" mean in the context of MCP communication?</strong></p>
+<ul>
+<li class="incorrect">A) MCP automatically chooses the fastest available network connection</li>
+<li class="incorrect">B) MCP requires specific hardware to function properly</li>
+<li class="incorrect">C) MCP only works with HTTP connections</li>
+<li class="incorrect">D) MCP clients and servers can communicate using different methods like HTTP, WebSockets, or standard input/output</li>
+</ul>
+<p><strong>3. What are Resources in the context of MCP?</strong></p>
+<ul>
+<li class="incorrect">A) App-controlled data access for UI purposes or adding context to conversations</li>
+<li class="incorrect">B) Model-controlled functions for performing calculations</li>
+<li class="incorrect">C) User-triggered commands that start predefined workflows</li>
+<li class="incorrect">D) Server configuration settings that control performance</li>
+</ul>
+<p><strong>4. In MCP architecture, what is the relationship between MCP Clients and MCP Servers?</strong></p>
+<ul>
+<li class="incorrect">A) MCP Clients generate AI responses while MCP Servers handle user input</li>
+<li class="incorrect">B) MCP Clients store data while MCP Servers process requests</li>
+<li class="incorrect">C) MCP Clients connect to MCP Servers that contain tools, prompts, and resources</li>
+<li class="incorrect">D) MCP Clients and MCP Servers are the same component with different names</li>
+</ul>
+<p><strong>5. What is Model Context Protocol (MCP)?</strong></p>
+<ul>
+<li class="incorrect">A) A programming language specifically designed for AI applications</li>
+<li class="incorrect">B) A communication layer that provides Claude with context and tools without requiring tedious integration code</li>
+<li class="incorrect">C) A security protocol for encrypting AI model responses</li>
+<li class="incorrect">D) A database management system for storing AI conversations</li>
+</ul>
+<p><strong>6. What is the MCP Server Inspector?</strong></p>
+<ul>
+<li class="incorrect">A) A command-line tool for monitoring server performance</li>
+<li class="incorrect">B) A code editor specifically designed for writing MCP servers</li>
+<li class="incorrect">C) A security tool for scanning MCP servers for vulnerabilities</li>
+<li class="incorrect">D) A browser-based interface for testing and debugging MCP servers in real-time</li>
+</ul>
+<p><strong>7. Which of the following correctly describes Tools in MCP?</strong></p>
+<ul>
+<li class="incorrect">A) App-controlled data that populates UI elements</li>
+<li class="incorrect">B) Static configuration files that define server behavior</li>
+<li class="incorrect">C) User-controlled workflows that can be triggered on demand</li>
+<li class="incorrect">D) Model-controlled functions that Claude decides when to call</li>
+</ul>
+<h2 id="anthropic-apps-and-agents">Anthropic Apps and Agents</h2>
+<h3 id="final-assessment-quiz">Final assessment quiz</h3>
+<p><em>Quiz questions could not be extracted.</em></p></div>
+</div>
+
+<div id="tab-videos" class="tab-content">
+  <script src="https://cdn.jwplayer.com/libraries/Akyo8gQO.js"></script>
+<div class="video-speed-bar">
+  <span class="speed-label">Speed:</span>
+  <button class="speed-btn" data-speed="0.5">0.5&times;</button>
+  <button class="speed-btn" data-speed="0.75">0.75&times;</button>
+  <button class="speed-btn active" data-speed="1">1&times;</button>
+  <button class="speed-btn" data-speed="1.25">1.25&times;</button>
+  <button class="speed-btn" data-speed="1.5">1.5&times;</button>
+  <button class="speed-btn" data-speed="1.75">1.75&times;</button>
+  <button class="speed-btn" data-speed="2">2&times;</button>
+  <span class="video-total">71 videos</span>
+</div>
+<div class="chapter-section"><div class="chapter-title">Introduction</div><div class="video-grid"><div class="video-card"><div class="video-title">Overview of Claude Models</div><div id="jwp-0"></div></div></div></div><div class="chapter-section"><div class="chapter-title">Accessing Claude with the API</div><div class="video-grid"><div class="video-card"><div class="video-title">Accessing the API</div><div id="jwp-1"></div></div><div class="video-card"><div class="video-title">Making a request</div><div id="jwp-2"></div></div><div class="video-card"><div class="video-title">Multi-Turn conversations</div><div id="jwp-3"></div></div><div class="video-card"><div class="video-title">Chat bot exercise</div><div id="jwp-4"></div></div><div class="video-card"><div class="video-title">System prompts</div><div id="jwp-5"></div></div><div class="video-card"><div class="video-title">System prompt exercise</div><div id="jwp-6"></div></div><div class="video-card"><div class="video-title">Temperature</div><div id="jwp-7"></div></div><div class="video-card"><div class="video-title">Streaming</div><div id="jwp-8"></div></div><div class="video-card"><div class="video-title">Controlling model output</div><div id="jwp-9"></div></div><div class="video-card"><div class="video-title">Structured data</div><div id="jwp-10"></div></div><div class="video-card"><div class="video-title">Structured data exercise</div><div id="jwp-11"></div></div></div></div><div class="chapter-section"><div class="chapter-title">Prompt Evaluation</div><div class="video-grid"><div class="video-card"><div class="video-title">Prompt evaluation</div><div id="jwp-12"></div></div><div class="video-card"><div class="video-title">A typical eval workflow</div><div id="jwp-13"></div></div><div class="video-card"><div class="video-title">Generating test datasets</div><div id="jwp-14"></div></div><div class="video-card"><div class="video-title">Running the eval</div><div id="jwp-15"></div></div><div class="video-card"><div class="video-title">Model based grading</div><div id="jwp-16"></div></div><div class="video-card"><div class="video-title">Code based grading</div><div id="jwp-17"></div></div><div class="video-card"><div class="video-title">Exercise on prompt evals</div><div id="jwp-18"></div></div></div></div><div class="chapter-section"><div class="chapter-title">Prompt Engineering</div><div class="video-grid"><div class="video-card"><div class="video-title">Prompt engineering</div><div id="jwp-19"></div></div><div class="video-card"><div class="video-title">Being clear and direct</div><div id="jwp-20"></div></div><div class="video-card"><div class="video-title">Being specific</div><div id="jwp-21"></div></div><div class="video-card"><div class="video-title">Structure with XML tags</div><div id="jwp-22"></div></div><div class="video-card"><div class="video-title">Providing examples</div><div id="jwp-23"></div></div><div class="video-card"><div class="video-title">Exercise on prompting</div><div id="jwp-24"></div></div></div></div><div class="chapter-section"><div class="chapter-title">Tool Use</div><div class="video-grid"><div class="video-card"><div class="video-title">Introducing tool use</div><div id="jwp-25"></div></div><div class="video-card"><div class="video-title">Tool functions</div><div id="jwp-26"></div></div><div class="video-card"><div class="video-title">JSON Schema for tools</div><div id="jwp-27"></div></div><div class="video-card"><div class="video-title">Handling tool use responses</div><div id="jwp-28"></div></div><div class="video-card"><div class="video-title">Running tool functions</div><div id="jwp-29"></div></div><div class="video-card"><div class="video-title">Sending tool results</div><div id="jwp-30"></div></div><div class="video-card"><div class="video-title">Multi-Turn conversations with tools</div><div id="jwp-31"></div></div><div class="video-card"><div class="video-title">Adding multiple tools</div><div id="jwp-32"></div></div><div class="video-card"><div class="video-title">Batch tool use</div><div id="jwp-33"></div></div><div class="video-card"><div class="video-title">Structured data with tools</div><div id="jwp-34"></div></div><div class="video-card"><div class="video-title">Flexible tool extraction</div><div id="jwp-35"></div></div><div class="video-card"><div class="video-title">The text editor tool</div><div id="jwp-36"></div></div></div></div><div class="chapter-section"><div class="chapter-title">RAG and Agentic Search</div><div class="video-grid"><div class="video-card"><div class="video-title">Introducing Retrieval Augmented Generation</div><div id="jwp-37"></div></div><div class="video-card"><div class="video-title">Text chunking strategies</div><div id="jwp-38"></div></div><div class="video-card"><div class="video-title">Text embeddings</div><div id="jwp-39"></div></div><div class="video-card"><div class="video-title">The full RAG flow</div><div id="jwp-40"></div></div><div class="video-card"><div class="video-title">Implementing the RAG flow</div><div id="jwp-41"></div></div><div class="video-card"><div class="video-title">BM25 lexical search</div><div id="jwp-42"></div></div><div class="video-card"><div class="video-title">A multi-search RAG pipeline</div><div id="jwp-43"></div></div><div class="video-card"><div class="video-title">Reranking results</div><div id="jwp-44"></div></div></div></div><div class="chapter-section"><div class="chapter-title">Features of Claude</div><div class="video-grid"><div class="video-card"><div class="video-title">Extended thinking</div><div id="jwp-45"></div></div><div class="video-card"><div class="video-title">Image support</div><div id="jwp-46"></div></div><div class="video-card"><div class="video-title">PDF support</div><div id="jwp-47"></div></div><div class="video-card"><div class="video-title">Citations</div><div id="jwp-48"></div></div><div class="video-card"><div class="video-title">Prompt caching</div><div id="jwp-49"></div></div><div class="video-card"><div class="video-title">Rules of prompt caching</div><div id="jwp-50"></div></div><div class="video-card"><div class="video-title">Prompt caching in action</div><div id="jwp-51"></div></div></div></div><div class="chapter-section"><div class="chapter-title">Model Context Protocol</div><div class="video-grid"><div class="video-card"><div class="video-title">Introducing MCP</div><div id="jwp-52"></div></div><div class="video-card"><div class="video-title">MCP clients</div><div id="jwp-53"></div></div><div class="video-card"><div class="video-title">Project setup</div><div id="jwp-54"></div></div><div class="video-card"><div class="video-title">Defining tools with MCP</div><div id="jwp-55"></div></div><div class="video-card"><div class="video-title">Implementing a client</div><div id="jwp-56"></div></div><div class="video-card"><div class="video-title">Defining resources</div><div id="jwp-57"></div></div><div class="video-card"><div class="video-title">Accessing resources</div><div id="jwp-58"></div></div><div class="video-card"><div class="video-title">Defining prompts</div><div id="jwp-59"></div></div><div class="video-card"><div class="video-title">Prompts in the client</div><div id="jwp-60"></div></div><div class="video-card"><div class="video-title">MCP review</div><div id="jwp-61"></div></div></div></div><div class="chapter-section"><div class="chapter-title">Anthropic Apps and Agents</div><div class="video-grid"><div class="video-card"><div class="video-title">Agents overview</div><div id="jwp-62"></div></div><div class="video-card"><div class="video-title">Claude Code setup</div><div id="jwp-63"></div></div><div class="video-card"><div class="video-title">Claude Code in action</div><div id="jwp-64"></div></div><div class="video-card"><div class="video-title">Enhancements with MCP servers</div><div id="jwp-65"></div></div><div class="video-card"><div class="video-title">Parallelizing Claude Code</div><div id="jwp-66"></div></div><div class="video-card"><div class="video-title">Automated debugging</div><div id="jwp-67"></div></div><div class="video-card"><div class="video-title">Computer Use</div><div id="jwp-68"></div></div><div class="video-card"><div class="video-title">How Computer Use works</div><div id="jwp-69"></div></div><div class="video-card"><div class="video-title">Qualities of agents</div><div id="jwp-70"></div></div></div></div>
+<script>
+const jwPlayers = [];
+let currentSpeed = 1.0;
+  jwPlayers.push(jwplayer('jwp-0').setup({playlist:'https://cdn.jwplayer.com/v2/media/jI15s29u',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-1').setup({playlist:'https://cdn.jwplayer.com/v2/media/fHW3vrEe',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-2').setup({playlist:'https://cdn.jwplayer.com/v2/media/WZfVrXpY',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-3').setup({playlist:'https://cdn.jwplayer.com/v2/media/zemcqJPI',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-4').setup({playlist:'https://cdn.jwplayer.com/v2/media/jIDW8lGe',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-5').setup({playlist:'https://cdn.jwplayer.com/v2/media/rpqLvhcX',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-6').setup({playlist:'https://cdn.jwplayer.com/v2/media/02clfR48',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-7').setup({playlist:'https://cdn.jwplayer.com/v2/media/GCb7VP4j',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-8').setup({playlist:'https://cdn.jwplayer.com/v2/media/78jGLtMy',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-9').setup({playlist:'https://cdn.jwplayer.com/v2/media/i4ZAgwI9',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-10').setup({playlist:'https://cdn.jwplayer.com/v2/media/UxEmB0By',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-11').setup({playlist:'https://cdn.jwplayer.com/v2/media/hpYaDkK1',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-12').setup({playlist:'https://cdn.jwplayer.com/v2/media/g8MgAWsn',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-13').setup({playlist:'https://cdn.jwplayer.com/v2/media/KHml9rkY',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-14').setup({playlist:'https://cdn.jwplayer.com/v2/media/xNukP1U7',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-15').setup({playlist:'https://cdn.jwplayer.com/v2/media/JOzYAVJS',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-16').setup({playlist:'https://cdn.jwplayer.com/v2/media/ZxESzWdu',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-17').setup({playlist:'https://cdn.jwplayer.com/v2/media/f2Jw2sER',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-18').setup({playlist:'https://cdn.jwplayer.com/v2/media/fNlJq9oL',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-19').setup({playlist:'https://cdn.jwplayer.com/v2/media/tyuXJDAP',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-20').setup({playlist:'https://cdn.jwplayer.com/v2/media/caZ6K7qR',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-21').setup({playlist:'https://cdn.jwplayer.com/v2/media/bNeTltfV',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-22').setup({playlist:'https://cdn.jwplayer.com/v2/media/dAE9TByF',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-23').setup({playlist:'https://cdn.jwplayer.com/v2/media/FuSXqBJJ',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-24').setup({playlist:'https://cdn.jwplayer.com/v2/media/7JTK8xyp',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-25').setup({playlist:'https://cdn.jwplayer.com/v2/media/2c1FuAuv',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-26').setup({playlist:'https://cdn.jwplayer.com/v2/media/ZKs0hMzu',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-27').setup({playlist:'https://cdn.jwplayer.com/v2/media/TJVycwih',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-28').setup({playlist:'https://cdn.jwplayer.com/v2/media/SmAEl9b8',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-29').setup({playlist:'https://cdn.jwplayer.com/v2/media/ihtmDjJn',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-30').setup({playlist:'https://cdn.jwplayer.com/v2/media/xNbBcm4I',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-31').setup({playlist:'https://cdn.jwplayer.com/v2/media/zDYRYhXo',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-32').setup({playlist:'https://cdn.jwplayer.com/v2/media/AVYtdSho',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-33').setup({playlist:'https://cdn.jwplayer.com/v2/media/YRx98Q7X',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-34').setup({playlist:'https://cdn.jwplayer.com/v2/media/zY3WeFZf',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-35').setup({playlist:'https://cdn.jwplayer.com/v2/media/r3VkxeGY',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-36').setup({playlist:'https://cdn.jwplayer.com/v2/media/8KXWsUp4',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-37').setup({playlist:'https://cdn.jwplayer.com/v2/media/h63mMcLg',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-38').setup({playlist:'https://cdn.jwplayer.com/v2/media/lE3vYZZV',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-39').setup({playlist:'https://cdn.jwplayer.com/v2/media/mFoJOntA',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-40').setup({playlist:'https://cdn.jwplayer.com/v2/media/hB3Fl5II',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-41').setup({playlist:'https://cdn.jwplayer.com/v2/media/w4lDODfl',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-42').setup({playlist:'https://cdn.jwplayer.com/v2/media/DKOlZ9aV',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-43').setup({playlist:'https://cdn.jwplayer.com/v2/media/YEOigr13',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-44').setup({playlist:'https://cdn.jwplayer.com/v2/media/DuRf3JNP',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-45').setup({playlist:'https://cdn.jwplayer.com/v2/media/PBrFHmKG',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-46').setup({playlist:'https://cdn.jwplayer.com/v2/media/66W6CgTm',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-47').setup({playlist:'https://cdn.jwplayer.com/v2/media/9ymXxg0L',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-48').setup({playlist:'https://cdn.jwplayer.com/v2/media/ESdp1t6f',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-49').setup({playlist:'https://cdn.jwplayer.com/v2/media/DZKGhoZr',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-50').setup({playlist:'https://cdn.jwplayer.com/v2/media/d5grqBoN',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-51').setup({playlist:'https://cdn.jwplayer.com/v2/media/Tct2BtU9',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-52').setup({playlist:'https://cdn.jwplayer.com/v2/media/dAITNpmW',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-53').setup({playlist:'https://cdn.jwplayer.com/v2/media/D86xpJvD',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-54').setup({playlist:'https://cdn.jwplayer.com/v2/media/b74TLtIM',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-55').setup({playlist:'https://cdn.jwplayer.com/v2/media/umAfCeyZ',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-56').setup({playlist:'https://cdn.jwplayer.com/v2/media/mslH6gZU',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-57').setup({playlist:'https://cdn.jwplayer.com/v2/media/hcWx9PMY',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-58').setup({playlist:'https://cdn.jwplayer.com/v2/media/l5skO0q0',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-59').setup({playlist:'https://cdn.jwplayer.com/v2/media/wljyE4zg',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-60').setup({playlist:'https://cdn.jwplayer.com/v2/media/35q3jn1q',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-61').setup({playlist:'https://cdn.jwplayer.com/v2/media/iVMjH27y',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-62').setup({playlist:'https://cdn.jwplayer.com/v2/media/btmjanJx',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-63').setup({playlist:'https://cdn.jwplayer.com/v2/media/NjqBjGTS',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-64').setup({playlist:'https://cdn.jwplayer.com/v2/media/7xfs3u8E',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-65').setup({playlist:'https://cdn.jwplayer.com/v2/media/GRL3AV41',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-66').setup({playlist:'https://cdn.jwplayer.com/v2/media/J2Ae5yre',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-67').setup({playlist:'https://cdn.jwplayer.com/v2/media/wrZ8fwfc',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-68').setup({playlist:'https://cdn.jwplayer.com/v2/media/0p3vnJsZ',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-69').setup({playlist:'https://cdn.jwplayer.com/v2/media/RNgrsswb',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-70').setup({playlist:'https://cdn.jwplayer.com/v2/media/WdmqOCWa',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+jwPlayers.forEach(p => {
+  p.on('play', function() { try { this.setPlaybackRate(currentSpeed); } catch(e) {} });
+});
+function applySpeed(rate) {
+  currentSpeed = rate;
+  jwPlayers.forEach(p => { try { p.setPlaybackRate(rate); } catch(e) {} });
+}
+document.querySelectorAll('.video-speed-bar .speed-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.video-speed-bar .speed-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    applySpeed(parseFloat(this.dataset.speed));
+  });
+});
+</script>
+</div>
+
+
+
+<script>
+document.getElementById('tabBar').addEventListener('click', function(e) {
+  const btn = e.target.closest('.tab-btn');
+  if (!btn) return;
+  const tab = btn.dataset.tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+});
+</script>
+</body>
+</html>

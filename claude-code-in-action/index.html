@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code in Action — Anthropic Academy</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --bg2: #1e293b;
+    --bg3: #162032;
+    --border: #2d3f55;
+    --accent: #7c3aed;
+    --accent2: #a855f7;
+    --green: #10b981;
+    --red: #ef4444;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --code-bg: #0d1526;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         background: var(--bg); color: var(--text); line-height: 1.6; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Header ── */
+  .site-header {
+    background: #0a0f1e;
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; align-items: center; gap: 0;
+    height: 60px; position: sticky; top: 0; z-index: 200;
+  }
+  .site-logo {
+    font-size: 15px; font-weight: 700; color: var(--text);
+    letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px;
+    white-space: nowrap;
+  }
+  .site-logo .logo-icon {
+    width: 28px; height: 28px; background: linear-gradient(135deg, #f97316, #ef4444);
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 900; color: #fff; flex-shrink: 0;
+  }
+  .breadcrumb { font-size: 13px; color: var(--text3); margin-left: 16px; display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: var(--text2); }
+  .breadcrumb .sep { color: var(--text3); }
+  .header-meta { margin-left: auto; font-size: 12px; color: var(--text3); }
+
+  /* ── Tab navigation ── */
+  .tab-bar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; gap: 0; overflow-x: auto;
+    position: sticky; top: 60px; z-index: 100;
+  }
+  .tab-btn {
+    padding: 14px 22px; font-size: 14px; font-weight: 500;
+    color: var(--text2); background: none; border: none;
+    border-bottom: 2px solid transparent; cursor: pointer;
+    white-space: nowrap; transition: all 0.15s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent); }
+
+  /* ── Tab content ── */
+  .tab-content { display: none; max-width: 960px; margin: 0 auto; padding: 36px 32px; }
+  .tab-content.active { display: block; }
+
+  /* ── Study Guide / Quiz markdown rendering ── */
+  .md-body h1 { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+  .md-body h2 {
+    font-size: 20px; font-weight: 700; color: #c8a2f8;
+    border-left: 3px solid var(--accent); padding-left: 12px;
+    margin: 36px 0 16px;
+  }
+  .md-body h3 {
+    font-size: 16px; font-weight: 600; color: var(--text);
+    margin: 24px 0 10px; padding-top: 4px;
+  }
+  .md-body p { color: var(--text); margin-bottom: 14px; }
+  .md-body em { color: var(--text2); }
+  .md-body strong { color: var(--text); }
+  .md-body hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  .md-body ul, .md-body ol { padding-left: 22px; margin-bottom: 14px; }
+  .md-body li { color: var(--text); margin-bottom: 4px; }
+  .md-body code {
+    background: var(--code-bg); color: #7dd3fc;
+    padding: 2px 6px; border-radius: 4px; font-size: 13px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  }
+  .md-body pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px; overflow-x: auto; margin-bottom: 16px;
+  }
+  .md-body pre code { background: none; padding: 0; color: #e2e8f0; }
+  .md-body table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 14px; }
+  .md-body th { background: var(--bg2); color: var(--accent2); padding: 8px 12px;
+                text-align: left; border: 1px solid var(--border); }
+  .md-body td { padding: 8px 12px; border: 1px solid var(--border); color: var(--text); }
+  .md-body tr:nth-child(even) td { background: var(--bg3); }
+  .md-body blockquote {
+    border-left: 3px solid var(--accent); padding: 8px 16px;
+    background: var(--bg2); border-radius: 0 6px 6px 0; margin-bottom: 14px;
+  }
+
+  /* ── Quiz ── */
+  .md-body li.correct {
+    background: rgba(16, 185, 129, 0.12);
+    border-left: 2px solid var(--green);
+    padding: 4px 10px; border-radius: 4px; list-style: none;
+    color: #6ee7b7; font-weight: 500;
+  }
+  .md-body li.incorrect { color: var(--text2); }
+  .md-body li.correct::before { content: ''; }
+
+  /* ── Videos tab ── */
+  .video-speed-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 16px;
+    margin-bottom: 28px; flex-wrap: wrap;
+  }
+  .speed-label { font-size: 13px; color: var(--text2); }
+  .speed-btn {
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
+    padding: 4px 12px; border-radius: 20px; cursor: pointer;
+    font-size: 12px; transition: all 0.15s;
+  }
+  .speed-btn:hover { background: #2a3a55; color: var(--text); }
+  .speed-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .video-total { margin-left: auto; font-size: 12px; color: var(--text3); }
+  .chapter-section { margin-bottom: 36px; }
+  .chapter-title {
+    font-size: 17px; font-weight: 700; color: #c8a2f8;
+    border-left: 3px solid var(--accent); padding-left: 12px;
+    margin-bottom: 14px;
+  }
+  .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
+  .video-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+  }
+  .video-title {
+    padding: 9px 13px; font-size: 13px; font-weight: 500; color: var(--text2);
+    background: var(--bg3); border-bottom: 1px solid var(--border);
+  }
+  .yt-wrap { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
+  .yt-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  /* ── Notebooks tab ── */
+  .nb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 32px; }
+  .nb-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px;
+    transition: border-color 0.15s;
+  }
+  .nb-card:hover { border-color: var(--accent); }
+  .nb-name { font-size: 13px; font-weight: 600; color: var(--text); word-break: break-all; }
+  .nb-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nb-link {
+    font-size: 11px; padding: 3px 10px; border-radius: 12px;
+    border: 1px solid var(--border); color: var(--text2);
+    background: var(--bg3); transition: all 0.15s;
+  }
+  .nb-link:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+  .nb-link.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .nb-link.primary:hover { background: var(--accent2); }
+  .section-note {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 18px; font-size: 13px; color: var(--text2);
+    margin-bottom: 24px;
+  }
+  .section-title { font-size: 16px; font-weight: 700; color: var(--text); margin: 24px 0 12px; }
+  .file-list { display: flex; flex-direction: column; gap: 8px; }
+  .file-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+  }
+  .file-icon { font-size: 18px; }
+  .file-name { font-size: 13px; color: var(--text); flex: 1; }
+  .file-link { font-size: 12px; color: var(--accent2); }
+
+  /* ── Index page cards ── */
+  .index-hero { padding: 60px 32px 40px; text-align: center; }
+  .index-hero h1 { font-size: 36px; font-weight: 800; color: var(--text); margin-bottom: 12px; }
+  .index-hero p { font-size: 16px; color: var(--text2); max-width: 520px; margin: 0 auto; }
+  .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                  gap: 20px; max-width: 1200px; margin: 0 auto; padding: 0 32px 60px; }
+  .course-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 10px;
+    text-decoration: none; transition: all 0.2s; color: inherit;
+  }
+  .course-card:hover { border-color: var(--accent); transform: translateY(-2px);
+                       box-shadow: 0 8px 24px rgba(124,58,237,0.15); text-decoration: none; }
+  .card-emoji { font-size: 32px; }
+  .card-title { font-size: 16px; font-weight: 700; color: var(--text); }
+  .card-meta { font-size: 12px; color: var(--text3); display: flex; gap: 12px; flex-wrap: wrap; }
+  .card-tag { background: var(--bg3); border: 1px solid var(--border);
+              padding: 2px 8px; border-radius: 10px; color: var(--text2); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-logo">
+    <div class="logo-icon">A</div>
+    Anthropic Academy
+  </div>
+  <div class="breadcrumb">
+    <span class="sep">›</span>
+    <a href="../index.html">All Courses</a>
+    <span class="sep">›</span>
+    <span>⚡ Claude Code in Action</span>
+  </div>
+  <div class="header-meta">15 videos · 8 quiz questions</div>
+</header>
+
+<div class="tab-bar" id="tabBar">
+  <button class="tab-btn active" data-tab="study">📚 Study Guide</button>
+  <button class="tab-btn" data-tab="quiz">📝 Quiz</button>
+  <button class="tab-btn" data-tab="videos">🎬 Videos</button>
+  
+</div>
+
+<div id="tab-study" class="tab-content active">
+  <div class="md-body"><h1 id="claude-code-in-action-study-guide">Claude Code in Action — Study Guide</h1>
+<p><em>Full course notes compiled from all lessons.</em></p>
+<hr />
+<h2 id="introduction">Introduction</h2>
+<h3 id="introduction_1">Introduction</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="what-is-a-coding-assistant">What is a coding assistant?</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="claude-code-in-action">Claude Code in action</h3>
+<p>Claude Code = AI coding assistant that functions as a collaborative engineer on projects, not just a code generator.</p>
+<p>Key capabilities: project setup, feature design, code writing, testing, deployment, error fixing in production.</p>
+<p>Setup workflow:<br />
+- Download project, open in editor<br />
+- Run `claude` command to launch<br />
+- Ask Claude to read README and execute setup directions<br />
+- Run `init` command = Claude scans codebase for architecture/coding style, creates claude.md file<br />
+- claude.md = automatically included context for future requests</p>
+<p>Memory types: Project (shared), Local, User memory files.</p>
+<p>Context management:<br />
+- Use # symbol to add specific notes to memory<br />
+- Can manually edit claude.md or rerun init to update<br />
+- Claude can handle Git operations (staging, committing)</p>
+<p>Effective prompting strategies:</p>
+<p>Method 1 - Three-step workflow:<br />
+1. Identify relevant files, ask Claude to analyze them<br />
+2. Describe feature, ask Claude to plan solution (no code yet)<br />
+3. Ask Claude to implement the plan</p>
+<p>Method 2 - Test-driven development:<br />
+1. Provide relevant context<br />
+2. Ask Claude to suggest tests for the feature<br />
+3. Select and implement chosen tests<br />
+4. Ask Claude to write code until tests pass</p>
+<p>Core principle: Claude Code = effort multiplier. More detailed instructions = significantly better results. Treat as collaborative engineer, not just code generator.</p>
+<h3 id="claude-code-setup">Claude Code setup</h3>
+<p>Claude Code = terminal-based coding assistant program that helps with code-related tasks</p>
+<p>Core capabilities = search/read/edit files + advanced tools (web fetching, terminal access) + MCP client support for expanded functionality via MCP servers</p>
+<p>Setup process:<br />
+1. Install Node.js (check with "npm help" command)<br />
+2. Run npm install to install Claude Code<br />
+3. Execute "claude" command in terminal to login to Anthropic account</p>
+<p>Full setup guide = docs.anthropic.com</p>
+<p>MCP client functionality = can consume tools from MCP servers to extend capabilities beyond basic file operations</p>
+<h3 id="project-setup">Project setup</h3>
+<p>CLI-based chatbot project = teaches MCP client-server interaction through hands-on implementation</p>
+<p>Project components:<br />
+- MCP client = connects to custom MCP server<br />
+- MCP server = provides 2 tools (read document, update document)<br />
+- Document collection = fake documents stored in memory only</p>
+<p>Key distinction: Normal projects implement either client OR server, not both. This project implements both for educational purposes.</p>
+<p>Setup process:<br />
+1. Download CLI_project.zip starter code<br />
+2. Extract and open in code editor<br />
+3. Follow readme.md setup directions<br />
+4. Add API key to .env file<br />
+5. Install dependencies (with/without UV)<br />
+6. Run project: "uv run main.py" or "python main.py"<br />
+7. Test with chat prompt</p>
+<p>Expected outcome = working chat interface that responds to basic queries, ready for MCP feature additions.</p>
+<h2 id="core-workflow">Core Workflow</h2>
+<h3 id="adding-context">Adding context</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="making-changes">Making changes</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="course-satisfaction-survey">Course satisfaction survey</h3>
+<p>Loading...</p>
+<h3 id="controlling-context">Controlling context</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="custom-commands">Custom commands</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="mcp-servers-with-claude-code">MCP servers with Claude Code</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="github-integration">Github integration</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h2 id="hooks">Hooks</h2>
+<h3 id="introducing-hooks">Introducing hooks</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="defining-hooks">Defining hooks</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="implementing-a-hook">Implementing a hook</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="gotchas-around-hooks">Gotchas around hooks</h3>
+<p>You may notice that after running the<br />
+<code>npm run setup</code><br />
+command there are two<br />
+<code>settings.json</code><br />
+files in the<br />
+<code>.claude</code><br />
+directory. Let me explain what's going on there.<br />
+The Claude Code documentation lists some recommendations around hooks security:<br />
+One of the recommendations is to use absolute paths (rather than relative paths) for scripts. This helps mitigate<br />
+path interception<br />
+and<br />
+binary planting<br />
+attacks.<br />
+This recommendation also makes it much more challenging to share<br />
+<code>settings.json</code><br />
+files. The reason is simple: the absolute path to any of the hook scripts on<br />
+your<br />
+machine will likely be different from the absolute<br />
+path<br />
+on my machine, simply because we will probably place the project in separate directories.<br />
+To solve this problem, our project has a<br />
+<code>settings.example.json</code><br />
+file. Inside of it, the script references contain a<br />
+<code>$PWD</code><br />
+placeholder. When we run<br />
+<code>npm run setup</code><br />
+, some dependencies are installed, but it also runs an<br />
+<code>init-claude.js</code><br />
+script placed inside the scripts directory. This script will replace those<br />
+<code>$PWD</code><br />
+placeholder with the absolute path to the project on your machine, copy the<br />
+<code>settings.example.json</code><br />
+file, and rename it to<br />
+<code>settings.local.json</code><br />
+.<br />
+This script allows us to share settings.json files but still use the recommended absolute paths!</p>
+<h3 id="useful-hooks">Useful hooks!</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="another-useful-hook">Another useful hook</h3>
+<p>There are more hooks beyond the<br />
+<code>PreToolUse</code><br />
+and<br />
+<code>PostToolUse</code><br />
+hooks discussed in this course. There are also:<br />
+<code>Notification</code><br />
+- Runs when Claude Code sends a notification, which occurs when Claude needs permission to use a tool, or after Claude Code has been idle for 60 seconds<br />
+<code>Stop</code><br />
+- Runs when Claude Code has finished responding<br />
+<code>SubagentStop</code><br />
+- Runs when a subagent (these are displayed as a "Task" in the UI) has finished<br />
+<code>PreCompact</code><br />
+- Runs before a compact operation occurs, either manual or automatic<br />
+<code>UserPromptSubmit</code><br />
+- Runs when the user submits a prompt, before Claude processes it<br />
+<code>SessionStart</code><br />
+- Runs when starting or resuming a session<br />
+<code>SessionEnd</code><br />
+- Runs when a session ends<br />
+Here's the confusing part:<br />
+- The stdin input to your commands will change based upon the type of hook being executed (<br />
+<code>PreToolUse</code><br />
+,<br />
+<code>PostToolUse</code><br />
+,<br />
+<code>Notification</code><br />
+, etc)<br />
+- The<br />
+<code>tool_input</code><br />
+contained in that will differ based upon the tool that was called (in the case of<br />
+<code>PreToolUse</code><br />
+and<br />
+<code>PostToolUse</code><br />
+hooks)<br />
+For example, here's a sample of some stdin input to a hook, where the hook is a<br />
+<code>PostToolUse</code><br />
+that was watching for uses of the<br />
+<code>TodoWrite</code><br />
+tool. For reference, that is the tool that Claude uses to keep track of to-do items.<br />
+<code>{
+  "session_id": "9ecf22fa-edf8-4332-ae85-b6d5456eda64",
+  "transcript_path": "&lt;path_to_transcript&gt;",
+  "hook_event_name": "PostToolUse",
+  "tool_name": "TodoWrite",
+  "tool_input": {
+    "todos": [{ "content": "write a readme", "status": "pending", "id": "1" }]
+  },
+  "tool_response": {
+    "oldTodos": [],
+    "newTodos": [{ "content": "write a readme", "status": "pending", "id": "1" }]
+  }
+}</code><br />
+And for comparison, here's an example of the input to a<br />
+<code>Stop</code><br />
+hook:<br />
+<code>{
+  "session_id": "af9f50b6-f042-4773-b3e2-c3a4814765ce",
+  "transcript_path": "&lt;path_to_transcript&gt;",
+  "hook_event_name": "Stop",
+  "stop_hook_active": false
+}</code><br />
+As you can see, the stdin input to your command will differ significantly based upon the hook (<br />
+<code>PreToolUse</code><br />
+,<br />
+<code>PostToolUse</code><br />
+,<br />
+<code>Stop</code><br />
+, etc)<br />
+and<br />
+the matcher used (in the case of<br />
+<code>PreToolUse</code><br />
+and<br />
+<code>PostToolUse</code><br />
+). This can make writing hooks challenging - you might not know the exact structure of the input to your command!<br />
+To handle this challenge, try making a helper hook like this:<br />
+<code>"PostToolUse": [ // Or "PreToolUse" or "Stop", etc
+  {
+    "matcher": "*",
+    "hooks": [
+      {
+        "type": "command",
+        "command": "jq . &gt; post-log.json"
+      }
+    ]
+  },
+]</code><br />
+Notice the provided command. It will write the input to this hook to the<br />
+<code>post-log.json</code><br />
+file, which allows you to inspect exactly what would have been fed into your command!<br />
+This makes it a lot easier for you to understand what data your command should inspect.</p>
+<h2 id="sdk-and-wrap-up">SDK and Wrap Up</h2>
+<h3 id="the-claude-code-sdk">The Claude Code SDK</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="summary-and-next-steps">Summary and next steps</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p></div>
+</div>
+
+<div id="tab-quiz" class="tab-content">
+  <div class="md-body"><h1 id="claude-code-in-action-quiz-guide">Claude Code in Action — Quiz Guide</h1>
+<p><em>All quiz questions with answer choices (correct answer marked with ✓).</em></p>
+<hr />
+<h2 id="sdk-and-wrap-up">SDK and Wrap Up</h2>
+<h3 id="quiz-on-claude-code">Quiz on Claude Code</h3>
+<p><strong>1. What is the fundamental limitation of language models that necessitates the use of a tool system in coding assistants?</strong></p>
+<ul>
+<li class="incorrect">A) They can only generate code in specific programming languages</li>
+<li class="incorrect">B) They have limited memory capacity for large codebases</li>
+<li class="incorrect">C) They cannot understand complex programming concepts</li>
+<li class="correct">D) They can only process text input/output and cannot directly interact with external systems ✓</li>
+</ul>
+<p><strong>2. What permission configuration is required when integrating MCP servers with Claude Code in GitHub Actions?</strong></p>
+<ul>
+<li class="correct">A) Each MCP server tool must be individually listed in the permissions ✓</li>
+<li class="incorrect">B) No special permissions are needed if running in GitHub Actions</li>
+<li class="incorrect">C) Permissions are automatically inherited from the GitHub repository settings</li>
+<li class="incorrect">D) A single blanket permission for all MCP operations</li>
+</ul>
+<p><strong>3. What is the primary difference between Plan Mode and Thinking Mode in Claude Code?</strong></p>
+<ul>
+<li class="incorrect">A) Plan Mode is for writing code while Thinking Mode is for debugging</li>
+<li class="incorrect">B) Plan Mode is faster while Thinking Mode is more accurate</li>
+<li class="incorrect">C) Plan Mode uses fewer tokens while Thinking Mode uses more tokens</li>
+<li class="correct">D) Plan Mode handles breadth (multi-step tasks) while Thinking Mode handles depth (complex logic) ✓</li>
+</ul>
+<p><strong>4. Which of the following correctly describes the three types of Claude.md files and their usage?</strong></p>
+<ul>
+<li class="incorrect">A) Project level (debugging), Local level (testing), Machine level (production)</li>
+<li class="incorrect">B) Project level (personal use), Local level (team sharing), Machine level (repository specific)</li>
+<li class="correct">C) Project level (shared with team, committed), Local level (personal, not committed), Machine level (global for all projects) ✓</li>
+<li class="incorrect">D) Project level (configuration), Local level (documentation), Machine level (automation)</li>
+</ul>
+<p><strong>5. How do you create a custom command in Claude Code that accepts runtime parameters?</strong></p>
+<ul>
+<li class="incorrect">A) Use the @parameters decorator in the command file</li>
+<li class="incorrect">B) Define parameters in settings.json configuration</li>
+<li class="incorrect">C) Add command line flags when executing the command</li>
+<li class="correct">D) Include $ARGUMENTS placeholder in the markdown command file ✓</li>
+</ul>
+<p><strong>6. Which type of hook can prevent a tool call from happening if certain conditions are met?</strong></p>
+<ul>
+<li class="incorrect">A) PostToolUse hook</li>
+<li class="incorrect">B) Project hook</li>
+<li class="incorrect">C) Global hook</li>
+<li class="correct">D) PreToolUse hook ✓</li>
+</ul>
+<p><strong>7. A developer wants to prevent Claude from reading sensitive .env files. Which type of hook should they set up, and what tool names would they likely match?</strong></p>
+<ul>
+<li class="incorrect">A) PostToolUse hook, matching Write and Edit</li>
+<li class="incorrect">B) PreToolUse hook, matching Write and Create</li>
+<li class="correct">C) PreToolUse hook, matching Read and Grep ✓</li>
+<li class="incorrect">D) PostToolUse hook, matching Read and Delete</li>
+</ul>
+<p><strong>8. What is the primary purpose of hooks in Claude Code?</strong></p>
+<ul>
+<li class="incorrect">A) To manage project dependencies.</li>
+<li class="incorrect">B) To automatically generate new code snippets.</li>
+<li class="correct">C) To run commands before or after Claude executes a tool. ✓</li>
+<li class="incorrect">D) To provide a user interface for Claude.</li>
+</ul></div>
+</div>
+
+<div id="tab-videos" class="tab-content">
+  <script src="https://cdn.jwplayer.com/libraries/Akyo8gQO.js"></script>
+<div class="video-speed-bar">
+  <span class="speed-label">Speed:</span>
+  <button class="speed-btn" data-speed="0.5">0.5&times;</button>
+  <button class="speed-btn" data-speed="0.75">0.75&times;</button>
+  <button class="speed-btn active" data-speed="1">1&times;</button>
+  <button class="speed-btn" data-speed="1.25">1.25&times;</button>
+  <button class="speed-btn" data-speed="1.5">1.5&times;</button>
+  <button class="speed-btn" data-speed="1.75">1.75&times;</button>
+  <button class="speed-btn" data-speed="2">2&times;</button>
+  <span class="video-total">15 videos</span>
+</div>
+<div class="chapter-section"><div class="chapter-title">Introduction</div><div class="video-grid"><div class="video-card"><div class="video-title">Introduction</div><div id="jwp-0"></div></div><div class="video-card"><div class="video-title">What is a coding assistant?</div><div id="jwp-1"></div></div><div class="video-card"><div class="video-title">Claude Code in action</div><div id="jwp-2"></div></div></div></div><div class="chapter-section"><div class="chapter-title">Core Workflow</div><div class="video-grid"><div class="video-card"><div class="video-title">Adding context</div><div id="jwp-3"></div></div><div class="video-card"><div class="video-title">Making changes</div><div id="jwp-4"></div></div><div class="video-card"><div class="video-title">Controlling context</div><div id="jwp-5"></div></div><div class="video-card"><div class="video-title">Custom commands</div><div id="jwp-6"></div></div><div class="video-card"><div class="video-title">MCP servers with Claude Code</div><div id="jwp-7"></div></div><div class="video-card"><div class="video-title">Github integration</div><div id="jwp-8"></div></div></div></div><div class="chapter-section"><div class="chapter-title">Hooks</div><div class="video-grid"><div class="video-card"><div class="video-title">Introducing hooks</div><div id="jwp-9"></div></div><div class="video-card"><div class="video-title">Defining hooks</div><div id="jwp-10"></div></div><div class="video-card"><div class="video-title">Implementing a hook</div><div id="jwp-11"></div></div><div class="video-card"><div class="video-title">Useful hooks!</div><div id="jwp-12"></div></div></div></div><div class="chapter-section"><div class="chapter-title">SDK and Wrap Up</div><div class="video-grid"><div class="video-card"><div class="video-title">The Claude Code SDK</div><div id="jwp-13"></div></div><div class="video-card"><div class="video-title">Summary and next steps</div><div id="jwp-14"></div></div></div></div>
+<script>
+const jwPlayers = [];
+let currentSpeed = 1.0;
+  jwPlayers.push(jwplayer('jwp-0').setup({playlist:'https://cdn.jwplayer.com/v2/media/rLVnV1aS',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-1').setup({playlist:'https://cdn.jwplayer.com/v2/media/WQnSCLF3',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-2').setup({playlist:'https://cdn.jwplayer.com/v2/media/3IQrknws',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-3').setup({playlist:'https://cdn.jwplayer.com/v2/media/wWHe1PIF',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-4').setup({playlist:'https://cdn.jwplayer.com/v2/media/v2XzmjpP',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-5').setup({playlist:'https://cdn.jwplayer.com/v2/media/pIw5RYqx',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-6').setup({playlist:'https://cdn.jwplayer.com/v2/media/ChNLn8eT',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-7').setup({playlist:'https://cdn.jwplayer.com/v2/media/EkzVe83z',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-8').setup({playlist:'https://cdn.jwplayer.com/v2/media/ZzNXo5m0',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-9').setup({playlist:'https://cdn.jwplayer.com/v2/media/3uGhMBFx',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-10').setup({playlist:'https://cdn.jwplayer.com/v2/media/qzgBYFlx',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-11').setup({playlist:'https://cdn.jwplayer.com/v2/media/WpOJxKsp',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-12').setup({playlist:'https://cdn.jwplayer.com/v2/media/fXIRG62r',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-13').setup({playlist:'https://cdn.jwplayer.com/v2/media/T2S0k8f2',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-14').setup({playlist:'https://cdn.jwplayer.com/v2/media/IiL1DO8v',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+jwPlayers.forEach(p => {
+  p.on('play', function() { try { this.setPlaybackRate(currentSpeed); } catch(e) {} });
+});
+function applySpeed(rate) {
+  currentSpeed = rate;
+  jwPlayers.forEach(p => { try { p.setPlaybackRate(rate); } catch(e) {} });
+}
+document.querySelectorAll('.video-speed-bar .speed-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.video-speed-bar .speed-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    applySpeed(parseFloat(this.dataset.speed));
+  });
+});
+</script>
+</div>
+
+
+
+<script>
+document.getElementById('tabBar').addEventListener('click', function(e) {
+  const btn = e.target.closest('.tab-btn');
+  if (!btn) return;
+  const tab = btn.dataset.tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude 101 — Anthropic Academy</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --bg2: #1e293b;
+    --bg3: #162032;
+    --border: #2d3f55;
+    --accent: #7c3aed;
+    --accent2: #a855f7;
+    --green: #10b981;
+    --red: #ef4444;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --code-bg: #0d1526;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         background: var(--bg); color: var(--text); line-height: 1.6; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Header ── */
+  .site-header {
+    background: #0a0f1e;
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; align-items: center; gap: 0;
+    height: 60px; position: sticky; top: 0; z-index: 200;
+  }
+  .site-logo {
+    font-size: 15px; font-weight: 700; color: var(--text);
+    letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px;
+    white-space: nowrap;
+  }
+  .site-logo .logo-icon {
+    width: 28px; height: 28px; background: linear-gradient(135deg, #f97316, #ef4444);
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 900; color: #fff; flex-shrink: 0;
+  }
+  .breadcrumb { font-size: 13px; color: var(--text3); margin-left: 16px; display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: var(--text2); }
+  .breadcrumb .sep { color: var(--text3); }
+  .header-meta { margin-left: auto; font-size: 12px; color: var(--text3); }
+
+  /* ── Tab navigation ── */
+  .tab-bar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; gap: 0; overflow-x: auto;
+    position: sticky; top: 60px; z-index: 100;
+  }
+  .tab-btn {
+    padding: 14px 22px; font-size: 14px; font-weight: 500;
+    color: var(--text2); background: none; border: none;
+    border-bottom: 2px solid transparent; cursor: pointer;
+    white-space: nowrap; transition: all 0.15s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent); }
+
+  /* ── Tab content ── */
+  .tab-content { display: none; max-width: 960px; margin: 0 auto; padding: 36px 32px; }
+  .tab-content.active { display: block; }
+
+  /* ── Study Guide / Quiz markdown rendering ── */
+  .md-body h1 { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+  .md-body h2 {
+    font-size: 20px; font-weight: 700; color: #c8a2f8;
+    border-left: 3px solid var(--accent); padding-left: 12px;
+    margin: 36px 0 16px;
+  }
+  .md-body h3 {
+    font-size: 16px; font-weight: 600; color: var(--text);
+    margin: 24px 0 10px; padding-top: 4px;
+  }
+  .md-body p { color: var(--text); margin-bottom: 14px; }
+  .md-body em { color: var(--text2); }
+  .md-body strong { color: var(--text); }
+  .md-body hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  .md-body ul, .md-body ol { padding-left: 22px; margin-bottom: 14px; }
+  .md-body li { color: var(--text); margin-bottom: 4px; }
+  .md-body code {
+    background: var(--code-bg); color: #7dd3fc;
+    padding: 2px 6px; border-radius: 4px; font-size: 13px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  }
+  .md-body pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px; overflow-x: auto; margin-bottom: 16px;
+  }
+  .md-body pre code { background: none; padding: 0; color: #e2e8f0; }
+  .md-body table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 14px; }
+  .md-body th { background: var(--bg2); color: var(--accent2); padding: 8px 12px;
+                text-align: left; border: 1px solid var(--border); }
+  .md-body td { padding: 8px 12px; border: 1px solid var(--border); color: var(--text); }
+  .md-body tr:nth-child(even) td { background: var(--bg3); }
+  .md-body blockquote {
+    border-left: 3px solid var(--accent); padding: 8px 16px;
+    background: var(--bg2); border-radius: 0 6px 6px 0; margin-bottom: 14px;
+  }
+
+  /* ── Quiz ── */
+  .md-body li.correct {
+    background: rgba(16, 185, 129, 0.12);
+    border-left: 2px solid var(--green);
+    padding: 4px 10px; border-radius: 4px; list-style: none;
+    color: #6ee7b7; font-weight: 500;
+  }
+  .md-body li.incorrect { color: var(--text2); }
+  .md-body li.correct::before { content: ''; }
+
+  /* ── Videos tab ── */
+  .video-speed-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 16px;
+    margin-bottom: 28px; flex-wrap: wrap;
+  }
+  .speed-label { font-size: 13px; color: var(--text2); }
+  .speed-btn {
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
+    padding: 4px 12px; border-radius: 20px; cursor: pointer;
+    font-size: 12px; transition: all 0.15s;
+  }
+  .speed-btn:hover { background: #2a3a55; color: var(--text); }
+  .speed-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .video-total { margin-left: auto; font-size: 12px; color: var(--text3); }
+  .chapter-section { margin-bottom: 36px; }
+  .chapter-title {
+    font-size: 17px; font-weight: 700; color: #c8a2f8;
+    border-left: 3px solid var(--accent); padding-left: 12px;
+    margin-bottom: 14px;
+  }
+  .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
+  .video-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+  }
+  .video-title {
+    padding: 9px 13px; font-size: 13px; font-weight: 500; color: var(--text2);
+    background: var(--bg3); border-bottom: 1px solid var(--border);
+  }
+  .yt-wrap { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
+  .yt-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  /* ── Notebooks tab ── */
+  .nb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 32px; }
+  .nb-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px;
+    transition: border-color 0.15s;
+  }
+  .nb-card:hover { border-color: var(--accent); }
+  .nb-name { font-size: 13px; font-weight: 600; color: var(--text); word-break: break-all; }
+  .nb-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nb-link {
+    font-size: 11px; padding: 3px 10px; border-radius: 12px;
+    border: 1px solid var(--border); color: var(--text2);
+    background: var(--bg3); transition: all 0.15s;
+  }
+  .nb-link:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+  .nb-link.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .nb-link.primary:hover { background: var(--accent2); }
+  .section-note {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 18px; font-size: 13px; color: var(--text2);
+    margin-bottom: 24px;
+  }
+  .section-title { font-size: 16px; font-weight: 700; color: var(--text); margin: 24px 0 12px; }
+  .file-list { display: flex; flex-direction: column; gap: 8px; }
+  .file-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+  }
+  .file-icon { font-size: 18px; }
+  .file-name { font-size: 13px; color: var(--text); flex: 1; }
+  .file-link { font-size: 12px; color: var(--accent2); }
+
+  /* ── Index page cards ── */
+  .index-hero { padding: 60px 32px 40px; text-align: center; }
+  .index-hero h1 { font-size: 36px; font-weight: 800; color: var(--text); margin-bottom: 12px; }
+  .index-hero p { font-size: 16px; color: var(--text2); max-width: 520px; margin: 0 auto; }
+  .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                  gap: 20px; max-width: 1200px; margin: 0 auto; padding: 0 32px 60px; }
+  .course-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 10px;
+    text-decoration: none; transition: all 0.2s; color: inherit;
+  }
+  .course-card:hover { border-color: var(--accent); transform: translateY(-2px);
+                       box-shadow: 0 8px 24px rgba(124,58,237,0.15); text-decoration: none; }
+  .card-emoji { font-size: 32px; }
+  .card-title { font-size: 16px; font-weight: 700; color: var(--text); }
+  .card-meta { font-size: 12px; color: var(--text3); display: flex; gap: 12px; flex-wrap: wrap; }
+  .card-tag { background: var(--bg3); border: 1px solid var(--border);
+              padding: 2px 8px; border-radius: 10px; color: var(--text2); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-logo">
+    <div class="logo-icon">A</div>
+    Anthropic Academy
+  </div>
+  <div class="breadcrumb">
+    <span class="sep">›</span>
+    <a href="../index.html">All Courses</a>
+    <span class="sep">›</span>
+    <span>🎓 Claude 101</span>
+  </div>
+  <div class="header-meta">4 videos</div>
+</header>
+
+<div class="tab-bar" id="tabBar">
+  <button class="tab-btn active" data-tab="study">📚 Study Guide</button>
+  <button class="tab-btn" data-tab="quiz">📝 Quiz</button>
+  <button class="tab-btn" data-tab="videos">🎬 Videos</button>
+  
+</div>
+
+<div id="tab-study" class="tab-content active">
+  <div class="md-body"><h1 id="claude-101-study-guide">Claude 101 — Study Guide</h1>
+<p><em>Full course notes compiled from all lessons.</em></p>
+<hr />
+<h2 id="claude-101">Claude 101</h2>
+<h3 id="what-is-claude">What is Claude?</h3>
+<p>Estimated time:<br />
+15 minutes</p>
+<h3 id="learning-objectives">Learning objectives</h3>
+<p>By the end of this lesson you'll be able to:<br />
+- Explain what Claude is and the principles that guide its design<br />
+- Describe Claude's core capabilities and how it differs from a simple chatbot<br />
+- Identify the different ways to access Claude (web, desktop, and mobile)<br />
+Course<br />
+roadmap<br />
+Meet Claude<br />
+What is Claude, how do you talk to it, and how do you get great results?<br />
+Organizing your work<br />
+How do Projects, Artifacts, and Skills give Claude structure and reusable knowledge?<br />
+Expanding Claude's reach<br />
+How do Connectors, Enterprise Search, and Research bring your tools and the web into the conversation?<br />
+Putting it all together<br />
+What does Claude look like in action across roles, and where else can you work with it?<br />
+Conclusion &amp; certificate<br />
+Where do you go from here, and how do you earn your certificate?</p>
+<h3 id="what-is-claude_1">What is Claude?</h3>
+<p>(10 minutes)<br />
+Claude is more than a chatbot—it's an AI assistant designed to be your thinking partner. In this lesson you'll learn what makes Claude different from other AI tools and see how it can help with a wide variety of work tasks.</p>
+<h4 id="key-takeaways">Key takeaways</h4>
+<p>Claude is built to be helpful, harmless, and honest<br />
+: At a high level, Claude is guided by principles that help it avoid toxic or discriminatory outputs, avoid helping humans engage in illegal or unethical activities, and broadly behave as a helpful, honest, and harmless AI system. This approach, called Constitutional AI, means Claude is trained to align with human values and operate transparently.<br />
+Claude is more than a chatbot<br />
+: Claude is capable of a wide variety of conversational and text processing tasks while maintaining a high degree of reliability and predictability, including summarization, search, creative and collaborative writing, Q&amp;A, coding, and more. Think of Claude as a thought partner who can help you tackle complex problems, and work through challenging situations, not just answer simple questions.<br />
+Claude is designed to be steerable and collaborative<br />
+: Claude can take direction on personality, tone, and behavior, and customers report that Claude is much less likely to produce harmful outputs, easier to converse with, and more steerable—so you can get your desired output with less effort.<br />
+You can access Claude wherever you work<br />
+: Claude apps are available to all plan types—Free, Pro, Max, Team, and Enterprise. Your conversations, projects, memory, and preferences sync across all devices when you're signed in. Whether you're at your desk or on the go, Claude is available through web, desktop, and mobile apps.</p>
+<h3 id="understanding-claudes-capabilities">Understanding Claude's capabilities</h3>
+<p>Claude can help with a wide range of tasks that go far beyond simple question-and-answer interactions to assistant-like partnership that can both automate<br />
+and<br />
+augment your work. Here's a few things Claude excels at:<br />
+Writing and content creation<br />
+: Claude can collaborate with you on social media posts, professional emails, and complex reports. Because Claude is trained to take direction on personality and tone, you can iterate together on structure and clarity until your voice comes through clearly.<br />
+Research and analysis<br />
+: Claude helps you explore research angles, compile findings, and analyze data to surface meaningful insights. You can upload documents and Claude will help you make sense of complex information—this is enabled by Claude's large context window, which can ingest 200K+ tokens (about 500 pages of text or more), with up to 1M tokens available on Pro, Max, Team, and Enterprise plans when using Opus 4.7. This allows Claude to consider extensive materials in a single conversation.<br />
+Coding assistance<br />
+: Claude Opus 4.7 is our most powerful model yet and the best coding model in the world. This strong performance on real-world coding tasks means Claude can help you write, debug, and explain code across multiple programming languages.<br />
+Problem-solving and reasoning<br />
+: Claude handles complex cognitive tasks, mathematical problems, strategic thinking and analysis, and research. Claude Opus 4.7 and Sonnet 4.7 are hybrid models offering two modes: near-instant responses and extended thinking for deeper reasoning. Anthropic Extended thinking allows Claude to work through problems step-by-step, making it well-suited for tasks that require careful analysis.<br />
+Learning new things<br />
+: Whether you're learning a new skill, exploring unfamiliar domains, or working through complex challenges, Claude can adapt to your learning style and pace. Learning mode is a new Claude experience that guides your reasoning process rather than providing answers, helping develop critical thinking skills.<br />
+Get inspired on ways to use Claude in your specific function by exploring our<br />
+use-case gallery<br />
+on claude.com. For a deeper dive into what AI can (and can't) do, see our<br />
+AI Capabilities<br />
+course.</p>
+<h3 id="ways-to-access-claude">Ways to access Claude</h3>
+<p>Claude is the intelligence—the AI assistant you're learning to work with throughout this course. That same intelligence is available across multiple interfaces, each suited to different types of tasks.<br />
+Claude.ai<br />
+(and the associated mobile and desktop apps) are the primary way most people interact with Claude. Here, you can ask questions, brainstorm ideas, create and edit documents, and a lot more. Claude.ai is ideal for conversations, writing assistance, research, analysis, and creating files. This is our focus in this course.<br />
+Claude Code<br />
+is an agentic coding tool that is designed for developers but can be used for all kinds of file manipulation on your desktop. Claude Code can directly edit files, run commands, and create commits.<br />
+Claude and Slack<br />
+brings Claude directly into your team's communication tool. You can chat with Claude in the AI assistant header from any channel or conversation, or by mentioning @Claude in threads. When you connect Slack to Claude, Claude searches your workspace's channels, direct messages, and shared files to find the context you need for better responses and research.<br />
+Claude for Excel<br />
+lets you work directly with Claude in a sidebar in Microsoft Excel, where Claude can read, analyze, modify, and create new Excel workbooks. Claude for Excel is best for model analysis, assumption updates, error debugging, template population, formula explanations, and multi-tab navigation.<br />
+This course will focus primarily on<br />
+Claude.ai<br />
+, but you can also check out<br />
+Claude Code in Action<br />
+for more information on using Claude in development workflows.</p>
+<h3 id="lesson-reflection">Lesson reflection</h3>
+<p>What tasks in your current work might benefit from having Claude as a thinking partner? Take a look at your calendar (or better yet, ask Claude to) and identify a few tasks you might want to use Claude to support.</p>
+<h3 id="whats-next">What's next</h3>
+<p>In the next lesson, you'll learn how to navigate the Claude interface, start your first conversation, and understand the basics of how Claude responds to your messages.</p>
+<h4 id="feedback">Feedback</h4>
+<p>As you progress through the course, we'd love to hear from you about how you are using concepts from the course in your work and any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license">Acknowledgments and license</h4>
+<p>Copyright 2025 Anthropic. All rights reserved.</p>
+<h3 id="your-first-conversation-with-claude">Your first conversation with Claude</h3>
+<h3 id="getting-better-results">Getting better results</h3>
+<p>Estimated time:<br />
+15 minutes</p>
+<h3 id="learning-objectives_1">Learning objectives</h3>
+<p>By the end of this lesson, you will be able to:<br />
+- Recognize common challenges when starting out with AI and use troubleshooting techniques to overcome them<br />
+- Define AI Fluency and know where to go to learn more about working with AI in a fluent way<br />
+- Explain how you might set up evals to better understand how Claude might perform with your unique workflows</p>
+<h3 id="common-challenges-and-how-to-fix-them">Common challenges and how to fix them</h3>
+<p>As you start working with Claude, you'll likely encounter moments where the response isn't quite what you expected. This is normal—and it's an opportunity to refine your approach. Here are some of the most common challenges and how to address them.<br />
+Challenge<br />
+What's happening<br />
+Try this<br />
+Claude's response is too generic<br />
+Your prompt didn't include enough context about your specific situation<br />
+Add details about your audience, role, or constraints. Instead of "Write an email about the project delay," try "Write an email to our enterprise client explaining that the software integration will be delayed by two weeks. They've been patient so far but this is the second delay. Keep it professional but apologetic."<br />
+The response is too long (or too short)<br />
+Claude is guessing at appropriate length<br />
+Be explicit: "Give me a two-paragraph summary" or "Keep this under 100 words" or "I need a comprehensive analysis—length isn't a concern."<br />
+Claude didn't follow my format<br />
+Claude understood<br />
+what<br />
+you want but not<br />
+how<br />
+you want it presented<br />
+Show, don't just tell. Provide an example of the format, or describe the structure explicitly: "Use bullet points with bold headers for each section."<br />
+I got confident-sounding information that turned out to be wrong<br />
+Claude occasionally generates plausible but incorrect information, especially with specific facts or niche topics<br />
+For high-stakes work, verify key facts independently. Ask Claude to cite sources or indicate confidence level. Enable web search to ground responses in current information.<br />
+The tone isn't right<br />
+Claude defaults to helpful and professional, which may not match your needs<br />
+Describe the tone in plain language: "Make this more conversational" or "This should sound authoritative and formal." Provide an example of writing in the style you want.</p>
+<h3 id="the-iteration-mindset">The iteration mindset</h3>
+<p>One of the most important shifts when working with Claude is recognizing that your first prompt rarely produces a perfect result—and that's okay. Think of your initial prompt as the start of a conversation, not a one-shot request.<br />
+Effective Claude users:<br />
+Treat first drafts as starting points.<br />
+Review what Claude produces, identify what's working and what isn't, then refine.<br />
+Give specific feedback.<br />
+"Make it shorter" is fine, but "Cut the first two paragraphs and make the conclusion more action-oriented" is better.<br />
+Know when to start fresh.<br />
+If a conversation has gone off track, sometimes it's faster to open a new chat with a clearer prompt than to try to redirect.</p>
+<h3 id="what-is-ai-fluency">What is AI Fluency?</h3>
+<p>AI Fluency is the ability to collaborate effectively with AI tools—not just knowing which buttons to click, but developing the judgment to use AI well across different situations.<br />
+The<br />
+4D Framework for AI Fluency<br />
+, developed through research collaboration between Professor Rick Dakan (Ringling College of Art and Design) and Professor Joseph Feller (University College Cork), identifies four core competencies that, when combined, can help you make the most of your AI interactions:<br />
+Delegation:<br />
+Deciding on what work should be done by humans, what work should be done by AI, and how to distribute tasks between them. Includes understanding your goals, AI capabilities, and making strategic choices about collaboration.<br />
+Description:<br />
+Effectively communicating with AI systems. Includes clearly defining outputs, guiding AI processes, and specifying desired AI behaviors and interactions.<br />
+Discernment:<br />
+Thoughtfully and critically evaluating AI outputs, processes, behaviors and interactions. Includes assessing quality, accuracy, appropriateness, and determining areas for improvement.<br />
+Diligence:<br />
+Using AI responsibly and ethically. Includes making thoughtful choices about AI systems and interactions, maintaining transparency, and taking accountability for AI-assisted work.<br />
+You've already been practicing these skills throughout this course. The prompt framework from Lesson 2 (setting the stage, defining the task, specifying rules) is rooted in Description. The troubleshooting techniques above draw on Discernment and Diligence.<br />
+To learn more, check out our free<br />
+AI Fluency course<br />
+that explore all four competencies in depth, with practical exercises and real-world applications.</p>
+<h3 id="evaluating-claude-for-your-workflows">Evaluating Claude for your workflows</h3>
+<p>As you start integrating Claude into more of your work, you might wonder: how do I know if Claude is actually good at this particular task?<br />
+This is where Discernment becomes essential. Evals (short for evaluations) are a way to develop intuition for assessing Claude's outputs on the tasks that matter to you. They're systematic ways to test how well Claude performs on specific types of tasks that matter to you.</p>
+<h4 id="why-evals-matter">Why evals matter</h4>
+<p>Your work is unique. Claude might excel at drafting marketing copy but need more guidance for technical documentation in your specific domain. Running simple evals helps you:<br />
+- Understand where Claude adds the most value in your workflow<br />
+- Identify tasks where you'll need to provide more context or examples<br />
+- Build confidence in Claude's outputs for recurring tasks</p>
+<h4 id="a-simple-eval-approach">A simple eval approach</h4>
+<p>You don't need complex infrastructure to evaluate Claude. Here's a practical approach:<br />
+Gather examples.<br />
+Collect 5-10 examples of a task you do regularly—emails you've written, reports you've created, analyses you've done.<br />
+Create test prompts.<br />
+Write prompts that would generate similar outputs. Include the context you'd naturally have when doing this work.<br />
+Compare outputs.<br />
+Run your prompts and compare Claude's responses to your examples. Ask yourself:<br />
+- Does Claude capture the key information?<br />
+- Is the tone and style appropriate?<br />
+- What's missing or could be improved?<br />
+Refine your approach.<br />
+Based on what you learn, adjust your prompts, add examples to show Claude what good looks like, or identify where human review is essential.</p>
+<h4 id="example-using-claude-for-data-analysis">Example: Using Claude for data analysis</h4>
+<p>The video above is taken from our AI Fluency for nonprofits course, but the example is relevant for anyone working with data in AI. To evaluate how Claude might work with your data:<br />
+- Find a dataset you've manually analyzed<br />
+- Create prompts that request Claude to do the analysis on your behalf<br />
+- Compare Claude's results to your originals<br />
+- Note patterns and refine your prompt accordingly: Maybe Claude gets the right numbers but misses the overall patterns<br />
+This kind of lightweight evaluation helps you develop intuition for how to work with Claude on tasks that matter to you—and where to focus your review and refinement energy.</p>
+<h3 id="lesson-reflection_1">Lesson reflection</h3>
+<p>Before moving on, consider:<br />
+- Which of the common challenges have you already encountered? What techniques might you try next time?<br />
+- Where in your work would a simple eval help you understand if Claude is a good fit for a recurring task?<br />
+- How might the 4D Framework help you think about your collaboration with Claude?</p>
+<h3 id="whats-next_1">What's next</h3>
+<p>In the next lesson, you'll explore the Claude desktop app and its three interaction modes: Chat, Cowork, and Code.</p>
+<h4 id="feedback_1">Feedback</h4>
+<p>As you progress through the course, we'd love to hear from you about how you are using concepts from the course in your work and any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_1">Acknowledgments and license</h4>
+<p>Copyright 2025 Anthropic. All rights reserved.</p>
+<h3 id="claude-desktop-app-chat-cowork-code">Claude desktop app: Chat, Cowork, Code</h3>
+<p>What you'll learn<br />
+Estimated time: 6 minutes<br />
+By the end of this lesson you'll be able to:<br />
+- Identify the three modes in the Claude desktop app — Chat, Cowork, and Code — and what each is designed for<br />
+- Explain key features unique to each mode, including quick entry, scheduled tasks, and local vs. remote development<br />
+- Choose the right mode based on the type of work you need to accomplish</p>
+<h3 id="navigating-the-claude-desktop-app-chat-cowork-code">Navigating the Claude desktop app: Chat, Cowork, Code</h3>
+<p>The Claude desktop app gives you three ways to work with Claude: Chat, Cowork, and Code — from quick questions to complex research to building software.<br />
+Chat is the same Claude you know from claude.ai, plus quick entry, screenshots, dictation, and connectors that come from running natively on your computer. Cowork is an agentic tool — you give it a goal, connect it to your tools and resources, and let it do the work. With Cowork, Claude has the reach and the room to do more. This broader scope allows it to conduct more thorough research and analysis, and produce more complex documents and deliverables. Code is for building software, from writing and testing code to deploying it.<br />
+Cowork and Code run on the same engine. Both are Claude Code underneath — local to your machine, capable of independent work, able to spin up sub-agents and sustain long tasks. This allows Claude to work through larger tasks on its own, like research and writing or building software.<br />
+Each mode is designed around the work it serves, showing you what matters and giving you control where you need it.</p>
+<h3 id="chat">Chat</h3>
+<p>Chat excels when you need to ask questions, brainstorm, draft, or work through problems back and forth.<br />
+If you've used claude.ai, this works the same way, with a few things that come from running natively on your computer:<br />
+Quick entry.<br />
+Double-tap the Option key on Mac to pull up Claude over whatever you're working on. It responds in a compact window that stays on top as you switch between apps. You never have to leave what you're doing to ask a question.<br />
+Screenshots and window sharing.<br />
+Capture a screenshot or share a window so Claude sees exactly what you're looking at. Faster than describing what's on your screen, and more precise. (Mac)<br />
+Dictation.<br />
+Talk through a problem instead of typing. Useful when you're thinking out loud, away from your keyboard, or working through something where speaking is faster than writing. (Mac)<br />
+Desktop connectors.<br />
+Connect local tools and services through connectors so Claude can work with other tools on your machine.<br />
+Try it out when:<br />
+- You're staring at an unfamiliar dashboard. Double-tap Option, drag your cursor over the window to screenshot it, and ask “what do these metrics mean?” Claude answers in the overlay while the dashboard stays in view.<br />
+- You're in between meetings and want to think through how to structure a presentation. Open quick entry, switch to voice, and talk it through. Claude drafts an outline from what you said.<br />
+- You've been jotting down ideas for a product launch across Apple Notes for weeks. You add the Notes connector from Settings and ask Claude: “Pull together everything in my notes about the Osprey launch, figure out where I left things half-finished, and check my other connected tools for anything that fills in the gaps.” Claude reads your notes on your machine, pieces together what you have, and follows up where you trailed off.</p>
+<h3 id="cowork">Cowork</h3>
+<p>Claude Cowork is built for work that takes real effort: pulling information from many sources, making sense of it, and producing something finished.<br />
+In Cowork, Claude can multitask, tackling different parts of a project at a time, so it has the scope to draw from more sources and the stamina to see things through. Thorough research briefs, cross-source financial analysis, end-to-end contract review, polished slide decks from material spread across sources.<br />
+Before starting, Claude often asks a short set of questions to pin down what you need: scope, format, constraints. It builds a plan you can review in the sidebar. As it works, you see the task come together: sources it's drawing from, files taking shape, progress through the plan. You can run multiple tasks at once, each in its own conversation, and switch between them from the sidebar.<br />
+Folder access.<br />
+Point Claude to a folder on your computer and it reads what's there, figures out what's relevant, and saves finished work back to the same place. You can also upload files, paste content into the conversation, or connect tools that pull in what Claude needs.<br />
+Scheduled tasks.<br />
+Claude can handle recurring work on a schedule: a daily briefing that pulls from your Slack and calendar, a weekly roundup of what shipped, a morning inbox triage that sorts what needs your attention. You define the task and when it should run, and Claude handles it automatically each time the app is open. If your computer or the app was closed when a task was due, it catches up when you're back.<br />
+Subagents.<br />
+Background workers that Claude spins up to handle parts of a task in parallel. If you ask for something complex — like a research brief that pulls from multiple sources — Claude breaks it into subtasks, assigns each to a subagent with its own context, and coordinates the results, giving you one finished deliverable.<br />
+Dispatch.<br />
+A persistent conversation thread that allows you to continue your Cowork conversations from your phone. From the Claude mobile app, you can hand Claude tasks that use everything on your computer — your files, connectors, plugins, even desktop apps. To use this feature, you need both the desktop and mobile apps, with your computer awake and the desktop app open.<br />
+Projects.<br />
+Projects in Cowork let you group related tasks into dedicated workspaces with their own files, context, instructions, and memory. If you use projects on Claude, Cowork projects work similarly, but they live locally on your desktop and are built around the tasks you run through Cowork.<br />
+Browser use.<br />
+Connect Claude in Chrome and Claude can navigate websites, interact with pages, and pull what it finds directly into the task it's working on. This is how Cowork does things like check competitor pricing across ten sites or gather data from pages that don't have an API.<br />
+Computer use.<br />
+When Claude doesn't have a connector or plugin for what you need, it can navigate your computer directly — clicking, typing, and opening apps just like you would. Claude follows a priority order: connectors first, then Chrome, then screen interaction, so it always picks the fastest, most reliable path. You'll see a permission prompt before Claude accesses each app, and you can set up a blocklist for anything you want off-limits. Computer use is in research preview on Pro and Max plans, macOS only (Windows coming soon)<br />
+Plugins.<br />
+Plugins give Claude capabilities it doesn't have on its own: pulling live financial data, searching your company's internal knowledge base, or working within a specific compliance framework. Browse and add them from the Cowork interface to fit the task.<br />
+Protected environment.<br />
+Cowork runs in a contained space on your computer. Claude can read, create, and edit files within the folders you share, but can't access anything outside them.<br />
+Try it out when:<br />
+- You want to query all your tools like you would a database. Ask “review what we decided about pricing last quarter across meeting notes, Slack, and email, then update our Q3 deck with the findings?” and Cowork finds the answer across meeting notes, slide decks, email, and Slack threads.<br />
+- You're researching a new market, scoping competitors, evaluating tools. For any research that might span multiple tabs with hard to extract information, Cowork visits the sites, reads the reports, pulls the pricing, and delivers a structured brief with sources, without you opening a single browser tab.<br />
+- You need to work through a folder of 50+ project documents including contracts, financial reports, and meeting transcripts. You can ask Cowork to find the documents most relevant to your initiative, and produce a summary memo. Cowork reads every page, cross-references across the full set, and pulls out the patterns that only emerge from reading all of them. Review fifty like you'd review five.<br />
+- You keep doing the same work every morning — checking messages, pulling together a status update, prepping for the day's meetings. Set it up once as a scheduled task and Claude handles it on repeat, so you start the day with answers instead of admin.<br />
+Cowork is available to Pro, Max, Team, and Enterprise users, with new capabilities being added regularly.</p>
+<h3 id="code">Code</h3>
+<p>The Code tab gives you access to the power of Claude Code, running directly inside the desktop app. This gives you a full development environment for building software.<br />
+Via Code, Claude works directly in your codebase: reading what's there, writing and modifying code, running commands. Visual diffs show what changed, a built-in terminal shows commands as they run, and git tracks every version so you can always roll back.<br />
+Where Cowork runs in a contained workspace limited to the folders you share, Code runs directly in your project with full access to your file system, terminal, and development tools.<br />
+You choose where work happens:<br />
+Local:<br />
+You select a folder on your computer and Claude works directly with those files. Because it runs on your machine, Claude can read your project, access local tools, and run a development server you can preview in your browser.<br />
+Remote:<br />
+You connect a GitHub repository and Claude works in a cloud environment. Sessions continue even if you close the app, so you can start a big refactor and check back later. Good for larger codebases or when you want to keep development off your local machine.<br />
+Three interaction modes let you control how much Claude does on its own:<br />
+Ask:<br />
+Claude proposes every change and waits for your approval. You review a visual diff and accept or reject before anything is modified.<br />
+Code:<br />
+Claude applies file changes automatically but checks before running terminal commands.<br />
+Plan:<br />
+Claude outlines its full approach before touching anything. A dedicated plan viewer lets you review and revisit the strategy as work progresses.<br />
+You can run multiple sessions across projects and filter them by status (Active or Archived) and environment (Local or Cloud) from the sidebar.<br />
+The Code tab is available on Pro, Max, Team, and Enterprise users.</p>
+<h3 id="comparing-the-three-modes">Comparing the three modes</h3>
+<p>Chat<br />
+Cowork<br />
+Code<br />
+Optimized for<br />
+Quicker exchanges: exploring ideas, iterative drafting, quick answers, learning through dialogue<br />
+Complex or sustained work: research, analysis, file organization, producing finished documents and deliverables<br />
+Building software: writing, testing, running and deploying code<br />
+Key features<br />
+Quick entry, dictation<br />
+Work from local folders, plugins, subagents, scheduled tasks<br />
+Ask/Code/Plan modes, visual diffs, git integration, local and remote environments<br />
+Tools and extensions<br />
+Connectors, Skills, Claude in Chrome<br />
+Connectors (local and remote), Skills, Claude in Chrome, Plugins, Computer Use<br />
+Connectors, Skills, Claude in Chrome, Plugins, Hooks</p>
+<h3 id="lesson-reflection_2">Lesson reflection</h3>
+<ul>
+<li>Think about the tasks you most commonly use Claude for. Which mode — Chat, Cowork, or Code — would best fit each of those tasks?</li>
+<li>Consider a recent project where you needed to pull information from multiple sources. How might Cowork have changed your workflow?</li>
+</ul>
+<h3 id="whats-next_2">What's next</h3>
+<p>In the next module, you'll learn how to organize your work and knowledge using Projects.</p>
+<h4 id="feedback_2">Feedback</h4>
+<p>As you progress through the course, we'd love to hear how you're using the Claude desktop app in your work, plus any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h3 id="introduction-to-projects">Introduction to projects</h3>
+<p>Estimated time:<br />
+20 minutes</p>
+<h3 id="learning-objectives_2">Learning objectives</h3>
+<p>By the end of this lesson, you will be able to:<br />
+- Explain what projects are and when to use them<br />
+- Create a new project with a name, description, and visibility settings<br />
+- Add documents and files to your project's knowledge base<br />
+- Write effective project instructions to guide Claude's behavior<br />
+- Share projects with teammates (for Claude for Work (Team and Enterprise plan) users)</p>
+<h3 id="video">Video</h3>
+<p>[Video: Introduction to Projects - Getting started with projects in Claude.ai]</p>
+<h4 id="key-takeaways_1">Key takeaways</h4>
+<p>Projects are self-contained workspaces<br />
+with their own memory, chat histories, knowledge bases, and customized instructions. Think of them as dedicated environments for specific work streams.<br />
+Project knowledge enhances Claude's understanding<br />
+by letting you upload relevant documents that Claude references across all chats within that project. No more re-uploading the same files each time.<br />
+Project instructions guide Claude's behavior<br />
+—you can specify tone, expertise level, response style, and more. These instructions apply to every conversation within the project.<br />
+Projects scale automatically.<br />
+When your knowledge base approaches context limits, Claude seamlessly enables Retrieval Augmented Generation (RAG) mode to expand capacity by up to 10x while maintaining response quality.<br />
+For Claude for Work users, projects enable collaboration.<br />
+Share projects with teammates so everyone benefits from the same context, instructions, and accumulated knowledge.</p>
+<h3 id="what-are-projects">What are Projects?</h3>
+<p>Projects are ideal for storing knowledge Claude should reference, organizing related chats around a specific topic or work area, and collaborating with team members who need access to the same shared context.</p>
+<h4 id="when-to-use-projects">When to use Projects</h4>
+<p>Projects are particularly valuable when you're working on something ongoing—not just a one-off question. Consider creating a project when you have a workflow with:<br />
+Reference materials you'll use repeatedly<br />
+(meeting notes, survey results, reports, historical data, etc.)<br />
+Consistent requirements<br />
+for how Claude should respond (always use formal language, always cite sources, always follow our template)<br />
+Team collaboration needs<br />
+where multiple people should work from the same foundation</p>
+<h3 id="creating-your-first-project">Creating your first project</h3>
+<p>Setting up a project takes just a few minutes. Here's how to get started:</p>
+<h4 id="step-1-set-up-your-project">Step 1: Set up your project</h4>
+<ul>
+<li>Hover over the left sidebar and click "Projects," or navigate directly to claude.ai/projects</li>
+<li>Click "+ New Project" in the upper right corner</li>
+<li>Give your project a descriptive name (e.g., "Q4 Marketing Campaign" or "Product Documentation")</li>
+<li>Add a brief description of what you're working on. While Claude doesn't see this description directly, it helps you and your teammates understand the project's purpose.</li>
+<li>Choose your visibility settings: keep it private or share with your organization (for Claude for Work users)</li>
+</ul>
+<h4 id="step-2-add-project-instructions">Step 2: Add project instructions</h4>
+<p>Project instructions tell Claude how to behave across all conversations in this project. Click on "Instructions" to open the instructions panel.<br />
+Good project instructions typically include:<br />
+Context about what you're working on:<br />
+"This project is for creating marketing content for our B2B software product."<br />
+Process instructions:<br />
+"First consider a blog structure that will entice this audience, then write the draft."<br />
+Tone and style preferences:<br />
+"Use a professional but conversational tone. Avoid jargon when possible."<br />
+Specific requirements:<br />
+"Always include a call-to-action at the end of marketing copy."<br />
+Once you've written your instructions, click "Save instructions." These will apply to every chat in this project and work alongside any user preferences and styles you've set.<br />
+You can also use project instructions to automate workflows — for example, "When I upload a meeting transcript, create a structured summary using this template." Think of instructions as programming Claude's behavior for this project.</p>
+<h4 id="step-3-build-your-knowledge-base">Step 3: Build your knowledge base</h4>
+<p>Your project's knowledge base is where you upload documents that Claude should reference. You'll find the files menu on the right side of your project's main page.<br />
+Click the "+" button to add content. You can upload various file types including PDF, DOCX, CSV, TXT, HTML, and more. You can also connect to Google Drive to link documents directly.<br />
+What to upload:<br />
+- Reference documents (brand guidelines, style guides, templates)<br />
+- Background materials (research reports, meeting notes, requirements docs)<br />
+- Examples of work you want Claude to emulate<br />
+- Technical documentation or specifications<br />
+Pro tip:<br />
+Name your files descriptively. Claude uses file names to understand and retrieve the right information, so "Q4-2024-Brand-Guidelines.pdf" is more helpful than "document1.pdf."</p>
+<h4 id="how-projects-handle-large-knowledge-bases">How projects handle large knowledge bases</h4>
+<p>You might wonder what happens when you upload a lot of content. Projects automatically scale to handle large amounts through a process called Retrieval Augmented Generation (RAG). At a high level, this means that Claude can automatically find and use the most relevant parts of your uploaded documents when answering, without you needing to tell it which file to look at.<br />
+When your project knowledge approaches the context window limit, Claude seamlessly enables RAG mode. Instead of loading all project content into memory at once, Claude intelligently searches and retrieves only the most relevant information needed to answer your questions. This expands your project's capacity by up to 10x while maintaining response quality.<br />
+You'll see a visual indicator when your project is RAG-enabled, but the experience should feel the same—you can still upload documents, chat with Claude, and get context-aware responses.</p>
+<h3 id="working-within-your-project">Working within your project</h3>
+<p>Once your project is set up, you can start chatting with Claude. Each conversation within the project automatically has access to your knowledge base and follows your project instructions.</p>
+<h3 id="collaboration-features">Collaboration features</h3>
+<p>For users on Claude for Work (Team and Enterprise) plans, projects become even more powerful through collaboration features.</p>
+<h4 id="permission-levels">Permission levels</h4>
+<p>When sharing a project, you can choose from three permission levels:<br />
+Can view:<br />
+Members can see project contents, access knowledge, and chat—but can't make changes. Think of this as read-only access with discussion rights.<br />
+Can edit:<br />
+Members have full collaboration power. They can modify instructions, update knowledge, manage other members, and actively contribute to the project.<br />
+Owner:<br />
+Project creators control everything, including who sees the project. They can share with specific people or make projects visible to the entire organization.</p>
+<h4 id="sharing-your-project">Sharing your project</h4>
+<p>To share a project:<br />
+- Open the project you want to share<br />
+- Click the "Share project" button to the right of the project name<br />
+- Add individual members using their name or email, or copy and paste a list of email addresses for bulk sharing (in this case, the project will show up in their "Shared with you" section)<br />
+- Or, share with "Everyone at [your organization]" to make your project discoverable within the Team tab<br />
+Team members will receive email notifications when you share a project with them, and they can find shared projects in their "Shared with me" tab.</p>
+<h3 id="example-projects-to-inspire-you">Example projects to inspire you</h3>
+<p>Not sure where to start? Here are some common project types across different functions:<br />
+Q4 product launch:<br />
+Upload your product specs, competitive analysis, and messaging brainstorming notes. Claude will have this context top of mind for any inquiry or document draft.<br />
+Research support:<br />
+Centralize your competitive review, user research data, and customer feedback. Claude can help you synthesize sources, draft reports, and maintain consistency across recommendations.<br />
+Client account hub:<br />
+Keep your client's brand guidelines, past deliverables, and communication history in one place. Set instructions so Claude matches their tone and references their specific context when creating proposals or reports.<br />
+Event planning workspace:<br />
+Upload venue contracts, speaker bios, and attendee data. Claude can help generate run-of-show documents, attendee communications, and post-event reports that stay consistent with your event's theme.<br />
+Job description generator:<br />
+Gather past job descriptions, team charters, and internal headcount request docs. Work with Claude to draft job descriptions that reflect your team's actual work and culture.</p>
+<h3 id="best-practices-for-projects">Best practices for projects</h3>
+<p>To get the most out of projects:<br />
+Start focused, then expand.<br />
+Begin with a specific use case rather than trying to create one project for everything. You can always add more content as you go.<br />
+Keep your knowledge base current.<br />
+Outdated documents can lead to outdated responses. Review and update your project knowledge periodically.<br />
+Write clear instructions.<br />
+Be specific about what you want. Vague instructions lead to inconsistent results.<br />
+Name your documents descriptively.<br />
+(e.g., 'Q4-2025-Sales-Report.pdf' not 'report.pdf') and group related files together. Claude uses filenames and proximity to understand relationships between documents.<br />
+Reference documents by name.<br />
+When asking questions, you can mention specific documents to help Claude focus its search: "Based on our Q3 report, what were the top customer concerns?"</p>
+<h3 id="lesson-reflection_3">Lesson reflection</h3>
+<p>Before moving on, consider:<br />
+- What ongoing work could benefit from having a dedicated project with persistent context?<br />
+- What documents do you expect you'll be re-uploading or re-explaining to Claude on a regular basis?<br />
+- If you're on a team, are there projects that would benefit from shared knowledge and instructions?</p>
+<h3 id="whats-next_3">What's next</h3>
+<p>In the next lesson, we'll learn how to create mini-apps with Artifacts — actual outputs that Claude build and you can share right away.<br />
+For more information on getting started with projects, visit the<br />
+Anthropic Help Center<br />
+.</p>
+<h4 id="feedback_3">Feedback</h4>
+<p>As you progress through the course, we'd love to hear from you about how you are using concepts from the course in your work and any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_2">Acknowledgments and license</h4>
+<p>Copyright 2025 Anthropic. All rights reserved.</p>
+<h3 id="creating-with-artifacts">Creating with artifacts</h3>
+<p>Estimated time:<br />
+20 minutes</p>
+<h3 id="learning-objectives_3">Learning objectives</h3>
+<p>By the end of this lesson, you will be able to:<br />
+- Explain what artifacts are and when Claude creates them<br />
+- Share artifacts with colleagues and publish them publicly<br />
+- Troubleshoot common artifact issues</p>
+<h3 id="what-are-artifacts">What are artifacts?</h3>
+<p>Artifacts are standalone, interactive outputs that Claude creates in a dedicated window alongside your conversation. Instead of getting a long block of code or text buried in the chat, you see your content rendered and ready to use—whether that's a working website, an interactive chart, or a document you can immediately download.<br />
+Claude automatically creates an artifact when content meets certain criteria:<br />
+- It's significant and self-contained, typically over 15 lines<br />
+- It's something you're likely to want to edit, iterate on, or reuse<br />
+- It represents complex content that stands on its own without needing the surrounding conversation<br />
+- It's content you'll want to reference or use later</p>
+<h3 id="common-artifact-types">Common artifact types</h3>
+<p>Claude can create different of artifacts, each suited to different needs:<br />
+Documents<br />
+(including markdown, plain text, Word docs, PDFs, PowerPoint, and Excel): Great for anything text-heavy that you'll want to export or continue editing — like meeting notes, reports, project plans, blog posts, and other written content.<br />
+Code snippets:<br />
+Working code in any programming language—Python, JavaScript, C++, and more. You can view the code, copy it, or download it to use in your own projects.<br />
+HTML pages:<br />
+Complete web pages with HTML, CSS, and JavaScript in a single file. Perfect for landing pages, forms, interactive demos, or quick prototypes.<br />
+SVG images:<br />
+Scalable vector graphics for logos, icons, illustrations, and other visual elements. These render directly in the artifact window so you can see exactly what you're getting.<br />
+Mermaid diagrams:<br />
+Flowcharts, sequence diagrams, Gantt charts, org charts, and more. Describe the relationships you want to visualize, and Claude will create a diagram you can refine.<br />
+React components:<br />
+Interactive UI elements with real functionality—calculators, dashboards, games, data visualizations. These aren't just mockups; they include actual logic and respond to user input.</p>
+<h3 id="creating-your-first-artifact">Creating your first artifact</h3>
+<p>Creating an artifact is as simple as having a conversation. Just describe what you want, and Claude will determine whether to present it as an artifact.<br />
+For example, you might say:<br />
+- "Create a flowchart showing our customer onboarding process (Note: Claude may now generate visual diagrams like flowcharts as HTML using Imagine, in addition to code-based artifacts.)"<br />
+- "Build an interactive dashboard that lets me input monthly expenses and see a breakdown"<br />
+- "Design a landing page for a productivity app with a hero section and feature list"<br />
+- "Write a project brief template I can reuse for new initiatives"<br />
+If Claude doesn't automatically create an artifact when you expect one, you can explicitly ask: "Create this as an artifact" or "Show me this in an artifact."<br />
+When Claude generates an artifact, it appears in a dedicated window to the right of your conversation. From here, you can:<br />
+View different formats:<br />
+Toggle between a preview (how it looks) and the underlying code<br />
+Copy content:<br />
+Click the copy icon to grab the content for use elsewhere<br />
+Download files:<br />
+Save the artifact as a file to your computer<br />
+View code:<br />
+See exactly what Claude generated under the hood</p>
+<h3 id="sharing-and-publishing-artifacts">Sharing and publishing artifacts</h3>
+<p>Once you've created something useful, you have several options for sharing it.<br />
+Copy or download:<br />
+For personal use or sharing via other channels, use the copy or download buttons in the lower right corner of the artifact window.<br />
+Share within your organization (Claude for Work):<br />
+Team and Enterprise users can share artifacts internally with colleagues. The shared artifact stays within your organization and requires team authentication to access.<br />
+Publish publicly:<br />
+For free, Pro, and Max users, you can publish artifacts to make them accessible to anyone with the link. When you publish:<br />
+- Only the selected version becomes public (your chat remains private)<br />
+- Anyone can view and interact with the artifact without a Claude account<br />
+- Others can "remix" your artifact—opening it in their own Claude conversation to modify and build upon it<br />
+To publish, click the "Share" or "Publish" button in the upper right corner of the artifact. You can unpublish at any time by returning to that artifact and removing public access. Note: When you publish an artifact, it is publicly accessible via its link — anyone can view it, even without a Claude account. Published artifacts are not indexed by search engines, so they won't appear in Google results.</p>
+<h3 id="tips-for-getting-the-most-from-artifacts">Tips for getting the most from artifacts</h3>
+<p>Be specific about what you want.<br />
+"Build a budget tracker" is good, but "Build a monthly budget tracker where I can input expenses by category, see a pie chart breakdown, and get a warning when I'm over budget" is better.<br />
+Describe the end user.<br />
+Telling Claude who will use the artifact helps it make appropriate design choices. "This flowchart is for new employees" leads to different results than "This flowchart is for the engineering team."<br />
+Iterate incrementally.<br />
+Ask Claude to add one feature or make one change at a time. This makes it easier to identify what's working and catch issues early.<br />
+Request artifacts when needed.<br />
+If you ask for something substantial and Claude responds in the chat instead of creating an artifact, just say "Please create that as an artifact."</p>
+<h3 id="lesson-reflection_4">Lesson reflection</h3>
+<p>Before moving on, consider:<br />
+- What recurring work could benefit from having an interactive artifact you can reuse?<br />
+- Are there processes in your work that would be clearer as a flowchart or diagram?<br />
+- What prototype or tool would help you test an idea quickly?</p>
+<h3 id="whats-next_4">What's next</h3>
+<p>In the next lesson, you'll learn about Skills — reusable instruction sets that teach Claude specialized workflows.</p>
+<h4 id="feedback_4">Feedback</h4>
+<p>As you progress through the course, we'd love to hear from you about how you are using concepts from the course in your work and any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_3">Acknowledgments and license</h4>
+<p>Copyright 2025 Anthropic. All rights reserved.</p>
+<h3 id="working-with-skills">Working with skills</h3>
+<p>Estimated time:<br />
+15 minutes</p>
+<h3 id="learning-objectives_4">Learning objectives</h3>
+<p>By the end of this lesson, you will be able to:<br />
+- Explain what Skills are and how Claude uses them<br />
+- Identify Anthropic's built-in Skills for document creation<br />
+- Enable and manage Skills in your settings<br />
+Plan availability:<br />
+Skills are currently a feature preview for Pro, Max, Team, and Enterprise plans. If you're on the Free plan, you can read along to understand the concept and skip the hands-on steps.</p>
+<h3 id="what-are-skills">What are Skills?</h3>
+<p>Skills are folders of instructions, scripts, and resources that Claude loads dynamically to improve performance on specialized tasks. Think of them as expertise packages—they teach Claude how to complete specific tasks in a repeatable way.<br />
+You've already seen Skills at work if you've used Claude to create Excel spreadsheets, PowerPoint presentations, Word documents, or PDFs. Those file creation capabilities are powered by Skills running behind the scenes. But Skills go far beyond document creation. Custom Skills can codify entire repeatable workflows — a quarterly variance analysis methodology, a brand voice review process, or a compliance checklist — so Claude follows the same rigorous steps every time.</p>
+<h3 id="types-of-skills">Types of Skills</h3>
+<p>There are two categories of Skills you'll encounter:<br />
+Anthropic Skills<br />
+are created and maintained by Anthropic. These include enhanced document creation capabilities for Excel, Word, PowerPoint, and PDF files. Anthropic Skills are available to all paid users and Claude invokes them automatically when relevant—you don't need to do anything special to use them.<br />
+Custom Skills<br />
+are ones you or your organization create for specialized workflows and domain-specific tasks. For example, you might create a skill that applies your company's brand guidelines to presentations, structures meeting notes in a specific format, or executes your organization's data analysis workflows.</p>
+<h3 id="enabling-skills">Enabling Skills</h3>
+<p>Skills are currently available as a feature preview for users on Pro, Max, Team, and Enterprise plans. To use Skills, you'll need to have Code execution and file creation enabled, since Skills require Claude's secure sandboxed computing environment to function.<br />
+Here's how to enable Skills:<br />
+- Navigate to<br />
+Settings &gt; Capabilities<br />
+- Ensure that<br />
+Code execution and file creation<br />
+is toggled on<br />
+- Scroll to the<br />
+Skills<br />
+section<br />
+- Toggle individual skills on or off as needed<br />
+For<br />
+Enterprise plans<br />
+, organization Owners must first enable both Code execution and Skills in Admin settings before individual members can access them.<br />
+For<br />
+Team plans<br />
+, this feature preview is enabled by default at the organization level.<br />
+Once enabled, you'll see available Skills listed in your settings, including Anthropic's built-in Skills and any custom Skills you've uploaded.</p>
+<h3 id="using-skills-in-practice">Using Skills in practice</h3>
+<p>The beauty of Skills is that you typically don't need to think about them—Claude handles skill selection automatically based on your request. Here are some examples of prompts that would invoke Skills:<br />
+- "Create an Excel spreadsheet tracking monthly expenses with formulas for totals"<br />
+- "Turn this meeting notes document into a PowerPoint presentation"<br />
+- "Generate a PDF report summarizing this data"<br />
+- "Build a financial model in Excel with scenario analysis"<br />
+When Claude uses a Skill, you'll see it mentioned in Claude's chain of thought as it works. The output will be a downloadable file you can save to your computer or directly to Google Drive.</p>
+<h3 id="file-execution">File execution</h3>
+<p>Claude works with you on slides, spreadsheets, and contract redlines<br />
+This same capability means that Claude can work with<br />
+your actual files<br />
+(within a contained environment) to create updated versions of your files (note: in Chat, Claude creates a new version of the document rather than editing the original in place). Upload slides, spreadsheets, contracts, (or any .xlsx, .pptx, .docx, or .pdf files) and watch as Claude creates slides, performs analyses, and adds suggested edits. When Claude is done, you can download these files or open them in Drive.<br />
+Note: To use these capabilities you'll need to give Claude access to external data sources. Simply toggle Allow limited network access on when prompted:</p>
+<h4 id="security-considerations">Security considerations</h4>
+<p>Because Skills can include executable code, it's important to use them thoughtfully:<br />
+- Only install custom Skills from trusted sources<br />
+- Anthropic's built-in Skills are tested and maintained by Anthropic<br />
+- Custom Skills you upload are private to your individual account<br />
+- If you're installing a custom Skill from an external source, review its contents before use to understand what it does.</p>
+<h3 id="creating-custom-skills">Creating custom skills</h3>
+<p>While Anthropic's built-in Skills cover common document creation tasks, the real power of Skills comes from creating your own. Custom Skills let you teach Claude your specific workflows, brand guidelines, and ways of working—so Claude can apply that knowledge automatically whenever it's relevant.<br />
+The easiest way to create a custom Skill is through conversation with Claude itself. You don't need to write code or manually create files—Claude handles the technical structure for you.<br />
+Here's how to create a Skill through conversation:<br />
+Start a new chat<br />
+and tell Claude what you want to create. For example: "I want to create a skill for writing quarterly business reviews" or "I need a skill that applies our brand guidelines to presentations."<br />
+Answer Claude's questions.<br />
+Claude will interview you about your workflow, asking things like: What should this skill do? What makes good output for this type of work? Can you give examples of when you'd use this skill?<br />
+Upload reference materials<br />
+if you have them. Templates, style guides, brand assets, or examples of work you're proud of all help Claude understand exactly what you're looking for.<br />
+Save your skill.<br />
+When finished, Claude generates a file containing your properly structured skill. All you have to do is save it and the skill will be ready for Claude to use.<br />
+See your skills.<br />
+Find the Customize tab in the left sidebar. There you can see all of the skills that are available to you and even edit the skills you use manually or by chatting with Claude.<br />
+Your custom Skill will appear in your Skills list alongside Anthropic's built-in Skills. From that point forward, Claude will automatically invoke it whenever you work on relevant tasks—no manual triggering needed. You can improve your skills with iteration — ask Claude to edit a skill and it will update the files for you.</p>
+<h3 id="skills-vs-projects">Skills vs. Projects</h3>
+<p>You might be wondering—if both skills and projects can be used to give more context to Claude, when should I use each? Think of it this way:<br />
+projects store knowledge, skills perform tasks<br />
+.<br />
+Projects<br />
+are knowledge hubs. They hold the reference materials Claude needs to understand your work—project specs, meeting notes, research documents. When you upload files to a project, Claude draws on that information across every conversation within that project.<br />
+Skills<br />
+are procedural machines. They encode<br />
+how<br />
+Claude should execute a task—the specific steps, order of operations, and methodology you want followed every time. Skills shine when you have repeatable workflows you want Claude to run consistently.<br />
+The two features complement each other. A skill can reference knowledge stored in a project—your "customer call prep" skill might pull from customer profiles uploaded to a project's knowledge base. The project provides the<br />
+what<br />
+(information), the skill provides the<br />
+how<br />
+(process).<br />
+Projects<br />
+Skills<br />
+Purpose<br />
+Store knowledge Claude references<br />
+Define processes Claude executes<br />
+Best for<br />
+Long-term context, reference materials, team collaboration<br />
+Repeatable workflows, multi-step tasks, consistent methodology<br />
+Example<br />
+Customer hub, research buddy, feedback generator<br />
+Process guidelines (like brand or legal), Blog drafting, PDF creation<br />
+Persistence<br />
+Knowledge available across all chats in the project<br />
+Instructions applied when the skill is invoked</p>
+<h3 id="lesson-reflection_5">Lesson reflection</h3>
+<p>Before moving on, consider:<br />
+- What types of documents do you create regularly that could benefit from Claude's built-in Skills?<br />
+- Are there repetitive workflows in your work that might be good candidates for custom Skills?<br />
+- How might Skills change the way you think about document creation and data analysis?</p>
+<h3 id="whats-next_5">What's next</h3>
+<p>In the next set of lessons, you'll start to expand Claude's reach with connectors. These powerful tools make information gathering seamless, and can give Claude the ability to perform actions right inside the tools where your work is happening.<br />
+For more information on Skills, including how to create your own custom Skills, visit the<br />
+Anthropic Help Center<br />
+.</p>
+<h4 id="feedback_5">Feedback</h4>
+<p>As you progress through the course, we'd love to hear from you about how you are using concepts from the course in your work and any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_4">Acknowledgments and license</h4>
+<p>Copyright 2025 Anthropic. All rights reserved.</p>
+<h3 id="connecting-your-tools">Connecting your tools</h3>
+<p>Estimated time:<br />
+20 minutes</p>
+<h3 id="learning-objectives_5">Learning objectives</h3>
+<p>By the end of this lesson, you will be able to:<br />
+- Explain what connectors are and why they matter for your work with Claude<br />
+- Navigate the connectors directory and set up your first connection<br />
+- Use connected tools effectively in your conversations with Claude</p>
+<h3 id="what-are-connectors">What are connectors?</h3>
+<h4 id="key-takeaways_2">Key takeaways</h4>
+<p>Connectors transform Claude from an assistant into an informed collaborator<br />
+by giving Claude access to the same tools, data, and context that you use every day. Instead of starting every conversation from scratch, Claude can work directly with your actual information.<br />
+Connectors allow Claude to read information and perform actions on your behalf.<br />
+Depending on the connector and permissions you grant, Claude can search your files, retrieve documents, analyze data, create new content, update records, and execute tasks across your connected applications—all from within your conversation.<br />
+The Model Context Protocol (MCP) powers connectors.<br />
+Think of MCP like USB-C for AI—a universal standard that allows Claude to connect to many different applications through a single, consistent interface. This open standard means developers can build connectors for any tool, and those connectors work seamlessly with Claude.<br />
+There are two types of connectors: web connectors and desktop extensions.<br />
+Web connectors link Claude to cloud services like Google Drive, Notion, Slack, and Asana. Desktop extensions run locally on your computer through the Claude Desktop app, giving Claude access to local files and native applications.</p>
+<h3 id="finding-and-connecting-tools">Finding and connecting tools</h3>
+<p>Anthropic maintains a directory of recommended connectors at claude.ai/directory. The directory is organized into two tabs:<br />
+Web:<br />
+Cloud services and applications (Gmail, Notion, Slack, Asana, Linear, Stripe, and many more)<br />
+Desktop extensions:<br />
+Local tools that run on your computer through the Claude Desktop app<br />
+To browse available connectors, you can also click the<br />
++<br />
+button in the lower left of the chat window, then select<br />
+Connectors<br />
+.</p>
+<h4 id="setting-up-a-web-connector">Setting up a web connector</h4>
+<p>Here's how to connect a cloud service:<br />
+Find the connector:<br />
+Navigate to claude.ai/directory, or click<br />
++</p>
+<blockquote>
+<p>Connectors<br />
+in any chat<br />
+Click Connect:<br />
+Select the connector you want to add<br />
+Authenticate:<br />
+You'll be redirected to the service's login page. Sign in with your existing credentials<br />
+Grant permissions:<br />
+Review the specific permissions Claude is requesting, then authorize access<br />
+Test the connection:<br />
+Return to Claude and try a simple request, like "Can you access my [tool name]?"<br />
+Once connected, Claude can search, read, and in some cases take actions within that service—depending on the permissions you've granted.</p>
+</blockquote>
+<h4 id="desktop-extensions">Desktop extensions</h4>
+<p>Desktop extensions require the Claude Desktop app rather than the web interface. These extensions let Claude interact with local applications, your file system, and native features on macOS or Windows.<br />
+Some desktop extensions include:<br />
+- Local file access for reading and organizing documents<br />
+- Browser control for automated web tasks<br />
+- Native application integration (like Figma for design work)<br />
+To install a desktop extension:<br />
+- Download and install the<br />
+Claude Desktop app<br />
+- Open the app and navigate to Settings &gt; Extensions<br />
+- Browse available extensions and click Install<br />
+- Follow any additional setup steps specific to that extension</p>
+<h3 id="using-connectors-in-your-work">Using connectors in your work</h3>
+<p>Once you've connected your tools, Claude considers them when responding to your requests. Here are some practical ways to use connected tools:<br />
+Project management (Asana, Linear, Jira)<br />
+- "What are my highest priority tasks due this week?"<br />
+- "Create a new task for reviewing the Q4 budget proposal"<br />
+- "Summarize the status of our product launch project"<br />
+Communication (Slack, Gmail)<br />
+- "Find the email thread where we discussed the vendor contract"<br />
+- "Draft a reply to the latest message in the #marketing channel"<br />
+- "What did the team decide about the timeline in yesterday's discussion?"<br />
+Documentation (Notion, Google Drive, Confluence)<br />
+- "Search our documentation for our brand voice guidelines"<br />
+- "Summarize the meeting notes from last week's product review"<br />
+- "What does our style guide say about using contractions?"<br />
+Business tools (Stripe, PayPal, Salesforce)<br />
+- "Show me revenue trends for the past quarter"<br />
+- "What's the status of the Acme Corp opportunity?"<br />
+- "List recent transactions over $1,000"</p>
+<h3 id="security-and-permissions">Security and permissions</h3>
+<p>When you connect Claude to external services, you're granting it access to read—and sometimes modify—data within those services. Here are some important considerations:<br />
+Scoped access:<br />
+Permissions are specific to what the connector needs and you can toggle individual permissions on and off within each application's menu.<br />
+Claude sees what you see:<br />
+Claude can only access data<br />
+you<br />
+have access to. Connecting your work email doesn't give Claude access to your CEO's inbox—only your own.<br />
+Revocable at any time:<br />
+You can disconnect a service through Claude's settings or through the third-party service's security settings. Just as with Skills, you can also find or build custom connectors. Exercise the same caution — only install connectors from trusted sources.</p>
+<h3 id="lesson-reflection_6">Lesson reflection</h3>
+<p>Before moving on, consider:<br />
+- Which of your daily work tools would be most valuable to connect to Claude?<br />
+- What tasks currently require you to copy and paste information that connectors could handle automatically?<br />
+- Are there workflows where combining data from multiple connected sources would save you significant time?</p>
+<h3 id="whats-next_6">What's next</h3>
+<p>In the next lesson, you'll learn about Enterprise Search—a specialized feature for Claude for Work users that connects Claude to your organization's knowledge sources with custom prompts optimized for your company's context.<br />
+For more information on connectors and the Model Context Protocol, visit the<br />
+Anthropic Help Center<br />
+or explore the connector directory at claude.ai/directory.</p>
+<h4 id="feedback_6">Feedback</h4>
+<p>As you progress through the course, we'd love to hear from you about how you are using concepts from the course in your work and any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_5">Acknowledgments and license</h4>
+<p>Copyright 2025 Anthropic. All rights reserved.</p>
+<h3 id="enterprise-search">Enterprise search</h3>
+<p>Estimated time:<br />
+15 minutes</p>
+<h3 id="learning-objectives_6">Learning objectives</h3>
+<p>By the end of this lesson, you will be able to:<br />
+- Explain what Enterprise Search is and the types of questions Enterprise Search can answer<br />
+- Understand how the setup process works for both admins and users<br />
+- Recognize how security and permissions protect organizational data<br />
+Plan availability:<br />
+Enterprise Search is available on Team and Enterprise plans, and must be enabled by a workspace admin. If you're on a Free, Pro, or Max plan, you can skip this lesson.</p>
+<h3 id="what-is-enterprise-search">What is Enterprise Search?</h3>
+<p>Enterprise Search adds a dedicated "Ask {Your Org Name}" option to your sidebar. This is designed specifically for finding and synthesizing knowledge buried across your company's tools and data sources. Think of Enterprise Search as a pre-built Project for your entire organization — your company's knowledge base is already loaded, so you can jump right in to get context-aware responses to your questions.<br />
+Unlike regular chats with connectors enabled, Enterprise Search is specifically designed for information gathering, using custom instructions configured by the Anthropic team.</p>
+<h3 id="what-can-you-ask">What can you ask?</h3>
+<p>Enterprise Search is particularly valuable for questions that span multiple sources or require synthesizing information from across your organization. Here are some common use cases:<br />
+Getting up to speed<br />
+- "What happened yesterday while I was out?"<br />
+- "Summarize key updates across the business from the last week"<br />
+- "What are the current blockers on the Platform project?"<br />
+Policy and process questions<br />
+- "What is our company's remote work policy?"<br />
+- "How do I submit an expense report?"<br />
+- "What's the process for requesting time off?"<br />
+Research and analysis<br />
+- "What are the main reasons customers cite for choosing competitors?"<br />
+- "Summarize discussions about the Q4 product roadmap"<br />
+- "Find information about our customer onboarding process"<br />
+Onboarding new team members<br />
+- "How does our authentication system work?"<br />
+- "Who should I talk to about learning the billing system?"<br />
+- "What tools does the engineering team use for deployment?"<br />
+Performance and project tracking<br />
+- "Find discussions and documents related to the marketing campaign"<br />
+- "What were the key decisions from last week's leadership meetings?"<br />
+- "Summarize team contributions to the Infrastructure initiative"<br />
+When you ask a question, Claude searches across all your connected tools—such as SharePoint documents, Slack conversations, Gmail threads, and Google Drive files—and synthesizes information into a unified response. Plus, it always cites its sources so you can get the full context.</p>
+<h3 id="setting-up-enterprise-search">Setting up Enterprise Search</h3>
+<p>Enterprise Search requires a<br />
+two-step setup process<br />
+: first an admin configures it for the organization, then individual users authenticate with their personal accounts.</p>
+<h4 id="for-admins-owners">For admins (Owners)</h4>
+<p>The Enterprise Search project is enabled by default for all Team and Enterprise organizations, but an Owner needs to complete the initial setup before team members can use it:<br />
+- Click "Ask Your Org" in the left sidebar.<br />
+- Click "Set up for your org" to continue (or "Disable" to turn the feature off).<br />
+- Connect your organization's tools. You'll be required to choose a connector for<br />
+Documents<br />
+(like Google Drive or SharePoint) and<br />
+Chat<br />
+(like Slack or Microsoft Teams). Email is recommended but optional.<br />
+- Click "+ Add more" to set up any additional tools your team needs.<br />
+- Customize the project name. Whatever you enter will appear as "Ask [Name]" in everyone's sidebar.<br />
+- Add a description, then click "Finish set up."<br />
+Once setup is complete, the project becomes available to all members of your organization.</p>
+<h4 id="for-users">For users</h4>
+<p>After an admin has set up Enterprise Search, you'll see the "Ask {Org Name}" project starred in your sidebar. Here's how to get started:<br />
+- Click on the project in your sidebar.<br />
+- Follow the guided onboarding flow to connect to the recommended services.<br />
+- Authenticate with each service you want to search (Slack, Google, Microsoft 365, etc.).<br />
+- Start asking Claude questions about your organization's knowledge.<br />
+The more connectors you enable, the more comprehensive your search results will be. You can always add more connectors later by clicking "Connect" in the project's Instructions section.</p>
+<h3 id="thats-a-lot-of-data-is-this-safe">That's a lot of data … is this safe?</h3>
+<p>In short, yes. Enterprise Search only shows what you already have permission to access in the original connected tool. Plus, your conversations remain private, and your connected data isn't indexed or stored separately.</p>
+<h3 id="lesson-reflection_7">Lesson reflection</h3>
+<p>Before moving on, consider:<br />
+- What questions do you frequently ask colleagues that could be answered by searching your organization's documents and communications?<br />
+- Are there onboarding or training scenarios where Enterprise Search could help new team members get up to speed faster?<br />
+- Which data sources would be most valuable to connect for your specific role?</p>
+<h3 id="whats-next_7">What's next</h3>
+<p>In the next lesson, you'll learn about Research mode—Claude's capability for deep, multi-step investigations that go beyond quick lookups to comprehensive analysis.<br />
+For more information on Enterprise Search, visit the<br />
+Anthropic Help Center<br />
+.</p>
+<h4 id="feedback_7">Feedback</h4>
+<p>As you progress through the course, we'd love to hear from you about how you are using concepts from the course in your work and any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_6">Acknowledgments and license</h4>
+<p>Copyright 2025 Anthropic. All rights reserved.</p>
+<h3 id="research-mode-for-deep-dives">Research mode for deep dives</h3>
+<p>Estimated time:<br />
+15 minutes</p>
+<h3 id="learning-objectives_7">Learning objectives</h3>
+<p>By the end of this lesson, you will be able to:<br />
+- Explain what Research does: systematic, multi-source investigation<br />
+- Identify when to use Research for comprehensive information gathering<br />
+- Understand how Research works with extended thinking to deliver thorough reports<br />
+- Write effective Research prompts for complex investigations</p>
+<h3 id="researching-with-claude">Researching with Claude</h3>
+<h4 id="key-takeaways_3">Key takeaways</h4>
+<p>Research transforms how Claude finds and analyzes information.<br />
+Instead of a single search, Claude operates agentically—conducting multiple searches that build on each other while determining exactly what to investigate next. It explores different angles of your question automatically and works through open questions systematically.<br />
+Research delivers comprehensive answers in minutes.<br />
+Most reports complete in 5 to 15 minutes, though more complex investigations may take up to 45 minutes—work that would typically require hours of manual research.<br />
+Extended thinking is automatically enabled with Research.<br />
+This powerful combination lets Claude both plan its approach thoughtfully and gather comprehensive information, breaking complex requests into manageable pieces.<br />
+Citations make verification easy.<br />
+Research delivers thorough answers complete with easy-to-check citations, so you can trust Claude's findings and quickly verify sources yourself.</p>
+<h3 id="what-is-research">What is Research?</h3>
+<p>Research is an advanced feature that transforms Claude from a conversational assistant into a systematic investigator. When you enable Research, Claude doesn't just answer your question—it explores it from multiple angles, synthesizing information from across the web and your connected integrations.<br />
+Think of it as having a skilled research assistant who can spend hours gathering information, cross-referencing sources, and compiling a comprehensive report—except it happens in minutes instead of hours.<br />
+Research is particularly valuable when you need more than a quick answer. It's designed for situations where a thorough understanding requires pulling together information from multiple sources, comparing different perspectives, and synthesizing findings into actionable insights.</p>
+<h3 id="when-to-use-research">When to use Research</h3>
+<p>Understanding when to use Research versus other Claude capabilities helps you get the best results for your specific needs.<br />
+Use Research when you need:<br />
+- Comprehensive reports that synthesize information from multiple sources<br />
+- In-depth analysis across the web and your connected integrations (like Google Workspace)<br />
+- Thorough investigations that would typically require hours of manual work<br />
+- Comparative analysis, such as evaluating competitors or vendor options<br />
+- Reports with citations you can verify<br />
+Research is ideal for tasks like:<br />
+- Market analysis and competitive research<br />
+- Planning complex projects, like team offsites or product launches<br />
+- Synthesizing information from your email, calendar, and documents<br />
+- Creating technical documentation that draws from multiple sources<br />
+- Preparing briefings that require current, verified information<br />
+Consider web search instead when:<br />
+- You need a quick, specific fact (like today's stock price or a company's address)<br />
+- The answer requires only one or two sources<br />
+- Speed matters more than comprehensiveness<br />
+Consider extended thinking instead when:<br />
+- You need deep reasoning on a complex problem that doesn't require external information<br />
+- You're working on mathematical problems, code debugging, or logical analysis<br />
+- The answer comes from reasoning through a problem rather than gathering information<br />
+Consider enterprise search instead when:<br />
+- You need answers that draw from your organization's internal knowledge — documents, Slack threads, emails, meeting notes<br />
+- You're onboarding and want to quickly find how your company handles something (like policies, processes, or past decisions)<br />
+- You're asking a question that's specific to your company, not the public web</p>
+<h3 id="how-research-works">How Research works</h3>
+<p>When you enable Research, you're activating an agentic, multi-step process that goes far beyond a simple web search. Claude autonomously decides what to search next based on what it has already found, pursuing leads and filling gaps without you needing to direct each step.<br />
+Step 1: Claude plans its approach.<br />
+When Research is enabled, extended thinking automatically activates. This lets Claude break down your request, identify what information it needs, and plan how to investigate different angles of your question.<br />
+Step 2: Claude conducts multiple searches.<br />
+Rather than running a single search, Claude conducts many searches that build on each other. It determines what to investigate next based on what it finds, pursuing promising leads and filling in gaps.<br />
+Step 3: Claude synthesizes findings.<br />
+After gathering information from multiple sources—including the web and any connected integrations like Gmail, Google Calendar, or Google Drive—Claude compiles everything into a comprehensive, well-organized report.<br />
+Step 4: Claude provides citations.<br />
+Every claim in Research reports links back to its source, making it easy to verify information and dig deeper when needed.</p>
+<h3 id="using-research-in-practice">Using Research in practice</h3>
+<p>Here's how to enable and use Research:<br />
+- Click the<br />
++<br />
+button on the bottom left of your chat interface<br />
+- Select<br />
+Research<br />
+from the menu—it appears highlighted once active<br />
+- Enter your prompt and submit<br />
+- Claude will work in the background, and you'll see progress indicators as it searches and analyzes<br />
+Important:<br />
+Web search must be enabled for Research to function. If you haven't already turned on web search, you can do so from the same<br />
++<br />
+menu.</p>
+<h4 id="tips-for-effective-research-prompts">Tips for effective Research prompts</h4>
+<p>Since Research can take 5 to 45 minutes depending on complexity, investing time in crafting your prompt pays off. Here are some strategies:<br />
+Be specific about your goals.<br />
+Instead of "Tell me about the EV market," try "Analyze the electric vehicle battery market—identify key players, technology trends, and supply chain challenges that might affect investment decisions."<br />
+Specify the sections or structure you want.<br />
+Claude will organize its findings around the structure you provide. For example: "Compare venue options for a team offsite including: location and accessibility, meeting space and amenities, catering options, and pricing considerations."<br />
+Include relevant constraints.<br />
+Budget ranges, timelines, geographic requirements, and other parameters help Claude focus its research on relevant options.<br />
+Ask Claude to help refine your prompt.<br />
+If you're not sure how to frame your research question, you can even ask Claude to help you write a better Research prompt before enabling the feature.</p>
+<h4 id="working-with-connected-integrations">Working with connected integrations</h4>
+<p>When you have Google Workspace or other integrations connected, Research becomes even more powerful. Claude can pull context from your emails, calendar, and documents alongside web research.<br />
+For example, you might ask Claude to:<br />
+- "Summarize what's been discussed about Project X across my emails and Slack, then research industry best practices for similar initiatives"<br />
+- "Review my calendar commitments for next week and research each company I'm meeting with"<br />
+- "Find all internal documents about our pricing strategy and compare to how competitors are positioning themselves"<br />
+When using Research with integrations, you can steer Claude by saying things like "Pull relevant context from my Google Drive" or "Include insights from my recent emails on this topic."<br />
+Pro tip:<br />
+You can also turn off web search to do internal-only research across your connected tools — great for questions like "What did our team discuss about the Q3 launch across Slack and Docs?"</p>
+<h3 id="lesson-reflection_8">Lesson reflection</h3>
+<p>Before moving on, consider:<br />
+- What research tasks in your work typically require gathering information from multiple sources?<br />
+- How might combining Research with your connected integrations (like Google Workspace) change your workflow?<br />
+- What's a complex question you've been putting off because it would take too much research time?</p>
+<h3 id="whats-next_8">What's next</h3>
+<p>In the next section we're putting it all together. You'll see how everything you've learned comes together through real-world use cases organized by role, and discover additional ways to interact with Claude beyond the web interface.<br />
+For more information on Research, including video tutorials, visit the<br />
+Anthropic Help Center<br />
+.</p>
+<h4 id="feedback_8">Feedback</h4>
+<p>As you progress through the course, we'd love to hear from you about how you are using concepts from the course in your work and any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_7">Acknowledgments and license</h4>
+<p>Copyright 2025 Anthropic. All rights reserved.</p>
+<h3 id="claude-in-action-use-cases-by-role">Claude in action: use-cases by role</h3>
+<p>Estimated time:<br />
+10 minutes</p>
+<h3 id="learning-objectives_8">Learning objectives</h3>
+<p>By the end of this lesson, you will be able to:<br />
+- Describe 2-3 use-cases for claude.ai that you can try right away<br />
+- Know where to go to find additional use-case inspiration<br />
+No matter what you do, Claude can help streamline your work. This lesson highlights practical use cases organized by role, so you can see how Claude applies to your specific work context.<br />
+Each use case below links to a detailed guide in our Use Case Gallery with step-by-step instructions you can follow.</p>
+<h3 id="general-professional-use">General professional use</h3>
+<p>These use cases apply across many roles and industries.<br />
+Generate project status reports<br />
+– Keep stakeholders informed with clear, consistent updates<br />
+Analyze patterns in user feedback<br />
+– Extract insights from customer comments and survey responses<br />
+Package your brand guidelines in a skill<br />
+– Create a reusable Claude skill that applies your brand standards</p>
+<h3 id="sales">Sales</h3>
+<p>Sales professionals can use Claude to accelerate deal preparation, create compelling materials, and stay on top of competitive intelligence.<br />
+Build a battle card library<br />
+– Create competitive intelligence resources that help your team win deals<br />
+Prepare for sales deals<br />
+– Research prospects and organize your talking points before important meetings<br />
+Create sales reports<br />
+– Turn your pipeline data into clear, actionable reports</p>
+<h3 id="marketing">Marketing</h3>
+<p>Marketers can leverage Claude to analyze performance data and efficiently repurpose content across channels.<br />
+Analyze campaign performance<br />
+– Extract insights from campaign metrics to inform your strategy<br />
+Adapt content across platforms<br />
+– Efficiently repurpose content for different channels and audiences</p>
+<h3 id="finance">Finance</h3>
+<p>Finance professionals can use Claude to build models, draft documents, and make sense of complex spreadsheets.<br />
+Build financial models<br />
+– Create and refine financial projections with Claude's help<br />
+Draft investment memos<br />
+– Structure and write investment analyses more efficiently<br />
+Understand and extend an inherited spreadsheet<br />
+– Decode complex spreadsheets and add new functionality</p>
+<h3 id="hr">HR</h3>
+<p>HR teams can use Claude to create better onboarding experiences and documentation.<br />
+Create new hire onboarding guides<br />
+– Develop comprehensive onboarding materials tailored to different roles</p>
+<h3 id="legal">Legal</h3>
+<p>Legal professionals can use Claude to track complex timelines and manage discovery processes.<br />
+Track discovery timelines and analyze patterns<br />
+– Organize case timelines and identify key patterns in legal documents</p>
+<h3 id="research">Research</h3>
+<p>Researchers can use Claude to plan literature reviews and verify data analysis.<br />
+Plan your literature review<br />
+– Organize your approach to reviewing academic sources<br />
+Verify statistics from raw data<br />
+– Double-check calculations and statistical analyses</p>
+<h3 id="explore-more">Explore more</h3>
+<p>These examples are just the beginning. Visit the<br />
+Use Case Gallery<br />
+to browse the full collection and find inspiration for how Claude can help with your specific work.</p>
+<h3 id="whats-next_9">What's next</h3>
+<p>In our final module, you'll meet a few more versions of Claude including Claude Code, Claude in Chrome, Claude in Excel, and Claude in Slack — each tailored to different types of working.</p>
+<h4 id="feedback_9">Feedback</h4>
+<p>As you progress through the course, we'd love to hear from you about how you are using concepts from the course in your work and any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_8">Acknowledgments and license</h4>
+<p>Copyright 2025 Anthropic. All rights reserved.</p>
+<h3 id="other-ways-to-work-with-claude">Other ways to work with Claude</h3>
+<p>Estimated time:<br />
+10 minutes</p>
+<h3 id="learning-objectives_9">Learning objectives</h3>
+<p>By the end of this lesson, you will be able to:<br />
+- Understand when to use additional Claude products including Claude Code, Claude for Slack, Claude for Excel, Claude for PowerPoint, and Claude for Chrome<br />
+As we mentioned at the start of this course, Claude is an intelligence.<br />
+Claude.ai<br />
+is just one way of working with it.<br />
+Claude is also available in several specialized tools designed to meet you where you already work. This lesson introduces five additional ways to work with Claude, each tailored to specific workflows and use cases.</p>
+<h3 id="claude-code">Claude Code</h3>
+<p>Claude Code is an agentic coding tool that works where you work — in your terminal, IDE, browser, or even in Slack. It understands your codebase, executes commands, and handles entire development workflows through natural language.<br />
+When to use Claude Code:<br />
+- You want to build features by describing what you need in plain English, and have Claude write the code, run tests, and create commits<br />
+- You need to debug issues by pasting error messages and having Claude analyze your codebase to identify and fix problems<br />
+- You're navigating an unfamiliar codebase and want to ask questions about how different parts work together<br />
+- You want to automate tedious tasks like fixing lint errors, resolving merge conflicts, or writing release notes<br />
+- You prefer working in your terminal alongside your existing IDE and development tools rather than switching to a separate interface</p>
+<h3 id="claude-in-slack">Claude in Slack</h3>
+<p>Claude integrates directly with Slack, allowing you to get help in channels and threads or bring Slack context into your Claude conversations.<br />
+When to use Claude in Slack:<br />
+- You want to draft responses to messages, summarize lengthy threads, or break down complex discussions without leaving Slack<br />
+- You need to prepare for meetings by having Claude pull together relevant conversations and shared documents from your workspace<br />
+- You're onboarding to a new team and want help understanding ongoing projects by reviewing channel history<br />
+- You want to hand off coding tasks directly from a bug report or feature discussion—just tag @Claude and it can spin up a Claude Code session using the surrounding context<br />
+- You need to quickly get answers about industry trends, technical concepts, or company information during a conversation</p>
+<h3 id="claude-for-excel">Claude for Excel</h3>
+<p>Claude for Excel brings Claude directly into Microsoft Excel through a sidebar, allowing you to analyze, understand, and modify spreadsheets through conversation.<br />
+When to use Claude for Excel:<br />
+- You're working with a complex multi-tab workbook and want to understand how specific formulas or calculation flows work across sheets<br />
+- You need to update assumptions or inputs across your model while preserving formula dependencies and relationships<br />
+- You're debugging spreadsheet errors like #REF!, #VALUE!, or circular references and want Claude to trace them to their source and suggest fixes<br />
+- You want to create new spreadsheets or populate existing templates with data while maintaining proper formula structure<br />
+- You need to quickly build pivot tables or charts to visualize your data</p>
+<h3 id="claude-for-powerpoint">Claude for PowerPoint</h3>
+<p>Claude for PowerPoint brings Claude into Microsoft PowerPoint as a sidebar, so you can draft, edit, and restructure presentations through conversation while keeping your existing template and brand styling intact.<br />
+When to use Claude for PowerPoint:<br />
+- You want to turn an outline, document, or set of notes into a first-draft slide deck without building each slide by hand<br />
+- You need to rewrite or tighten slide copy — shortening bullets, adding speaker notes, or adjusting tone for a specific audience<br />
+- You're restructuring an existing deck and want help reordering sections, splitting dense slides, or merging overlapping ones<br />
+- You want consistent formatting applied across the deck — titles, bullet styles, and layouts — without manually fixing each slide<br />
+- You'd like quick visual suggestions for a slide, such as which layout or chart type best fits the point you're making</p>
+<h3 id="claude-for-chrome">Claude for Chrome</h3>
+<p>Claude for Chrome is a browser extension that adds Claude as a sidebar in Google Chrome. It can observe what you're working on and take actions directly within your browser.<br />
+When to use Claude for Chrome:<br />
+- You want to summarize articles, research papers, or web pages while browsing<br />
+- You need help drafting email responses or managing your inbox<br />
+- You're filling out repetitive forms and want to automate the process<br />
+- You want to test website features or navigate multi-step workflows without manually clicking through each step<br />
+- You need a browsing assistant that maintains context as you move between tabs and tasks. This makes it great for pulling context from niche internal tools, CRMs, or dashboards.<br />
+Important note:<br />
+Claude for Chrome is currently in research preview. Anthropic recommends using it for low-risk tasks on trusted websites. The extension asks for permission before taking high-risk actions like purchasing or sharing personal data, and certain categories of websites (financial services, adult content) are blocked by default.</p>
+<h3 id="summary">Summary</h3>
+<p>Each of these tools extends Claude's capabilities into the specific environments where you work:<br />
+Tool<br />
+Best for<br />
+Where it runs<br />
+Claude.ai<br />
+General tasks, research, writing, analysis, file creation<br />
+Web, desktop, and mobile apps<br />
+Claude Code<br />
+Software development, codebase navigation, git workflows<br />
+Terminal/command line, IDE, or your browser<br />
+Claude Cowork<br />
+Complex, multi-step tasks: research briefs, document creation, file organization, data analysis<br />
+Desktop (and mobile apps via Dispatch)<br />
+Claude/Claude Code in Slack<br />
+Team collaboration, meeting prep, quick answers in context<br />
+Slack workspace<br />
+Claude for Excel<br />
+Spreadsheet analysis, financial modeling, formula debugging<br />
+Microsoft Excel sidebar<br />
+Claude for PowerPoint<br />
+Slide creation, presentation editing, formatting and design<br />
+Microsoft PowerPoint sidebar<br />
+Claude for Chrome<br />
+Web research, email management, browser automation<br />
+Chrome browser sidebar</p>
+<h3 id="whats-next_10">What's next</h3>
+<p>Wrap up with a short recap of this course and a quiz to earn your certificate of completion that you can share on LinkedIn, and with your team.</p>
+<h4 id="feedback_10">Feedback</h4>
+<p>As you progress through the course, we'd love to hear from you about how you are using concepts from the course in your work and any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_9">Acknowledgments and license</h4>
+<p>Copyright 2025 Anthropic. All rights reserved.</p>
+<h3 id="whats-next_11">What's next?</h3>
+<p>Estimated time: 5 minutes<br />
+Congratulations on completing Claude 101! You've built a solid foundation for working with Claude effectively. Let's recap what you've learned and point you toward resources for continued growth.</p>
+<h3 id="what-youve-learned">What you've learned</h3>
+<p>Getting started with Claude<br />
+- Claude is an AI assistant built to be helpful, harmless, and honest—more than a chatbot, it's a thinking partner for complex work<br />
+- You can access Claude through web, desktop, and mobile apps, with your conversations syncing across devices<br />
+- Effective prompts set the stage (context), define the task (action), and specify rules (format and style)<br />
+Getting better results<br />
+- Iteration is key—treat first responses as starting points and refine through conversation<br />
+- Common challenges like generic responses or wrong tone can be fixed with more specific context<br />
+- AI Fluency encompasses four competencies: Delegation, Description, Discernment, and Diligence<br />
+Organizing your work<br />
+- Projects create dedicated workspaces with persistent knowledge, custom instructions, and team collaboration<br />
+- Artifacts are standalone outputs like documents, code, diagrams, and interactive tools that Claude creates alongside your conversation<br />
+- Skills are instruction packages that teach Claude specialized workflows—including built-in document creation and custom skills you can create<br />
+Expanding Claude's reach<br />
+- Connectors link Claude to your tools (Google Workspace, Slack, Notion, and many more) so it can work with your actual data<br />
+- Enterprise Search provides a dedicated project for searching across your organization's knowledge sources<br />
+- Research mode conducts systematic, multi-source investigations that would take hours to do manually<br />
+Putting it all together<br />
+- Claude applies across roles—sales, marketing, finance, HR, legal, research, and beyond<br />
+- Beyond claude.ai, you can work with Claude through Claude Code, Slack, Excel, and Chrome</p>
+<h3 id="additional-resources">Additional resources</h3>
+<p>Learn more about AI and Claude<br />
+AI Fluency courses<br />
+– Free courses on effective AI collaboration<br />
+AI Capabilities and Limitations<br />
+– Free introductory course on what AI can and can't do<br />
+Use Case Gallery<br />
+– Step-by-step guides and prompts for powerful workflows<br />
+Anthropic Help Center<br />
+– Detailed documentation and troubleshooting<br />
+Prompting documentation<br />
+– Comprehensive guide to getting the best results<br />
+Product-specific resources<br />
+Claude Code in Action<br />
+– Free course on using Claude for development workflows<br />
+Introduction to Claude Cowork<br />
+– Free course on how to use Claude's desktop companion for multi-step work<br />
+Connector Directory<br />
+– Browse and connect your tools</p>
+<h3 id="a-word-of-encouragement">A word of encouragement</h3>
+<p>The most important thing you can do now is just get started! The skills you've learned here will sharpen with practice, and you'll develop intuition for when and how Claude can help.<br />
+Start simple. Pick one recurring task from your work this week and try it with Claude. Maybe it's drafting an email, summarizing meeting notes, or analyzing a spreadsheet. See what happens. Iterate. Learn what works for your specific needs.<br />
+Remember: Claude is designed to be a collaborator, not a replacement. The best results come when you bring your expertise, context, and judgment to the conversation.<br />
+You now have the foundation. The rest comes from doing the work.</p>
+<h4 id="feedback_11">Feedback</h4>
+<p>We'd love to hear how this course has helped you and what we could improve. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_10">Acknowledgments and license</h4>
+<p>Copyright 2025 Anthropic. All rights reserved.</p>
+<h3 id="certificate-of-completion">Certificate of completion</h3>
+<p>Loading...</p></div>
+</div>
+
+<div id="tab-quiz" class="tab-content">
+  <div class="md-body"><h1 id="claude-101-quiz-guide">Claude 101 — Quiz Guide</h1>
+<p><em>All quiz questions with answer choices (correct answer marked with ✓).</em></p>
+<hr /></div>
+</div>
+
+<div id="tab-videos" class="tab-content">
+  
+<div class="video-speed-bar">
+  <span class="speed-label">Speed:</span>
+  <button class="speed-btn" data-speed="0.5">0.5&times;</button>
+  <button class="speed-btn" data-speed="0.75">0.75&times;</button>
+  <button class="speed-btn active" data-speed="1">1&times;</button>
+  <button class="speed-btn" data-speed="1.25">1.25&times;</button>
+  <button class="speed-btn" data-speed="1.5">1.5&times;</button>
+  <button class="speed-btn" data-speed="1.75">1.75&times;</button>
+  <button class="speed-btn" data-speed="2">2&times;</button>
+  <span class="video-total">4 videos</span>
+</div>
+<div class="chapter-section"><div class="chapter-title">Claude 101</div><div class="video-grid"><div class="video-card"><div class="video-title">Getting better results</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/Zzn-g8lvLMA?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Introduction to projects</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/GJ5jTgcbRHA?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Working with skills</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/LpGpwhORWr0?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Other ways to work with Claude</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/s-avRazvmLg?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div>
+<script>
+const jwPlayers = [];
+let currentSpeed = 1.0;
+
+jwPlayers.forEach(p => {
+  p.on('play', function() { try { this.setPlaybackRate(currentSpeed); } catch(e) {} });
+});
+function applySpeed(rate) {
+  currentSpeed = rate;
+  jwPlayers.forEach(p => { try { p.setPlaybackRate(rate); } catch(e) {} });
+}
+document.querySelectorAll('.video-speed-bar .speed-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.video-speed-bar .speed-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    applySpeed(parseFloat(this.dataset.speed));
+  });
+});
+</script>
+</div>
+
+
+
+<script>
+document.getElementById('tabBar').addEventListener('click', function(e) {
+  const btn = e.target.closest('.tab-btn');
+  if (!btn) return;
+  const tab = btn.dataset.tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+});
+</script>
+</body>
+</html>

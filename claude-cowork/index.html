@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introduction to Claude Cowork — Anthropic Academy</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --bg2: #1e293b;
+    --bg3: #162032;
+    --border: #2d3f55;
+    --accent: #7c3aed;
+    --accent2: #a855f7;
+    --green: #10b981;
+    --red: #ef4444;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --code-bg: #0d1526;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         background: var(--bg); color: var(--text); line-height: 1.6; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Header ── */
+  .site-header {
+    background: #0a0f1e;
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; align-items: center; gap: 0;
+    height: 60px; position: sticky; top: 0; z-index: 200;
+  }
+  .site-logo {
+    font-size: 15px; font-weight: 700; color: var(--text);
+    letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px;
+    white-space: nowrap;
+  }
+  .site-logo .logo-icon {
+    width: 28px; height: 28px; background: linear-gradient(135deg, #f97316, #ef4444);
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 900; color: #fff; flex-shrink: 0;
+  }
+  .breadcrumb { font-size: 13px; color: var(--text3); margin-left: 16px; display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: var(--text2); }
+  .breadcrumb .sep { color: var(--text3); }
+  .header-meta { margin-left: auto; font-size: 12px; color: var(--text3); }
+
+  /* ── Tab navigation ── */
+  .tab-bar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; gap: 0; overflow-x: auto;
+    position: sticky; top: 60px; z-index: 100;
+  }
+  .tab-btn {
+    padding: 14px 22px; font-size: 14px; font-weight: 500;
+    color: var(--text2); background: none; border: none;
+    border-bottom: 2px solid transparent; cursor: pointer;
+    white-space: nowrap; transition: all 0.15s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent); }
+
+  /* ── Tab content ── */
+  .tab-content { display: none; max-width: 960px; margin: 0 auto; padding: 36px 32px; }
+  .tab-content.active { display: block; }
+
+  /* ── Study Guide / Quiz markdown rendering ── */
+  .md-body h1 { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+  .md-body h2 {
+    font-size: 20px; font-weight: 700; color: #c8a2f8;
+    border-left: 3px solid var(--accent); padding-left: 12px;
+    margin: 36px 0 16px;
+  }
+  .md-body h3 {
+    font-size: 16px; font-weight: 600; color: var(--text);
+    margin: 24px 0 10px; padding-top: 4px;
+  }
+  .md-body p { color: var(--text); margin-bottom: 14px; }
+  .md-body em { color: var(--text2); }
+  .md-body strong { color: var(--text); }
+  .md-body hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  .md-body ul, .md-body ol { padding-left: 22px; margin-bottom: 14px; }
+  .md-body li { color: var(--text); margin-bottom: 4px; }
+  .md-body code {
+    background: var(--code-bg); color: #7dd3fc;
+    padding: 2px 6px; border-radius: 4px; font-size: 13px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  }
+  .md-body pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px; overflow-x: auto; margin-bottom: 16px;
+  }
+  .md-body pre code { background: none; padding: 0; color: #e2e8f0; }
+  .md-body table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 14px; }
+  .md-body th { background: var(--bg2); color: var(--accent2); padding: 8px 12px;
+                text-align: left; border: 1px solid var(--border); }
+  .md-body td { padding: 8px 12px; border: 1px solid var(--border); color: var(--text); }
+  .md-body tr:nth-child(even) td { background: var(--bg3); }
+  .md-body blockquote {
+    border-left: 3px solid var(--accent); padding: 8px 16px;
+    background: var(--bg2); border-radius: 0 6px 6px 0; margin-bottom: 14px;
+  }
+
+  /* ── Quiz ── */
+  .md-body li.correct {
+    background: rgba(16, 185, 129, 0.12);
+    border-left: 2px solid var(--green);
+    padding: 4px 10px; border-radius: 4px; list-style: none;
+    color: #6ee7b7; font-weight: 500;
+  }
+  .md-body li.incorrect { color: var(--text2); }
+  .md-body li.correct::before { content: ''; }
+
+  /* ── Videos tab ── */
+  .video-speed-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 16px;
+    margin-bottom: 28px; flex-wrap: wrap;
+  }
+  .speed-label { font-size: 13px; color: var(--text2); }
+  .speed-btn {
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
+    padding: 4px 12px; border-radius: 20px; cursor: pointer;
+    font-size: 12px; transition: all 0.15s;
+  }
+  .speed-btn:hover { background: #2a3a55; color: var(--text); }
+  .speed-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .video-total { margin-left: auto; font-size: 12px; color: var(--text3); }
+  .chapter-section { margin-bottom: 36px; }
+  .chapter-title {
+    font-size: 17px; font-weight: 700; color: #c8a2f8;
+    border-left: 3px solid var(--accent); padding-left: 12px;
+    margin-bottom: 14px;
+  }
+  .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
+  .video-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+  }
+  .video-title {
+    padding: 9px 13px; font-size: 13px; font-weight: 500; color: var(--text2);
+    background: var(--bg3); border-bottom: 1px solid var(--border);
+  }
+  .yt-wrap { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
+  .yt-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  /* ── Notebooks tab ── */
+  .nb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 32px; }
+  .nb-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px;
+    transition: border-color 0.15s;
+  }
+  .nb-card:hover { border-color: var(--accent); }
+  .nb-name { font-size: 13px; font-weight: 600; color: var(--text); word-break: break-all; }
+  .nb-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nb-link {
+    font-size: 11px; padding: 3px 10px; border-radius: 12px;
+    border: 1px solid var(--border); color: var(--text2);
+    background: var(--bg3); transition: all 0.15s;
+  }
+  .nb-link:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+  .nb-link.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .nb-link.primary:hover { background: var(--accent2); }
+  .section-note {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 18px; font-size: 13px; color: var(--text2);
+    margin-bottom: 24px;
+  }
+  .section-title { font-size: 16px; font-weight: 700; color: var(--text); margin: 24px 0 12px; }
+  .file-list { display: flex; flex-direction: column; gap: 8px; }
+  .file-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+  }
+  .file-icon { font-size: 18px; }
+  .file-name { font-size: 13px; color: var(--text); flex: 1; }
+  .file-link { font-size: 12px; color: var(--accent2); }
+
+  /* ── Index page cards ── */
+  .index-hero { padding: 60px 32px 40px; text-align: center; }
+  .index-hero h1 { font-size: 36px; font-weight: 800; color: var(--text); margin-bottom: 12px; }
+  .index-hero p { font-size: 16px; color: var(--text2); max-width: 520px; margin: 0 auto; }
+  .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                  gap: 20px; max-width: 1200px; margin: 0 auto; padding: 0 32px 60px; }
+  .course-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 10px;
+    text-decoration: none; transition: all 0.2s; color: inherit;
+  }
+  .course-card:hover { border-color: var(--accent); transform: translateY(-2px);
+                       box-shadow: 0 8px 24px rgba(124,58,237,0.15); text-decoration: none; }
+  .card-emoji { font-size: 32px; }
+  .card-title { font-size: 16px; font-weight: 700; color: var(--text); }
+  .card-meta { font-size: 12px; color: var(--text3); display: flex; gap: 12px; flex-wrap: wrap; }
+  .card-tag { background: var(--bg3); border: 1px solid var(--border);
+              padding: 2px 8px; border-radius: 10px; color: var(--text2); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-logo">
+    <div class="logo-icon">A</div>
+    Anthropic Academy
+  </div>
+  <div class="breadcrumb">
+    <span class="sep">›</span>
+    <a href="../index.html">All Courses</a>
+    <span class="sep">›</span>
+    <span>🤝 Introduction to Claude Cowork</span>
+  </div>
+  <div class="header-meta">7 videos</div>
+</header>
+
+<div class="tab-bar" id="tabBar">
+  <button class="tab-btn active" data-tab="study">📚 Study Guide</button>
+  <button class="tab-btn" data-tab="quiz">📝 Quiz</button>
+  <button class="tab-btn" data-tab="videos">🎬 Videos</button>
+  
+</div>
+
+<div id="tab-study" class="tab-content active">
+  <div class="md-body"><h1 id="introduction-to-claude-cowork-study-guide">Introduction to Claude Cowork — Study Guide</h1>
+<p><em>Full course notes compiled from all lessons.</em></p>
+<hr />
+<h2 id="foundations">Foundations</h2>
+<h3 id="what-is-claude-cowork">What is Claude Cowork</h3>
+<p>Estimated time:<br />
+8 minutes</p>
+<h3 id="learning-objectives">Learning objectives</h3>
+<p>By the end of this lesson you'll be able to:<br />
+- Define Claude Cowork and explain what makes it a different way of working with Claude<br />
+- Understand Cowork as Claude working in your environment — on your files, in your apps, with your tools<br />
+- Tell Chat, Cowork, and Code apart, and know which to reach for when</p>
+<h3 id="introducing-cowork">Introducing Cowork</h3>
+<p>This video introduces Claude Cowork and the type of work it's built to do. Notice how Cowork functions: not as a smarter chatbot, but as a different way of working with Claude entirely.</p>
+<h4 id="key-takeaways">Key takeaways</h4>
+<p>Cowork is Claude built for the work, not just the answer.<br />
+It meets you where you work — whether it's local on your machine, cloud apps, or your browser.<br />
+Cowork is about delegating.<br />
+Chat is still where you go to think out loud, draft, or ask. Cowork adds something new: the ability to describe an outcome and have Claude plan, execute, and deliver the whole thing.<br />
+Cowork is built for multi-step, longer-running work.<br />
+Tasks that span several tools, take a while to complete, and end in a real artifact — Cowork is designed to handle that whole arc end-to-end.<br />
+You stay in control.<br />
+Claude shows you its plan before it starts, by default asks before it takes actions that matter (sending, deleting, sharing), and lets you steer at any point.</p>
+<h3 id="what-cowork-actually-is">What Cowork actually is</h3>
+<p>Cowork is a mode of Claude inside the desktop app where Claude works on tasks alongside you. You point it at a folder on your computer, connect the apps where your work lives (Gmail, Slack, Google Drive, your calendar), and describe what you want done. Claude makes a plan, works through the steps, uses the tools and files it needs, and saves a real deliverable back to your folder.<br />
+The mental model that matters most:<br />
+Cowork is about delegating, not just chatting.<br />
+Chat is still incredibly powerful — it's where you'll go to think through problems, draft and refine, brainstorm, ask questions, and have Claude as a sounding board. Cowork doesn't replace any of that. What it adds is something new: the ability to hand Claude an entire piece of work — context-gathering, analysis, file production, tool use — and have it come back completed.<br />
+This is the single biggest shift for new Cowork users to make, and it's essential to really get this down. Most people's first instinct — coming from Chat — is to type a question, see what comes back, type a follow-up, and iterate. That works in Cowork too, but you'll get the most out of it when you reach for it for the work you'd normally<br />
+do yourself<br />
+, not the work you'd normally<br />
+ask about<br />
+.<br />
+But the differences between the two go even deeper than this. Mechanically, Chat is turn-by-turn. It can pull from your tools, but you stitch the steps together yourself. It is purpose-built for bounded exchanges and quick thinking. Cowork, on the other hand, sustains a whole piece of work: it pulls from many tools at once, runs through multi-step plans, and returns the finished output. That's the gap uploads to Chat can't fully close.<br />
+You can see what makes a great Cowork task below.<br />
+Anatomy of a Cowork task<br />
+What did we decide about pricing last quarter? Look across<br />
+the meeting notes in the Q3 Sales folder<br />
+,<br />
+my emails from the sales team, the leadership Slack, and the proposal decks<br />
+—<br />
+pull it all together<br />
+and<br />
+write me a one-page summary I can send to the exec team<br />
+.<br />
+Ask<br />
+Sonnet 4.6<br />
+Click any underlined part of the prompt to see why this is Cowork's kind of work.<br />
+Click any underlined part of the prompt to see why this is Cowork's kind of work.<br />
+Local files, multiple tools, multiple steps, a real deliverable<br />
+— that's the shape of work Cowork takes off your plate.</p>
+<h3 id="how-cowork-works-in-your-environment">How Cowork works in your environment</h3>
+<p>Cowork works in your environment. Not adjacent to it.<br />
+On your files<br />
+— Claude reads what's in the folder you point it at, writes finished outputs back.<br />
+In your apps<br />
+— Claude pulls context from the email, calendar, messaging, drive, CRM you've connected.<br />
+In your browser<br />
+— for web tools that don't have a connector, Claude in Chrome reads and acts on the page itself: dashboards, portals, or anything behind a login.<br />
+With your tools<br />
+— Claude takes action, not just describes what to do.</p>
+<h3 id="chat-vs-cowork-vs-code">Chat vs. Cowork vs. Code</h3>
+<p>Now that you know what Cowork is, take a moment to see how it fits alongside the other two ways you work with Claude on the desktop app.<br />
+The three modes are built for different shapes of work.<br />
+Chat<br />
+is turn-by-turn dialogue — quick exchanges, brainstorming, exploratory thinking, one tool at a time.<br />
+Cowork<br />
+is what you've just been reading about: a workspace where Claude reaches across many tools, sustains work over time, and produces finished outputs.<br />
+Code<br />
+is a full development environment that runs inside your codebase, with terminal and git access — built for developers writing and shipping software.<br />
+The interactive below has two parts: a three-way comparison so you can see all three at a glance, and a six-task challenge that asks you to pick the right mode for each scenario.<br />
+Chat</p>
+<h3 id="thinking-with-claude">Thinking with Claude</h3>
+<p>A conversation. You ask, draft, brainstorm, or think out loud — Claude responds in the chat window.<br />
+Best for<br />
+- Asking questions and exploring ideas<br />
+- Drafting something you'll polish yourself<br />
+- Anything that fits in a single response<br />
+Cowork</p>
+<h3 id="delegating-to-claude">Delegating to Claude</h3>
+<p>A workspace. Point Claude at a folder and your tools, describe an outcome — Claude plans, executes, and delivers.<br />
+Best for<br />
+- Multi-step work across files and tools<br />
+- Producing real deliverables (docs, decks, sheets)<br />
+- Work you want to set in motion and come back to<br />
+Code</p>
+<h3 id="building-software-with-claude">Building software with Claude</h3>
+<p>An agentic coding tool. Claude works inside a codebase — editing files, running tests, making commits.<br />
+Best for<br />
+- Working in a repo<br />
+- Building or refactoring across many source files<br />
+- Developer work, not document work</p>
+<h3 id="match-the-task-to-the-mode">Match the task to the mode</h3>
+<p>For each task, pick the mode you'd reach for. We'll tell you why.<br />
+Task 1 of 6<br />
+Pick a mode to continue<br />
+To recap:<br />
+Chat is for thinking with Claude. Cowork is for delegating to Claude. Code is for building software with Claude.<br />
+Most knowledge workers will live in Chat and Cowork — and use them for very different things.</p>
+<h3 id="lesson-reflection">Lesson reflection</h3>
+<p>Think about a task you did recently where the value was in the doing, not just the thinking. Maybe it spanned multiple tools. Maybe it ended in a deliverable you assembled by hand. Maybe it's something you do every week that you'd love to leverage AI to handle for you.<br />
+Hold on to that task — you can come back to it in Lesson 3 when you start identifying your own Cowork use cases, and again in Lesson 4 when you delegate your first real task.</p>
+<h3 id="whats-next">What’s next</h3>
+<p>In the next lesson, you'll get Cowork set up: install the desktop app, point Claude at a working folder, add your first connectors, and learn the permissions model that keeps you in control of what Cowork can do.</p>
+<h4 id="feedback">Feedback</h4>
+<p>As you progress through the course, we'd love to hear how you're using concepts from it in your work, plus any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license">Acknowledgments and license</h4>
+<p>Copyright 2026 Anthropic. All rights reserved.</p>
+<h3 id="setting-up-claude-cowork">Setting up Claude Cowork</h3>
+<p>Estimated time:<br />
+8 minutes</p>
+<h3 id="learning-objectives_1">Learning objectives</h3>
+<p>By the end of this lesson you'll be able to:<br />
+- Open Cowork in the Claude Desktop app and point it at a working folder<br />
+- Connect the apps where your work lives<br />
+- Recognize what Claude asks before doing — and what it doesn't — so you can hand off work with confidence</p>
+<h3 id="install-cowork">Install Cowork</h3>
+<p>Cowork runs inside the Claude Desktop app on Mac and Windows. If you don't have it yet, install it from<br />
+claude.com/download<br />
+. Open the app, sign in, and find Cowork in the mode selector at the top right hand corner of the page. If Cowork isn't visible, you may need a paid plan or a more recent version of the desktop app.</p>
+<h3 id="pointing-claude-at-a-folder">Pointing Claude at a folder</h3>
+<p>Click<br />
+Work in a project<br />
+in the prompt bar and pick a folder on your computer. This is the single most important setup choice you'll make for each new task, because the folder is where the work lives. Claude reads every file inside (Word docs, Excel files, PDFs, PowerPoints, whatever's there) and saves finished outputs back to the same location.<br />
+Choose a folder that's scoped to one project or stream of work. Claude doesn't need access to your entire documents folder, just the one that includes the files it needs for the task. See the interactive below for an example.<br />
+You're about to ask Cowork to write the<br />
+Q3 competitive memo<br />
+. Pick the folder it should work in.<br />
+Add folder for Cowork<br />
+Your computer<br />
+Click a folder to see what comes into scope.<br />
+Pick the smallest folder that holds what the task needs.<br />
+You can always add another folder later if you need to give Cowork access to something outside it.<br />
+The folder is where Cowork has read AND write access.<br />
+It can open your files, edit them, create new ones, and organize them. This is the main difference from Chat: In Chat, Claude can read what you upload but can't save anything back to your computer — in Cowork, Claude can.<br />
+Pick a real folder with the right context.<br />
+Cowork works best when the folder has the context for what you're doing — the source materials, the relevant documents, the templates.<br />
+Cloud-based files behave differently.<br />
+What a cloud connector lets Claude do varies. Many — like the default Google Drive and M365 connectors — are read-and-search only. Others can also create or edit. To confirm what your connectors can do, check each connector's description when you enable it. The most reliable place for Claude to build and iterate on a document is still your local working folder.</p>
+<h3 id="adding-connectors">Adding connectors</h3>
+<p>Connectors are how Claude reaches into the apps where your work already happens — your email, your calendar, your team messaging tool, your CRM, your cloud storage. You set them up once in the<br />
+Customize<br />
+area and then you can toggle off/on the connectors you need for each task.<br />
+Connectors most people set up first:<br />
+Email and calendar<br />
+(Outlook via M365 or Gmail) — for pulling context out of meetings, drafting follow-ups, finding past threads<br />
+Messaging<br />
+(Slack or Teams via M365) — for searching channel history and synthesizing what your team has said<br />
+Cloud storage<br />
+(SharePoint or OneDrive via Microsoft 365, Google Drive, Box) — for accessing documents that don't live on your local machine<br />
+CRM and project tools<br />
+— Notion, Salesforce, HubSpot, Asana, Linear, and others, depending on what your team uses and where your real data lives<br />
+Once a connector is on, you reference it naturally in your prompts. "Check what the team said in Slack about the launch" or "find the customer follow-up email from last quarter" — Claude knows where to look.<br />
+Try this interactive below to see the power of connecting Claude to your work.<br />
+Connectors<br />
+Try it</p>
+<h3 id="toggle-the-connectors-cowork-can-reach-for-this-task">Toggle the connectors Cowork can reach for this task.</h3>
+<p>Each task only uses the connectors you've toggled on. Flip them and watch what changes — both the reach and the kind of work Cowork can actually do.<br />
+Customize<br />
+Connectors for this task<br />
+0<br />
+of 4 on<br />
+Gmail<br />
+Read mail, draft replies, find past threads<br />
+Google Calendar<br />
+See meetings, create or update events, pull context from invites<br />
+Slack<br />
+Search channels, summarize threads, send messages<br />
+Google Drive<br />
+Search documents, pull data, summarize folders<br />
+What Cowork can reach<br />
+0<br />
+Nothing connected yet.<br />
+Flip a connector and Cowork can pull from that source for this task.<br />
+Worked example<br />
+"Draft a Monday status update<br />
+."<br />
+Reach: none<br />
+A note for tools that don't have a connector: for internal dashboards, vendor portals, or web apps behind a login,<br />
+Claude in Chrome<br />
+is the bridge. It's a browser extension that lets Claude read and interact with pages directly. We'll cover it in Module 3 — for now, just know that "no connector" doesn't mean that the data is out of reach. (Note that Claude in Chrome may not be available on some enterprise plans.)</p>
+<h3 id="the-permissions-model">The permissions model</h3>
+<p>When you pick a folder, you're automatically authorizing Claude to read and write in it. When it comes to the tasks inside that folder, Cowork has two permission modes. In the default — “Ask before acting” — Claude pauses for your okay before each action that touches the outside world: sending an email, posting a message, sharing a file. In “Act without asking,” it doesn't pause for those, so only switch to it for tools and tasks you trust. One thing is constant in both modes: Claude always asks before permanently deleting a file, and that prompt can't be skipped.<br />
+Permissions<br />
+The mode selector</p>
+<h3 id="cowork-uses-a-mode-selector-for-approvals">Cowork uses a mode selector for approvals.</h3>
+<p>Pick how Claude should handle approvals each task. A few guardrails apply regardless of the mode you choose.<br />
+Ask before acting<br />
+Claude pauses so you can approve each action.<br />
+Best for<br />
+New tools, unfamiliar files, or anything you want to watch closely.<br />
+Act without asking<br />
+Claude works without pausing for approval. Faster, but riskier.<br />
+Best for<br />
+When you're actively supervising and working with trusted files and sites.<br />
+In both modes<br />
+Cowork always asks before permanently deleting files. No exceptions.<br />
+You also control — same as Chat<br />
+Connectors and MCPs<br />
+— which ones Claude can reach, and how often each one asks for permission.<br />
+Web access<br />
+— your org's admin can turn web search off, and you can limit which sites Claude in Chrome can visit.<br />
+Assess how much you trust a connector or website before extending access beyond Claude's default settings.<br />
+The point of all of this: you can hand Claude a substantial piece of work, knowing it won't take an action that surprises you. That's what "delegating, not just chatting" actually feels like — and it only works because the permissions model is doing real work in the background.</p>
+<h3 id="try-it-now">Try it now</h3>
+<p>The best way to understand this is to do it. Delegate one small task before you move on — both to confirm your setup works and to feel what Cowork is like.<br />
+Step 1 — Pick a folder with real work in it.<br />
+Point Claude at an actual project: a client account, a deliverable you're in the middle of, a folder you'd be working in this week anyway. If you'd rather not point Claude at the live folder just yet, copy the contents into a new folder and use that. Just make sure to use real material, not toy files. Cowork is only as useful as the context it has, and the goal here is to feel that.<br />
+Step 2 — Connect one app.<br />
+Start with the one where most of your work context lives. For many users, email and cloud storage (e.g. Google Drive, Box, M365) are the highest-value first connectors.<br />
+Step 3 — Ask Claude to summarize the contents of the folder.<br />
+Something like:<br />
+"Take a look at everything in this folder and write me a brief on what you've learned — what's in the folder, how the documents relate to one another, any surprising insights, or other information you think would be pertinent to share."<br />
+Step 4 — Read the brief and check it against your own knowledge.<br />
+What did Claude catch that you might have missed? What did it miss or get wrong? What surprised you?</p>
+<h3 id="whats-next_1">What’s next</h3>
+<p>In the next lesson, you'll learn how to recognize the work in your day-to-day that is best suited for Cowork — the patterns to look for, and how to map your own workflows to them. By the end of it you'll have a specific task picked out and ready to delegate.</p>
+<h4 id="feedback_1">Feedback</h4>
+<p>As you progress through the course, we'd love to hear how you're using concepts from it in your work, plus any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_1">Acknowledgments and license</h4>
+<p>Copyright 2026 Anthropic. All rights reserved.</p>
+<h3 id="what-claude-cowork-can-do-for-you">What Claude Cowork can do for you</h3>
+<p>Estimated time:<br />
+11 minutes</p>
+<h3 id="learning-objectives_2">Learning objectives</h3>
+<p>By the end of this lesson you'll be able to:<br />
+- Spot the three patterns of work that suit Cowork: multi-step, file-based, multi-tool<br />
+- Set up a scheduled task with /schedule<br />
+- Send Claude a task from your phone with Dispatch</p>
+<h3 id="what-makes-a-task-right-for-claude-cowork">What makes a task right for Claude Cowork</h3>
+<p>Not every task is a fit for Cowork, and you'll get more out of it when you can recognize the tasks that are. Three patterns cover most of the work Cowork is built for: tasks that take several steps, tasks that leverage context from real files, and tasks that span the tools you already use.<br />
+Pattern 1: The task is multi-step.<br />
+If a task requires several steps, it's a good fit for Cowork. In one prompt, Claude gathers context, compares sources, does additional research, drafts a summary, and formats the deliverable. With Cowork, you can hand the whole arc to Claude.<br />
+Examples:<br />
+- Triage a week of customer-feedback emails into themes, with example quotes for each<br />
+- Pull figures from three reports and a spreadsheet, then assemble them into a single interactive dashboard<br />
+Pattern 2: The task lives in real files on your computer.<br />
+Cowork is a great fit for when the objective of the task is to output a real artifact — a Word doc, a spreadsheet, a deck, a PDF — saved in the format you need. And the inputs are real too: Claude reads the existing files in your folder, edits them, and saves changes back. Chat can produce a new document; Cowork works on the files you already have.<br />
+Examples:<br />
+- A formatted client proposal that pulls from your standard template and the meeting notes<br />
+- A monthly metrics report assembled from raw spreadsheets, complete with charts<br />
+Pattern 3: The task spans multiple tools.<br />
+The work touches the systems where you already operate — Gmail, Slack, the M365 suite, your calendar, your CRM. Claude accesses them through your connectors (the integrations that link Claude to your apps), gathers context, and acts. Chat connects to tools too — the difference is that Cowork plans across them and runs the whole sequence as one delegation, instead of you stitching the steps together one prompt at a time.<br />
+Examples:<br />
+- Drafting follow-up emails in Outlook after a meeting based on the calendar invite, attendee list, and meeting notes<br />
+- Searching Slack for everything the team has said about a launch and synthesizing it into an update<br />
+Explore the interactive below to see how Cowork performs across the three patterns.<br />
+Three patterns of work that suit Cowork<br />
+The through-line across all three patterns is the same: work that used to mean juggling steps, files, and tools in your own head can now be handed off as a single task. When you spot that shape, give it to Cowork.</p>
+<h3 id="scheduled-tasks-have-claude-work-on-a-cadence">Scheduled tasks: have Claude work on a cadence</h3>
+<p>Scheduled tasks let you set up a task once and have Claude run it on a cadence.<br />
+There are two ways to set up a scheduled task. You can start fresh: type /schedule, describe the task and the cadence, and Claude drafts a prompt for you to review and accept. Or — the more natural path — do the task once in Cowork, confirm the output looks right, then type /schedule to turn that exact process into a recurring one. Tell Claude your preferred cadence (hourly, daily, weekdays, or manual), review the prompt, and accept.<br />
+Scheduled tasks only run when your computer is on and Claude is running. If your laptop is closed, asleep, or off at the scheduled time, Claude picks the task up as soon as you're back and lets you know it was delayed.<br />
+Some ideas worth scheduling:<br />
+- A Friday afternoon review: what shipped during the week, a recap of the major decisions made in Slack or Teams, and a preview of next week's tasks<br />
+- A monthly metrics roll-up pulled from your spreadsheets on the first of every month<br />
+- A morning briefing for the meetings on your calendar that draws on past meeting notes in your folder and your email threads to surface necessary context</p>
+<h3 id="dispatch-send-claude-a-task-from-your-phone">Dispatch: send Claude a task from your phone</h3>
+<p>So far we've covered tasks you start at your desk and tasks Claude starts on a schedule. Dispatch covers the third case: tasks you start while away from your computer entirely. Dispatch lets you start a Cowork task from the Claude mobile app. You assign the task from your phone; the work runs on your desktop — same files, same connectors, same permissions; you get a push notification when it's done.<br />
+Just like with scheduled tasks, Dispatch only works when your desktop is on, awake, and signed in with Cowork open. If your machine is asleep or off when you send a task from your phone, Claude holds it until you're back at your desk.<br />
+A note on availability: Dispatch is in research preview, currently on Pro and Max plans. If you're on an Enterprise plan, it may not be available yet — and where it is enabled, your IT admin sets it up. If you don't see Dispatch in your Claude app, that's likely why.</p>
+<h3 id="bringing-it-together">Bringing it together</h3>
+<p>Multi-step, file-based, multi-tool — the patterns tell you what's worth handing off. Scheduled tasks and Dispatch tell you when and where the handoff can happen. The judgment stays with you: Claude plans, executes, and asks. You decide what gets sent, shared, or shipped.</p>
+<h3 id="lesson-reflection_1">Lesson reflection</h3>
+<p>Look at your calendar or to-do list for this week. Pick one piece of work that matches one or more of the three patterns above — multi-step, file-producing, or tool-using. Write it down. You'll hand it to Claude in Lesson 4.</p>
+<h3 id="whats-next_2">What’s next</h3>
+<p>In the next lesson, you'll walk through delegating that task end to end — from prompt to finished deliverable.</p>
+<h4 id="feedback_2">Feedback</h4>
+<p>As you progress through the course, we'd love to hear how you're using concepts from it in your work, plus any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_2">Acknowledgments and license</h4>
+<p>Copyright 2026 Anthropic. All rights reserved.</p>
+<h3 id="hand-claude-cowork-your-first-task">Hand Claude Cowork your first task</h3>
+<p>Estimated time:<br />
+15 minutes</p>
+<h3 id="learning-objectives_3">Learning objectives</h3>
+<p>By the end of this lesson you'll be able to:<br />
+- Walk a Cowork task end-to-end: through delegation, mid-task steering, and final review<br />
+- Respond to Cowork's clarifying questions in a way that produces better output<br />
+- Course-correct when Claude heads in the wrong direction</p>
+<h3 id="watch-one-go-end-to-end">Watch one go end-to-end</h3>
+<p>This video walks through a single, real piece of work from delegation to deliverable: the prompt, the clarifying questions Claude asks, the moment the user reroutes mid-task, and the finished result at the end. Notice the rhythm — it's less like prompting a chatbot and more like briefing a smart colleague who's about to disappear into a task and come back with something done.</p>
+<h4 id="key-takeaways_1">Key takeaways</h4>
+<p>Claude asks before it commits.<br />
+Most non-trivial tasks start with a clarifying question or two. The questions are how Claude closes context gaps before the work starts, not friction in the way.<br />
+You can steer mid-task.<br />
+If Claude is heading in the wrong direction, jump in. You don't have to wait for it to finish and start over.<br />
+The finished deliverable is the artifact, not the chat.<br />
+Claude makes changes to the files on your computer. Your job at the end is to review it the way you'd review a colleague's work.</p>
+<h3 id="delegate-your-first-task">Delegate your first task</h3>
+<p>You picked a task in previous lessons. Now is when it leaves your plate. Open Cowork, point it at the folder where the context for the task lives, turn on any connectors that hold relevant context for the task, and write your prompt.<br />
+A good Cowork prompt does three things:<br />
+Names the deliverable.<br />
+"A one-page brief," "a slide for the QBR," "a ranked list with notes per candidate." Specifics about format and length save you a regenerate.<br />
+Names the inputs.<br />
+Which folder, which channels, which date range, which application. Cowork is only as good as the context you point it at.<br />
+Names additional specifics or nuances Claude would need to get the job done.<br />
+"I want to see base, best, and worst case scenarios that also account for the 3 new locations we opened in Q3 last year."<br />
+That sentence directs Claude on the type of output you're looking for, and provides key insights from your expertise that Claude might not see.<br />
+Build an example Cowork prompt in the interactive below.<br />
+Build the prompt<br />
+Deliverable<br />
+Inputs<br />
+Nuance<br />
+Write a message…<br />
+Ask<br />
+Sonnet 4.6<br />
+0 of 3 rows complete<br />
+That's a complete delegation<br />
+— deliverable, inputs, and the context Cowork can't guess.<br />
+Leave a row empty and Cowork will usually ask you for it.<br />
+If you're used to prompting a chatbot, this will feel like more upfront work — it is. The trade is that more of the back-and-forth happens upfront, before Claude starts, instead of across five rounds of "actually, can you also..."</p>
+<h3 id="answer-the-clarifying-questions">Answer the clarifying questions</h3>
+<p>Claude asks questions to clarify any ambiguities about your objectives before it gets into the work. In Chat, you collaborate as you go — context shows up turn by turn. In Cowork, you delegate and it returns with a completed artifact. Anything that might trip it up — any gaps in its understanding — comes up through the questions before it dives in.<br />
+Most are easy: Claude presents a couple of options and you click the one that fits. If none of the options fit, you can answer in your own words.<br />
+Below are some examples of the questions you might receive from Cowork after submitting the prompt you built above.<br />
+Cowork is asking you a few things<br />
+1 of 4<br />
+↑↓<br />
+to navigate<br />
+Enter<br />
+to select<br />
+Esc<br />
+to skip<br />
+Pick an answer to see what it tells Cowork.</p>
+<h3 id="steer-mid-task">Steer mid-task</h3>
+<p>Watch Cowork's plan and progress as it works. If it's going off-track — wrong source, wrong format, wrong tone — interrupt. You can also stop the run if it's substantially off, refine the prompt, and start again with what you've learned. Most people's instinct from Chat is to wait until the response is done and then regenerate. Resist that. Cowork is built for course corrections, and the cost of a redirect is low.<br />
+Steer the example task below and see how Claude responds.<br />
+Steer mid-task<br />
+Help me draft the Q3 competitive memo for the leadership offsite.<br />
+I'll read the analyst-call PDFs and last quarter's memo, cross-reference each competitor's pricing changes against our positioning notes, then draft against the Q2 board-memo template.<br />
+Read 3 files, searched 2 folders<br />
+Writing draft · section 2 of 4<br />
+Progress<br />
+1<br />
+Read source PDFs and last quarter's memo<br />
+2<br />
+Cross-reference pricing changes<br />
+3<br />
+Outline three competitor moves<br />
+4<br />
+Drafting against Q2 board-memo template<br />
+5<br />
+Review against original prompt<br />
+Write a message… (click Queue to steer mid-task)<br />
+You don't need to wait for it to finish and then regenerate.<br />
+You can correct the plan while it's still running — Cowork picks up from where it was.</p>
+<h3 id="review-the-finished-deliverable">Review the finished deliverable</h3>
+<p>When Claude is done, you can preview the file in the app. The file is also in your folder, so you can open it up and see it there.<br />
+Review it the way you'd read a draft from someone you trust but don't yet fully know — with your discernment turned on. Things to check, especially the first few times:<br />
+Does it meet the actual objective?<br />
+Or did it produce something subtly different from what you asked for?<br />
+Are the facts accurate?<br />
+If Claude references facts or figures, confirm they're correct by reviewing the source material. Start by asking Claude to identify the docs it pulled from, then check them yourself.<br />
+Does anything sound made up?<br />
+A specific date, name, or quote that you can't trace to an input is a flag, not a feature.<br />
+If the draft is mostly right, tell Claude what to change rather than starting over. Claude remembers the conversation and edits faster than it regenerates.<br />
+If the draft is wrong in a load-bearing way, the prompt was missing the load-bearing piece of context. Point Claude to the new context and ask it to make adjustments.</p>
+<h3 id="try-it-now_1">Try it now</h3>
+<p>Take the task you identified in Lesson 3 — or pick one now. Hand it to Cowork using the process you just walked through — name the deliverable, the inputs, and any nuance; answer the clarifying questions specifically; steer if it drifts; review the result with your discernment on. The first run is the one that teaches you the most.</p>
+<h3 id="whats-next_3">What’s next</h3>
+<p>You've now done it once. In Module 2, you'll start making Cowork<br />
+yours<br />
+— keeping the context that worked, the workflows you want repeated, and the expertise your team relies on, so you don't re-supply it every time you start a task.</p>
+<h4 id="feedback_3">Feedback</h4>
+<p>As you progress through the course, we'd love to hear how you're using concepts from it in your work, plus any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_3">Acknowledgments and license</h4>
+<p>Copyright 2026 Anthropic. All rights reserved.</p>
+<h3 id="get-better-results-faster">Get better results faster</h3>
+<p>Estimated time:<br />
+5 minutes</p>
+<h3 id="learning-objectives_4">Learning objectives</h3>
+<p>By the end of this lesson you'll be able to:<br />
+- Name the four building blocks that make Claude better at your work over time: global instructions, projects, skills, and plugins</p>
+<h3 id="how-cowork-gets-better-at-your-work">How Cowork gets better at your work</h3>
+<p>In Lesson 4 you delegated one task and got a real deliverable back. What this module adds is the part that compounds: the more Claude knows about you, your work, and how your team does things, the better the next deliverable is — and the faster you get there.<br />
+Four building blocks make that happen. Each one gives Claude something it can carry forward, so the context you supply once keeps paying off.</p>
+<h3 id="the-four-building-blocks">The four building blocks</h3>
+<p>Four ways Cowork learns about you<br />
+Each one gives Cowork a different kind of knowledge. Each kind makes it more capable.<br />
+L6</p>
+<h3 id="global-instructions">Global instructions</h3>
+<p>What Cowork learns<br />
+Who you are and how you work.<br />
+What that unlocks<br />
+Every task starts already calibrated to your role, your formats, and your preferences.<br />
+L6</p>
+<h3 id="projects">Projects</h3>
+<p>What Cowork learns<br />
+The context of one stream of work.<br />
+What that unlocks<br />
+Inside the project, Cowork works like someone already on the team, with access to the files, the history, and the decisions to date.<br />
+L7</p>
+<h3 id="skills">Skills</h3>
+<p>What Cowork learns<br />
+How a specific process should be done.<br />
+What that unlocks<br />
+When a matching task comes up, Cowork runs it the way your team would: your templates, your standards, your steps.<br />
+L8</p>
+<h3 id="plugins">Plugins</h3>
+<p>What Cowork learns<br />
+The expertise of your role or field.<br />
+What that unlocks<br />
+Cowork goes from generalist to specialist, with the workflows, connectors, and know-how someone in your seat needs.<br />
+They're independent and they compound.<br />
+The more Cowork knows, the more it can take off your plate.<br />
+You're not going to start with all four of these on Day 1. As you work in Cowork more, you'll realize what global instructions make sense to apply to every conversation. You'll start to see your recurring workstreams and what makes sense to have as a project. If you find you're explaining the same workflows to Claude multiple times, those will be the right opportunities for your first skills. And as you and your teams perfect those processes, plugins will come in as you have something worth sharing.</p>
+<h3 id="whats-next_4">What’s next</h3>
+<p>The next three lessons take you through these layers in order. Lesson 6 covers global instructions and projects — the layer most people set up first. Lessons 7 and 8 cover skills and plugins, finishing with a hands-on activity that gets a real plugin installed for your work.</p>
+<h4 id="feedback_4">Feedback</h4>
+<p>As you progress through the course, we'd love to hear how you're using concepts from it in your work, plus any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_4">Acknowledgments and license</h4>
+<p>Copyright 2026 Anthropic. All rights reserved.</p>
+<h2 id="advanced-features">Advanced Features</h2>
+<h3 id="standing-context-global-instructions-and-projects">Standing context: Global instructions and projects</h3>
+<p>Estimated time:<br />
+7 minutes</p>
+<h3 id="learning-objectives_5">Learning objectives</h3>
+<p>By the end of this lesson you'll be able to:<br />
+- Set global instructions so Claude starts every session already knowing how you work<br />
+- Decide when a piece of work belongs in a project<br />
+- Choose between the three ways to start a project</p>
+<h3 id="onboard-your-new-collaborator">Onboard your new collaborator</h3>
+<p>In Chat, memory builds itself — turn it on and Claude learns from your conversations automatically. Cowork works differently. The context that carries from task to task is mostly the context you set up:<br />
+global instructions<br />
+, which apply to every Cowork session, and<br />
+projects<br />
+, where Claude builds memory automatically from the conversations you have inside them. Most people start with global instructions and add projects as recurring work surfaces.</p>
+<h3 id="global-instructions-the-brief-that-applies-to-every-session">Global instructions: the brief that applies to every session</h3>
+<p>Global instructions are a standing brief. You write them once, in Settings, and Claude will reference them during every session — every chat, every scheduled task, every Dispatch.<br />
+To set them up:<br />
+- 1. Open the Claude desktop app and go to<br />
+Settings → Cowork<br />
+.<br />
+- 2. Click<br />
+Edit<br />
+next to<br />
+Global instructions<br />
+.<br />
+- 3. Write your brief and save.<br />
+What to put in it: who you are and what you do; the shorthand and acronyms you use (so Claude doesn't have to ask what "the QBR deck" is); and how you like output delivered (format, length, tone, etc.). The interactive below shows a few worked examples based on different roles.<br />
+Global instructions<br />
+Instructions for Claude<br />
+Claude will keep these in mind across chats and Cowork within<br />
+Anthropic's guidelines<br />
+.<br />
+Learn more<br />
+What this gets you<br />
+Your global instructions don't need to be complete on day one. As you work with Cowork more, you'll notice corrections you keep giving (<br />
+"share the bottom line up front in your responses"<br />
+or<br />
+"don't use Oxford commas"<br />
+) — those are global-instruction candidates.</p>
+<h3 id="projects-a-scoped-workspace-for-a-stream-of-work">Projects: a scoped workspace for a stream of work</h3>
+<p>Global instructions cover<br />
+you<br />
+. Projects cover<br />
+what you're working on<br />
+.<br />
+A project is a workspace tied to a specific stream of work — a customer, a recurring deliverable, a launch. Inside the project are three things you can set up and one that Claude builds for you:<br />
+Instructions<br />
+— like global instructions, but scoped to this project. ("This project is for our weekly transformation team meetings. The purpose is to gather data from across the organization and distill it into a slide deck each week.")<br />
+Scheduled tasks<br />
+— recurring runs you've set up that belong to the project: the Friday status pull, the pre-meeting brief, the end-of-month rollup. You set these up from a conversation inside the project, and they run with the project's context every time.<br />
+Context<br />
+— one or more folders or links Claude should work from. Every conversation in the project has access to them.<br />
+Memory<br />
+— what Claude learns from the conversations you have inside the project. This builds up over time as you work; you don't write it.<br />
+That last one is the difference projects make. Outside of a project, each session starts fresh apart from your global instructions. Inside one, every conversation adds to what Claude knows — so the next task opens with the client's situation, last week's decisions, and what's still open already in hand.<br />
+Review the examples below to get a sense for the makeup of a Cowork project.<br />
+Three workstreams, three project setups<br />
+Some streams of work that are good for a project:<br />
+A client or account.<br />
+The folder of meeting notes and deliverables, and the standing instructions for the account. Every meeting prep, follow-up, and review draft happens inside the project, and Claude picks up the relationship as it goes.<br />
+A recurring deliverable.<br />
+The monthly report, the quarterly review, the weekly leadership update. Each new cycle is a new conversation inside the same project that automatically builds on the insights from the last time.<br />
+A launch or initiative.<br />
+The redesign, the migration, the new program rollout. Briefs, decisions, status updates — the whole thread of the work in one place until it ships.</p>
+<h3 id="three-ways-to-start-a-project">Three ways to start a project</h3>
+<p>There are three ways to create a project, depending on where the materials already live:<br />
+From scratch<br />
+— start empty, add instructions and context as you go.<br />
+From an existing folder on your computer<br />
+— point the project at a folder you already work out of. The folder becomes the project's working directory.<br />
+From a Chat project<br />
+— if you've been using projects in Chat, you can transition the instructions and knowledge over to Cowork. This only works one-way: changes you make in Cowork don't sync back to Chat.<br />
+To create one, click<br />
+Projects<br />
+in the Cowork sidebar, then<br />
+New project<br />
+, and choose whichever option makes the setup easiest for you. You can change the working folder, instructions, and connectors at any time.</p>
+<h3 id="try-it-now_2">Try it now</h3>
+<p>Put both layers in place — global instructions for you, and one project for a stream of work you're in right now.<br />
+- 1.<br />
+Write a first-pass global instructions block.<br />
+Don't overthink it — just start with a few sentences.<br />
+A useful starter:<br />
+I'm a [role] at [company], working on [main 1–2 streams of work]. Here are some common [acronyms/shorthand] you need to know. Most of my deliverables are [docs, decks, briefs, models — whatever]. I want updates and briefs concise — lead with the recommendation, keep background to one paragraph. I like to review the .md previews before creating the final document file.<br />
+- 2.<br />
+Create a project for one stream of work.<br />
+Pick something recurring — a customer account, a monthly deliverable, a current initiative. Point it at the folder where the materials already live, or start fresh if there isn't one yet.</p>
+<h3 id="whats-next_5">What’s next</h3>
+<p>In the next lesson, you'll meet skills — how to teach Claude the processes you and your team rely on, so the way you do specialized work happens automatically.</p>
+<h4 id="feedback_5">Feedback</h4>
+<p>As you progress through the course, we'd love to hear how you're using concepts from it in your work, plus any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_5">Acknowledgments and license</h4>
+<p>Copyright 2026 Anthropic. All rights reserved.</p>
+<h3 id="skills-teach-claude-cowork-your-way">Skills: Teach Claude Cowork your way</h3>
+<p>Estimated time:<br />
+12 minutes</p>
+<h3 id="learning-objectives_6">Learning objectives</h3>
+<p>By the end of this lesson you'll be able to:<br />
+- Define a skill and explain how Claude uses one<br />
+- Recognize the four building blocks a skill can include<br />
+- Build a skill from one of your own recurring processes</p>
+<h3 id="what-a-skill-actually-is">What a skill actually is</h3>
+<p>A skill is a reusable playbook — a folder of files and resources — that teaches Claude how to do a specific kind of work the way you'd want it done. When you start a task that matches the skill, Claude loads the playbook and follows it.<br />
+Skills are automatically used during the task right when you need them. You don't have to invoke them by name; Claude notices when a task matches a skill you have installed and loads it automatically. You can also be explicit (<br />
+"use the board memo drafting skill"<br />
+) when you want to.</p>
+<h3 id="whats-inside-a-skill">What’s inside a skill</h3>
+<p>A skill is more than a long instruction. The four kinds of files a skill can include — and how they work together — are how you encode a real process well enough that Claude can run it like your team would:<br />
+Instructions<br />
+(the SKILL.md file). The brief that tells Claude what the skill does, when to use it, and how to do it. Write it the way you'd write a runbook for a new colleague — specific enough that they can do the work.<br />
+Assets.<br />
+Logos, brand templates, slide masters, fonts. The raw materials the skill uses to produce real-looking output.<br />
+References.<br />
+Examples of good output, style guides, clause libraries, the past work you'd hand a new teammate as the bar to match. References are how Claude learns what "good" looks like for this kind of work.<br />
+Scripts.<br />
+Small pieces of code Claude can run for the parts of the process that should happen the same way every time — a variance calculation, a structured comparison, a chart formatter, a doc reformatter.<br />
+A skill can use any combination of these. Some skills are just a SKILL.md file with instructions, and that's perfectly fine for some processes. Others have a SKILL.md plus a brand asset folder. Others have all four. The mix follows the work: include what needs to be included, nothing more.<br />
+Below are three examples of skills. Click through each to get a sense for their application and makeup.<br />
+Inside a skill<br />
+A skill is a folder.<br />
+What goes inside depends on the process.<br />
+Switch between three examples:<br />
+meeting-recap/<br />
+board-memo/<br />
+brand-template.pptx<br />
+2025-Q4-board-memo.docx<br />
+2026-Q1-board-memo.docx<br />
+variance-analysis/<br />
+variance.py<br />
+Click SKILL.md in the meeting-recap folder to see what it does.<br />
+meeting-recap<br />
+SKILL.md<br />
+The brief<br />
+The simplest skill is just this one file — the instructions, with nothing else attached.</p>
+<hr />
+<p>name: meeting-recap<br />
+description: Write a recap after any meeting with action items</p>
+<hr />
+<h1 id="meeting-recap">Meeting recap</h1>
+<h2 id="when-to-use">When to use</h2>
+<p>After any meeting with action items.</p>
+<h2 id="format">Format</h2>
+<ul>
+<li>Decisions</li>
+<li>Action items (owner + date)</li>
+<li>Open questions</li>
+</ul>
+<h2 id="length">Length</h2>
+<p>Under 150 words.<br />
+What you'd use it for<br />
+Lock in the recap format once. No template, no script, no examples needed — just the rules.<br />
+board-memo<br />
+SKILL.md<br />
+The brief<br />
+Tells Cowork what this skill does and how to do it — written like a runbook for a new colleague.</p>
+<hr />
+<p>name: board-memo<br />
+description: Draft the monthly board memo in our house format</p>
+<hr />
+<h1 id="board-memo">Board memo</h1>
+<h2 id="when-to-use_1">When to use</h2>
+<p>Monthly close. Quarterly board prep.</p>
+<h2 id="process">Process</h2>
+<ol>
+<li>Pull variance from the close folder</li>
+<li>Section order: Variance → Forecast → Risks → Asks</li>
+<li>Lead with churn-adjusted ARR<br />
+What you'd use it for<br />
+Codify the unwritten rules — the section order, the question that always comes up — so Cowork doesn't have to be told them every month.<br />
+board-memo<br />
+assets/<br />
+Templates &amp; brand<br />
+The actual files Cowork reaches for — templates, brand kits, anything the deliverable needs to look like.<br />
+brand-template.pptx<br />
+What you'd use it for<br />
+Put your team's slide template here and decks Cowork builds with this skill can match it.<br />
+board-memo<br />
+references/<br />
+Prior work<br />
+Your two best past memos — finished work Cowork reads to match the tone, length, and structure.<br />
+2025-Q4-board-memo.docx<br />
+2026-Q1-board-memo.docx<br />
+What you'd use it for<br />
+When the easiest way to describe the bar is to show it, not write it down.<br />
+variance-analysis<br />
+SKILL.md<br />
+The brief<br />
+Tells Cowork where the inputs live, what counts as material, and which script to run before writing it up.</li>
+</ol>
+<hr />
+<p>name: variance-analysis<br />
+description: Compare actuals vs plan and write up material variances</p>
+<hr />
+<h1 id="variance-analysis">Variance analysis</h1>
+<h2 id="sources">Sources</h2>
+<p>Actuals: Finance/close/{YYYY-MM}/<br />
+Plan: Finance/plan/{YYYY}-plan.xlsx</p>
+<h2 id="what-counts-as-material">What counts as material</h2>
+<blockquote>
+<p>5% AND &gt;$50K. Both, not either.</p>
+</blockquote>
+<h2 id="run">Run</h2>
+<ol>
+<li>Call scripts/variance.py</li>
+<li>One paragraph per material line<br />
+What you'd use it for<br />
+Put the team's definition of “material” and the write-up format here once. Every month, Cowork applies them without being re-told.<br />
+variance-analysis<br />
+scripts/<br />
+Repeatable calculation<br />
+A small Python script that does the same calculation, the same way, every time. Say “run variance for May” — Cowork pulls the right files, runs the script, produces the write-up.</li>
+</ol>
+<h1 id="scriptsvariancepy">scripts/variance.py</h1>
+<h1 id="same-calculation-every-month-no-rounding-drift">Same calculation every month, no rounding drift.</h1>
+<p>def variance(month):<br />
+    actuals  = read_close(month)<br />
+    plan     = read_plan(month)<br />
+    rows = []<br />
+    for line in actuals.lines:<br />
+        delta_pct = (line.actual - plan[line.id]) / plan[line.id]<br />
+        delta_abs = line.actual - plan[line.id]<br />
+        if abs(delta_pct) &gt; 0.05 and abs(delta_abs) &gt; 50_000:<br />
+            rows.append((line.name, delta_pct, delta_abs))<br />
+    return rows<br />
+What you'd use it for<br />
+Pin the calculation you don't want re-derived — same numbers, same shape, every run. The write-up is the part Cowork drafts; the math is the part the script owns.<br />
+This is what makes skills so useful for codifying how your team works. Cowork is a coworker that can act on your behalf — and skills are how you get it to do the work the way it should be done. The instructions tell it what to do; the assets give it the raw materials; the references show it what good looks like; the scripts let it run the repeatable parts the same way every time.</p>
+<h3 id="build-a-skill-with-claude">Build a skill with Claude</h3>
+<p>The fastest way to build a skill is with Claude.<br />
+Start a new conversation in Cowork and say something like:<br />
+I want to build a skill for [the recurring process you're tired of re-explaining]. Walk me through what you need to know.<br />
+Claude will ask a few questions: what the skill should do, when it should trigger, what good output looks like, what resources it should use to inform the skill. Answer as specifically as you can — point at real examples of the work, real templates, real prior outputs. The output is a skill folder with the SKILL.md and any assets, references, and scripts the skill needs, ready to install.<br />
+Once it's installed, you can find the skill in<br />
+Customize<br />
+. If you want to make any changes to the skill, you can just provide Claude with the correction and ask it to update the skill.<br />
+"Add a step that flags any deal over $100K that slipped two stages — that always matters."<br />
+Claude updates the skill in place.<br />
+Skills work the same way inside any conversation, including conversations inside a project. So a skill you build for variance analysis will show up whenever variance analysis is the task — whether you're working in your default Cowork session or inside a specific finance project.</p>
+<h3 id="lesson-reflection_2">Lesson reflection</h3>
+<p>Think of one process you repeat — a report you run, a format you always use, a checklist you follow. Jot it down. That's your first skill candidate. You don't need to build it now. Come back and build it with Claude when you have time.</p>
+<h3 id="whats-next_6">What’s next</h3>
+<p>Skills package your specific workflows so anyone on your team can run them and get the same quality result. Plugins bundle several skills and connectors into one installable package built around a job. That's the next lesson.</p>
+<h4 id="feedback_6">Feedback</h4>
+<p>As you progress through the course, we'd love to hear how you're using concepts from it in your work, plus any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_6">Acknowledgments and license</h4>
+<p>Copyright 2026 Anthropic. All rights reserved.</p>
+<h3 id="plugins-encode-your-team-expertise">Plugins: Encode your team expertise</h3>
+<p>Estimated time:<br />
+12 minutes</p>
+<h3 id="learning-objectives_7">Learning objectives</h3>
+<p>By the end of this lesson you'll be able to:<br />
+- Define a plugin and what it bundles together<br />
+- Recognize the two shapes plugins take<br />
+- Install or customize a plugin against a real piece of your work</p>
+<h3 id="watch-what-a-plugin-unlocks">Watch what a plugin unlocks</h3>
+<p>The video shows what changes when a team's workflow stops being one person's playbook and becomes a shared toolkit anyone can install.</p>
+<h4 id="key-takeaways_2">Key takeaways</h4>
+<p>A plugin is a packaged set of skills built around a job.<br />
+Where a skill is one playbook, a plugin is several — skills, plus the connectors and subagents they depend on. (A subagent is a purpose-built helper a skill can spin up to handle one part of the work in its own context — e.g., a research subagent for a research step, a drafting subagent for a drafting step.)<br />
+Plugins teach Claude your team's way of working.<br />
+Install a finance plugin and Claude knows the way your team analyzes equities. Install a legal plugin and it knows your contract playbook. The expertise travels with the install, not the person.<br />
+Anthropic publishes plugins for common roles<br />
+— finance, legal, sales, marketing, customer support, product management, and more. You can install one off the shelf, customize it, or build your own.</p>
+<h3 id="two-kinds-of-plugins">Two kinds of plugins</h3>
+<p>Plugins come in two flavors — both useful, both common.<br />
+Shape 1: An end-to-end process bundled together.<br />
+When the work has many sequential steps, you can package the skills for each step into a plugin so the whole process runs as one. For example, a monthly-close plugin might include separate skills for pulling the actuals, building the variance table, and drafting the board memo — each one a step in the larger workflow. Anyone on the team installs the plugin and gets the entire process the way you do it.<br />
+Shape 2: A team's most-used skills bundled together.<br />
+This is great for a set of recurring jobs the team does. You can bundle the most important ones into a single plugin. For example, a finance plugin might include separate skills for variance analysis, financial modeling, investment-memo drafting, and quarterly reports. They aren't dependent on each other — they're just the skills the team reaches for most. Bundling them means new teammates install one thing and have the team's whole toolkit.<br />
+Explore the interactive below to see the different shapes of plugins.<br />
+Two plugins, two shapes</p>
+<h3 id="experiment-readout">Experiment Readout</h3>
+<p>…<br />
+Source<br />
+Uploaded from file<br />
+Version<br />
+1.0.0<br />
+Last updated<br />
+3 days ago<br />
+Description<br />
+Run an A/B test from raw results to shipped readout.<br />
+Skills<br />
+Click any skill to see what it does.<br />
+Connectors<br />
+BigQuery<br />
+Slack<br />
+Hex</p>
+<h3 id="legal">Legal</h3>
+<p>…<br />
+Source<br />
+Marketplace (<br />
+Anthropic &amp; Partners<br />
+)<br />
+Version<br />
+1.2.0<br />
+Author<br />
+Anthropic<br />
+Last updated<br />
+9 hours ago<br />
+Description<br />
+The contract and review work a legal team does most.<br />
+Skills<br />
+Click any skill to see what it does.<br />
+Connectors<br />
+Box<br />
+Egnyte<br />
+Slack<br />
+M365<br />
+Atlassian<br />
+Stay in the loop.<br />
+A plugin enables Claude to run your workflows, but the output is still yours to review.<br />
+The shape that matters in either case: a plugin is a package built around<br />
+workflows<br />
+. "Renewal prep for our customer success team" is a plugin. "Equity research for our fund" is a plugin. "The monthly board cycle for the CFO's office" is a plugin.</p>
+<h3 id="install-a-plugin-from-the-anthropic-marketplace">Install a plugin from the Anthropic marketplace</h3>
+<p>Anthropic publishes plugins for the most common roles in knowledge work, each one built and maintained as a starting point you can use as-is or shape to your team. Find them in<br />
+Customize → Plugins<br />
+in Cowork. Browse for the plugin that matches your work, click<br />
+Install<br />
+, and approve the connectors the plugin uses. The plugin's skills become available immediately.</p>
+<h3 id="customize-a-plugin-to-fit-your-team">Customize a plugin to fit your team</h3>
+<p>A plugin from the marketplace is a strong default, not a final answer. The skills and connectors inside use a generic version of the workflow; your team has its own templates, definitions, and steps. You can shape any installed plugin to match.<br />
+After you've installed the plugin, go back to<br />
+Customize → Plugins → [Plugin name]<br />
+and click<br />
+Customize<br />
+. This opens a new Cowork task where you and Claude work together to tailor the plugin. You can add a starter prompt by directing it to specific assets, sharing context, or uploading the examples you want it to use as a base. Claude will then update the plugin to be true to your team's context.<br />
+For example, you could say something like:<br />
+"Here are our last three red-lined NDAs. Update the /nda-triage skill in this plugin so the format and tone match these."<br />
+Claude adapts the plugin in place. The more you shape it to your team's actual work, the more leverage it produces.</p>
+<h3 id="build-your-own-plugin">Build your own plugin</h3>
+<p>If your team has a workflow that doesn't fit any existing plugin, you can build one by working with Cowork. It will bundle the skills the workflow needs, include any connectors it depends on, and package it for easy installation into your instance of Cowork.<br />
+Most teams start small. One skill for the most repetitive task. Then another. By the time it has three or four skills and the connectors that matter, it's a plugin worth sharing — and you'll learn how to share it with your team in Lesson 13.<br />
+Your admin may have already published plugins for your organization — check the Directory (Customize → Plugins) before you build anything yourself.</p>
+<h3 id="try-it-now_3">Try it now</h3>
+<p>Let's find the plugins that fit your work. In a new Cowork conversation, type:<br />
+/setup-cowork<br />
+The skill starts a short interview. Claude asks about the type of work you do, then suggests a plugin that would work best for your needs. You can easily add the plugin right from chat and test it out in the conversation. Once installed, customize it for your team.</p>
+<h3 id="whats-next_7">What’s next</h3>
+<p>You've now made Cowork yours for one piece of your work. The next module is about extending Cowork beyond the desktop — into your browser, and into the M365 apps where a lot of the work lands.</p>
+<h4 id="feedback_7">Feedback</h4>
+<p>As you progress through the course, we'd love to hear how you're using concepts from it in your work, plus any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_7">Acknowledgments and license</h4>
+<p>Copyright 2026 Anthropic. All rights reserved.</p>
+<h3 id="claude-in-chrome">Claude in Chrome</h3>
+<p>Estimated time:<br />
+10 minutes</p>
+<h3 id="learning-objectives_8">Learning objectives</h3>
+<p>By the end of this lesson you'll be able to:<br />
+- Recognize the kinds of work Claude in Chrome unlocks<br />
+- Use Chrome alongside Cowork on a real piece of work</p>
+<h3 id="watch-it-work">Watch it work</h3>
+<p>The video shows how Claude can work in Chrome to read, click, and navigate websites alongside you.</p>
+<h4 id="key-takeaways_3">Key takeaways</h4>
+<p>Claude in Chrome is the bridge for tools that don't have a connector.<br />
+For anything that lives in a browser, Claude can read and act on those pages.<br />
+Claude in Chrome and Cowork work together.<br />
+Claude can gather info and take actions in the browser; it then takes the results and builds the deliverable back in Cowork. One conversation, both surfaces.<br />
+You stay in control.<br />
+By default, Claude in Chrome asks before sensitive actions, and you can approve or deny each one.</p>
+<h3 id="what-this-unlocks">What this unlocks</h3>
+<p>A few examples that matter in real work:<br />
+Internal dashboards.<br />
+Your finance team's Tableau view, your sales ops Looker dashboard, the BI tool with the metric you check every Monday. Claude can pull the numbers, download them to your computer, and use that context for Cowork tasks.<br />
+Vendor portals and customer systems.<br />
+The procurement portal that doesn't have an API. The CRM that's behind your single sign-on. The customer support tool where every ticket has to be triaged. Claude can navigate the portal, pull what you need, and act on it the way you would.<br />
+Web apps behind a login.<br />
+Anything with a browser interface — even tools your team built — becomes scriptable.<br />
+"Open the procurement system, find every PO from our top ten suppliers in Q3, and pull the line items into a spreadsheet."<br />
+Web research that ends in a deliverable.<br />
+Open ten tabs, pull what's on each, and turn it into a brief — without copy-paste.<br />
+The pattern: any time you'd find yourself thinking<br />
+"I'd love to give this context to Claude, but it lives on the web,"<br />
+Claude in Chrome is the answer.</p>
+<h3 id="use-it-with-cowork">Use it with Cowork</h3>
+<p>A real example: your team's customer health dashboard lives behind a login and doesn't have a connector. You want a one-page summary of every account showing yellow or red, by Friday.<br />
+In Cowork, you say:<br />
+Open the customer health dashboard in Chrome, pull every account showing yellow or red, and for each one, pull the past 30 days of activity from the customer's folder in Drive and recent threads in #customer-success in Slack. Build a one-page summary I can review before my Friday call.<br />
+Cowork prompt<br />
+“Pull yellow and red accounts from the customer-health dashboard for the last 30 days, then build a one-page summary with the top three at-risk accounts.”<br />
+Claude (MCP)<br />
+Customer Health — Dashboard<br />
+×<br />
+app.internal/customer-health</p>
+<h3 id="customer-health">Customer health</h3>
+<p>All statuses<br />
+Green<br />
+Yellow<br />
+Red<br />
+Last 90 days<br />
+Last 7 days<br />
+Last 30 days<br />
+Last 90 days<br />
+Exported · handed to Cowork<br />
+Account<br />
+ARR<br />
+Status<br />
+Last activity<br />
+Northwind<br />
+$1.4M<br />
+Green<br />
+2 hours ago<br />
+Acme<br />
+$980K<br />
+Green<br />
+Yesterday<br />
+Globex<br />
+$640K<br />
+Yellow<br />
+5 days ago<br />
+Initech<br />
+$420K<br />
+Red<br />
+12 days ago<br />
+Hooli<br />
+$1.1M<br />
+Green<br />
+3 hours ago<br />
+Massive Dynamic<br />
+$830K<br />
+Yellow<br />
+8 days ago<br />
+Soylent<br />
+$310K<br />
+Green<br />
+Yesterday<br />
+Claude<br />
+Cowork takes it from here<br />
+at-risk-accounts-summary.docx<br />
+Pulling Drive context · building summary · 1 of 3 sections<br />
+Claude hands the browser steps to Claude in Chrome, takes the data back, pulls the supporting context from Drive and Slack, and builds the summary in your folder. One delegation, three sources of context.</p>
+<h3 id="a-few-watch-outs">A few watch-outs</h3>
+<p>You need to be signed in.<br />
+Claude can't sign in to a tool for you. If the dashboard requires authentication, you log in once in your browser; Claude works in the session you're already authenticated in.<br />
+Be deliberate about what you give Claude access to on the web.<br />
+Just like with connectors, Claude sees what you see — but on the open web, that includes anything you have access to. For sensitive sites, narrow what Claude can act on, and review the actions before approving them.<br />
+To find the latest setup guidance, see<br />
+Get started with Claude in Chrome<br />
+.</p>
+<h3 id="try-it-now_4">Try it now</h3>
+<p>Pick one task on your plate that lives in a browser-based tool that doesn't have a connector. Open Cowork, describe the task, and let Claude work in Chrome, then hand off insights to Claude in Cowork.</p>
+<h3 id="whats-next_8">What’s next</h3>
+<p>In the next lesson, you'll see Claude show up inside the M365 apps where a lot of work actually lands — Word, Excel, PowerPoint, and Outlook.</p>
+<h4 id="feedback_8">Feedback</h4>
+<p>As you progress through the course, we'd love to hear how you're using concepts from it in your work, plus any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_8">Acknowledgments and license</h4>
+<p>Copyright 2026 Anthropic. All rights reserved.</p>
+<h3 id="claude-for-microsoft-365">Claude for Microsoft 365</h3>
+<p>Estimated time:<br />
+5 minutes</p>
+<h3 id="learning-objectives_9">Learning objectives</h3>
+<p>By the end of this lesson you'll be able to:<br />
+- Recognize what Claude does inside Word, Excel, PowerPoint, and Outlook<br />
+- Move work between the apps with one Claude conversation<br />
+- Decide when to do the work in Cowork versus inside the document</p>
+<h3 id="collaborate-with-claude-across-microsoft-365-apps">Collaborate with Claude across Microsoft 365 apps</h3>
+<h4 id="key-takeaways_4">Key takeaways</h4>
+<p>Claude lives inside the document.<br />
+Claude shows up as an add-in inside Word, Excel, PowerPoint, and Outlook, working on the files and spaces you have open.<br />
+One conversation can carry context across the apps.<br />
+Build the analysis in Excel and hand it to PowerPoint to make the slide. Use the Word memo as the source for the draft Outlook reply.<br />
+Claude in Cowork and Claude in M365 are different tools for different moments.<br />
+Claude inside Cowork builds finished deliverables across many sources. Claude inside M365 is for refining, debugging, and shaping a file you're already working on — and for carrying context from that file into other documents you're building.</p>
+<h3 id="what-claude-does-inside-each-app">What Claude does inside each app</h3>
+<p>Excel.<br />
+Analyze data, write formulas, debug #REF! errors and circular references, run scenario tests without breaking the model, build a sheet from a template, cite back to specific cells. The strongest move:<br />
+"Pull the actuals from the Q3 sheet, compare them to the Q3 plan in the same workbook, and write the variance commentary in column F next to each line item."<br />
+PowerPoint.<br />
+Read your slide master, fonts, and color scheme, then build slides that match. Generate native, editable charts (not pasted images). Operate on whatever slide you have selected. The strongest move:<br />
+"Take the analysis I just did in Excel and turn it into a three-slide deck for the QBR, using our deck template."<br />
+Word.<br />
+Draft, revise, and reformat in place. Work with comments and tracked changes. Pull context from connected sources to ground the draft. The strongest move:<br />
+"Draft the executive summary based on the body of this memo and the source data referenced in the appendix."<br />
+Outlook.<br />
+Triage incoming mail with context from the rest of your work. Draft replies that reflect prior threads, calendar context, and recent decisions.</p>
+<h3 id="move-work-across-the-apps-in-one-conversation">Move work across the apps in one conversation</h3>
+<p>The cross-app move is where M365 plus Claude starts to feel different from working in any single app. You're not just working<br />
+on<br />
+one document — you're carrying its context into the next one.<br />
+Outlook → Word.<br />
+A client brief lands in your inbox.<br />
+"Open the brief in Word and start the memo from our firm template."<br />
+Word launches with the attachment open and the email thread already loaded in the sidebar. Claude already knows what the sender asked for.<br />
+Word → Excel.<br />
+Partway through the memo you need the numbers behind it.<br />
+"Build the market-sizing model behind option 2."<br />
+Excel opens, pulls the assumptions from the brief Claude just read in Word, and builds a multi-tab model with formulas you can inspect.<br />
+Excel → PowerPoint.<br />
+"Turn this into the steering-committee deck in the client template."<br />
+The deck builds in your slide master with native, editable charts with the updated numbers from Excel.<br />
+Back to Outlook.<br />
+"Find 30 minutes with the team before Thursday."<br />
+The invite drafts with the attendees and waits for you to click Send.</p>
+<h3 id="when-to-use-m365-versus-cowork">When to use M365 versus Cowork</h3>
+<p>A useful rule:<br />
+Reach for Cowork<br />
+when the work pulls from many sources and ends in a deliverable. Building the brief from twenty source files, pulling a report together from Salesforce and three Slack channels, running a workflow on a schedule.<br />
+Reach for Claude inside M365<br />
+when you're working in the Office files themselves — editing in place and carrying context from one app to the next.<br />
+Most real work uses both. Claude builds the first draft of the deck; you open it in PowerPoint and refine it with Claude in the slide. Claude pulls the data into the model; you open it in Excel and ask Claude to investigate the outlier you spotted. The two surfaces hand off cleanly — and the file is the file in both cases.</p>
+<h3 id="try-it-now_5">Try it now</h3>
+<p>First, install the Claude add-in for the M365 app you use most — see<br />
+Work across Excel, PowerPoint, and Word<br />
+for more on setup, and<br />
+Claude for Outlook<br />
+for the separate Outlook beta listing. If add-ins are managed by your IT team, check with them.<br />
+Open one of the M365 apps with a real document you're working on this week. Try one move with Claude inside the app — refine a paragraph, debug a formula, build a slide from a passage in a Word doc. The first time you see Claude operating on the document you're staring at, the difference from chat-then-paste lands.</p>
+<h3 id="whats-next_9">What’s next</h3>
+<p>You've now seen Cowork everywhere it shows up — the desktop, the browser, and the documents themselves. Module 4 turns to the parts of using Cowork that matter once you're handing it real work: working safely, making sure the things you build behave, and sharing them with your team.</p>
+<h4 id="feedback_9">Feedback</h4>
+<p>As you progress through the course, we'd love to hear how you're using concepts from it in your work, plus any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_9">Acknowledgments and license</h4>
+<p>Copyright 2026 Anthropic. All rights reserved.</p>
+<h3 id="best-practices-for-working-safely">Best practices for working safely</h3>
+<p>Estimated time:<br />
+8 minutes</p>
+<h3 id="learning-objectives_10">Learning objectives</h3>
+<p>By the end of this lesson you'll be able to:<br />
+- Set up your workspace so the important stuff stays protected<br />
+- Write prompts that don't leave room for the wrong action<br />
+- Recognize the moments when<br />
+"stop and think"<br />
+matters more than speed</p>
+<h3 id="your-part-in-working-safely-with-cowork">Your part in working safely with Cowork</h3>
+<p>You already know from Lesson 2 that Claude always asks before deleting, and — in the default permission mode — before sending or sharing too. That's the floor. This lesson is what<br />
+you<br />
+bring on top — the pre-emptive moves that keep an autonomous tool with file, app, and connector access from doing something you didn't intend.</p>
+<h3 id="set-up-so-mistakes-cant-reach-what-matters">Set up so mistakes can't reach what matters</h3>
+<p>The single highest-leverage move is the folder you point Claude at. It's the boundary for what Claude can read, write, and (with your confirmation) delete.<br />
+Use a dedicated working folder, not a catch-all.<br />
+Pointing Claude at Documents, Downloads, or Desktop is the equivalent of letting a new colleague rummage through every file you have. Make a folder for the work. Move (or copy) in what's needed. Point Claude there.<br />
+Back up anything irreplaceable before you start.<br />
+If a file matters and a fresh copy can't be regenerated — old client deliverables, contracts you can't get re-issued, anything you'd be sorry to lose — make sure a copy lives somewhere Cowork can't reach. Cloud backup, a separate folder, a drive that isn't connected. Claude won't delete without asking, but the cost of clicking through the wrong confirmation is the cost of the file.<br />
+Test new workflows on copies first.<br />
+For example if you're building a scheduled task that'll run every Friday, the first run goes against a copy of the data. Once you've seen it behave, point it at the live folder.</p>
+<h3 id="write-prompts-that-leave-no-room-for-the-wrong-action">Write prompts that leave no room for the wrong action</h3>
+<p>How you ask matters as much as what folder you point at.<br />
+Be specific about destructive verbs.<br />
+"Cut the section"<br />
+can be read as<br />
+"remove from view"<br />
+or<br />
+"delete from the file."<br />
+"Update the file"<br />
+can mean<br />
+"rewrite it"<br />
+or<br />
+"add to it."<br />
+If the wrong reading would be irrecoverable, name what you mean:<br />
+"Remove the section from the draft, but keep the file."<br />
+"Add a new appendix; don't rewrite the existing sections."<br />
+Name the bounds in the prompt.<br />
+"Only the 3 most recently updated files in this folder."<br />
+"Only contracts that closed in Q3."<br />
+"Don't message anyone — draft only."<br />
+This narrows what Cowork is doing and gives you a clear line for spotting drift.<br />
+Use scheduled tasks for drafts initially.<br />
+Scheduled tasks run while you're not watching. Until you're confident that the task runs the way you need it to, prompt it to draft for your review rather than send on your behalf.</p>
+<h3 id="in-the-moment-the-three-checks-that-catch-the-rest">In the moment: the three checks that catch the rest</h3>
+<p>Read the plan once it has been made.<br />
+When Claude starts a task, it lays out what it's going to do in the progress tab. Skim it. Consider: does the plan make sense? are the steps in the right order? is it using the right sources? Redirect as necessary.<br />
+Watch for unexpected patterns.<br />
+You don't need to validate every command. But if Claude is touching files or sites you didn't mention, or scope is creeping past what you asked for, stop the task.<br />
+"Something feels off"<br />
+is a real signal — pay attention to this.<br />
+Approve confirmation prompts deliberately.<br />
+Stay in “Ask before acting” for anything that sends, posts, or shares — and when a confirmation prompt does appear, read it. Most mistakes don't happen because the safeguards failed; they happen because someone clicked through a confirmation that wasn't quite the action they intended. The dialog exists because the action matters — treat it that way.</p>
+<h3 id="when-cowork-isnt-the-right-tool">When Cowork isn't the right tool</h3>
+<p>A short list:<br />
+Regulated workflows that need an audit trail.<br />
+Cowork activity isn't captured in audit logs, the Compliance API, or data exports.<br />
+Anything you wouldn't trust a smart, quick colleague to do unsupervised.<br />
+Sending the legal doc to a counterparty, posting the public announcement, pushing a customer-facing change. Claude can prepare; you ship.<br />
+Highly sensitive personal data<br />
+outside the boundary your IT team has explicitly approved.</p>
+<h3 id="go-deeper">Go deeper</h3>
+<p>Use Claude Cowork safely<br />
+is a valuable resource for learning what to do — and not to do — when working with Claude in Cowork. It covers the rest of what warrants more thought so that you understand the built-in guardrails and what you remain responsible for as Claude acts on your behalf.</p>
+<h3 id="lesson-reflection_3">Lesson reflection</h3>
+<p>Review the interactive below to get a sense for how to work safely with Cowork.<br />
+This Cowork task is about to run.<br />
+Five things about it would make a careful colleague pause.<br />
+Find them.<br />
+Hazards found<br />
+0 of 5<br />
+Connectors<br />
+Microsoft 365<br />
+Claude in Chrome<br />
+can act on pages in tabs you've allowed it to access<br />
+1<br />
+Asana<br />
+Clean up last quarter's client files<br />
+3<br />
+—<br />
+archive the old stuff<br />
+4<br />
+and<br />
+post a note in each client's Slack channel that their folder's been tidied<br />
+5<br />
+.<br />
+Scheduled · Every Friday 5pm<br />
+~/Documents/Work<br />
+Ask<br />
+Sonnet 4.6<br />
+Click anything in the window that looks risky.<br />
+All five found.<br />
+Now watch it become a task you'd run unattended.<br />
+Same job. Nothing here can't be undone.<br />
+Look at the connectors, the folder, the prompt wording, and what runs when. Click anything that gives you pause.<br />
+As you think about the tasks<br />
+you're<br />
+going to hand to Cowork:<br />
+- Which folder would you point Claude at — and is there anything inside it that shouldn't be reachable, or anything irreplaceable that needs to be backed up first?<br />
+- Is there a destructive verb in the prompt you'd write that you'd want to be more specific about?</p>
+<h3 id="whats-next_10">What’s next</h3>
+<p>In the next lesson, you'll learn how to make sure the skills and plugins you build actually behave — using lightweight evals to check their output before you rely on them or share them with anyone else.</p>
+<h4 id="feedback_10">Feedback</h4>
+<p>As you progress through the course, we'd love to hear how you're using concepts from it in your work, plus any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_10">Acknowledgments and license</h4>
+<p>Copyright 2026 Anthropic. All rights reserved.</p>
+<h3 id="validating-skills-for-plugins">Validating skills for plugins</h3>
+<p>Estimated time:<br />
+8 minutes</p>
+<h3 id="learning-objectives_11">Learning objectives</h3>
+<p>By the end of this lesson you'll be able to:<br />
+- Explain what an eval is and why it matters before you share or rely on a skill<br />
+- Run a lightweight eval through skill-creator</p>
+<h3 id="why-this-matters">Why this matters</h3>
+<p>When you build a skill or bundle them into a plugin, you're essentially building a small product that other people will use. And like anything you'd hand to a colleague — a template, a spreadsheet model, a checklist — it's worth a test drive before it leaves your desk.<br />
+When you use a skill you built, you know how to work around any issues or failures. You know exactly what to ask it, what files to give it, and what the answer is supposed to look like. A teammate doesn't have any of that. They might phrase the request a little differently, hand it slightly different inputs, or hit an edge case — an unusual-but-real situation, like a request that's just outside what the skill was designed for. That's where skills tend to stumble, and the person using it won't know why.<br />
+Testing a skill with evals — short for evaluations — is how you catch those stumbles before someone else does. Don't let the word intimidate you. An eval is just a try-out: a realistic request goes in, you look at what comes out, and you tell Claude what to fix. No code, no test scripts — just your judgment about whether the result is good enough to put your name on.</p>
+<h3 id="how-the-eval-system-works">How the eval system works</h3>
+<p>When you build a skill with skill-creator — Claude's built-in helper for creating skills — it walks you through evals as part of the process. Here's what that actually looks like.<br />
+Skill-creator comes up with two or more realistic prompts someone might use with your skill. For each prompt, it produces a pair of outputs:<br />
+- One where Claude uses your skill<br />
+- One where Claude answers the same prompt<br />
+without<br />
+your skill<br />
+That second one is the comparison point. It's there so you can see, side by side, what difference your skill is actually making — not just "is this output okay," but "is this output better than what Claude would have done on its own."<br />
+Review each pair and give feedback in plain English, right on the review page. As you read each pair, you're really just answering two questions:<br />
+- Is the skill version the one I'd use? If yes, great — note what made it better so the skill keeps doing that.<br />
+- If not, what's missing or off? Be specific. "The tone is too formal" or "it skipped the executive summary" gives Claude something to act on; "this isn't quite right" doesn't.<br />
+Once you submit your feedback, Claude revises the skill for you based on what you said.</p>
+<h3 id="iterate-on-the-skill">Iterate on the skill</h3>
+<p>Your feedback is the fix. Once you submit it, Claude updates the skill — rewriting the instructions, adjusting the examples, tightening what it asks for — and you can run the same prompts again to see if the change stuck.<br />
+Change one thing at a time. If the first round showed the skill was too wordy<br />
+and<br />
+missing a section, pick the one that matters more, fix it, re-run, then come back for another review. You'll be able to tell what actually moved the needle. If you're still not happy with the outputs after the revision, run it again — it's a loop, not a one-time gate. Most skills are ready after one or two rounds. The bar for shipping a skill — to yourself, to a teammate — isn't perfect evals. It's that the cases you care about pass meaningfully better than the baseline, and that you've named the cases you don't yet handle.<br />
+And if the outputs already look great on the first pass? You're done. Evals aren't a hoop to jump through — they're there for when you need confidence, not ceremony.</p>
+<h3 id="try-it-now_6">Try it now</h3>
+<p>Step through a mock eval review below — three prompts, each with a with-skill and a without-skill output side by side.<br />
+Read an eval<br />
+An eval is just two outputs side by side, with a few rules of what “good” looks like.<br />
+Your job is to pick which one you'd actually send<br />
+— and tell Claude what to change.<br />
+1<br />
+of 3<br />
+Typical case</p>
+<h3 id="recap-a-regular-team-sync">Recap a regular team sync</h3>
+<p>Prompt<br />
+Write the recap for today's product sync. Notes are in<br />
+<code>notes/2026-05-01-product-sync.md</code><br />
+.<br />
+With skill<br />
+✓<br />
+✓<br />
+✓<br />
+✓<br />
+4/4<br />
+Product sync — recap<br />
+Decisions<br />
+- Ship the new onboarding flow to 10% of new sign-ups starting Monday.<br />
+- Pause the in-app tour redesign until after launch.<br />
+Action items<br />
+- Maya — finalize the rollout plan by Fri May 9.<br />
+- Devon — instrument the new flow for activation rate by Wed May 7.<br />
+- Priya — draft the announcement post by Mon May 12.<br />
+Open questions<br />
+Do we need legal sign-off on the new copy before 10%?<br />
+House rules<br />
+✓<br />
+Leads with decisions<br />
+✓<br />
+Every action item has an owner and a date<br />
+✓<br />
+Open questions called out<br />
+✓<br />
+Under 150 words<br />
+Without skill<br />
+×<br />
+×<br />
+×<br />
+✓<br />
+1/4<br />
+Product sync recap<br />
+The team had a productive discussion about the new onboarding flow this morning. After reviewing the latest mockups, the group decided to move ahead with a 10% rollout starting next Monday. The in-app tour redesign came up but the consensus was to revisit it after launch.<br />
+Maya offered to finalize the rollout plan and Devon mentioned he'd look at the instrumentation. Priya is going to draft something for the announcement. There was also some back and forth about whether legal needs to weigh in on the new copy — the team didn't reach a conclusion on that.<br />
+Overall<br />
+a productive meeting with clear next steps<br />
+.<br />
+House rules<br />
+×<br />
+Leads with decisions<br />
+×<br />
+Every action item has an owner and a date<br />
+×<br />
+Open questions called out<br />
+✓<br />
+Under 150 words<br />
+Which one would you send?<br />
+One thing you'd tell Claude to change<br />
+Messy input</p>
+<h3 id="recap-a-stand-up-from-rough-partly-pasted-in-notes">Recap a stand-up from rough, partly pasted-in notes</h3>
+<p>Prompt<br />
+Recap the marketing stand-up — notes are pretty rough, half of it is just pasted Slack messages.<br />
+With skill<br />
+✓<br />
+✓<br />
+✓<br />
+×<br />
+3/4<br />
+Marketing stand-up — recap<br />
+Decisions<br />
+- Move the webinar from May 14 to May 21 to avoid the customer-conference overlap.<br />
+Action items<br />
+- Jordan — update the registration page and re-send invites by Mon May 5.<br />
+(owner unclear — confirm with Priya?)<br />
+— rework the email cadence around the new date by Wed May 7.<br />
+Open questions<br />
+- Do we need to notify partners who promoted the original date?<br />
+- Who's on point for the rescheduled day-of logistics?<br />
+House rules<br />
+✓<br />
+Leads with decisions<br />
+✓<br />
+Every action item has an owner and a date<br />
+(or flagged)<br />
+✓<br />
+Open questions called out<br />
+×<br />
+Under 150 words<br />
+(164)<br />
+Without skill<br />
+✓<br />
+×<br />
+×<br />
+✓<br />
+2/4<br />
+Marketing stand-up<br />
+The team agreed to push the webinar from May 14 to May 21 because the customer conference is the same week. Jordan will update the landing page and re-send invites.<br />
+Priya will rework the email cadence around the new date.<br />
+The team also discussed how to handle the partners who already promoted the original date and the day-of logistics for the new date.<br />
+Good progress — everyone's aligned on the move.<br />
+House rules<br />
+✓<br />
+Leads with decisions<br />
+×<br />
+Every action item has an owner and a date<br />
+(invented an owner)<br />
+×<br />
+Open questions called out<br />
+(buried in prose)<br />
+✓<br />
+Under 150 words<br />
+Which one would you send?<br />
+One thing you'd tell Claude to change<br />
+Style vs. substance</p>
+<h3 id="recap-for-an-exec-who-reads-only-the-first-three-lines">Recap for an exec who reads only the first three lines</h3>
+<p>Prompt<br />
+Recap for the exec check-in — keep it brief, they only read the first three lines.<br />
+With skill<br />
+✓<br />
+✓<br />
+✓<br />
+×<br />
+3/4<br />
+Exec check-in — recap<br />
+Decisions<br />
+- Move the launch from May 28 to<br />
+June 12<br />
+to absorb the QA delay.<br />
+- Hold the customer-comms plan until the new date is locked.<br />
+Action items<br />
+- Sam — circulate the revised launch plan by Mon May 5.<br />
+Open questions<br />
+- Does the new date affect the Q2 number we committed to?<br />
+House rules<br />
+✓<br />
+Leads with decisions<br />
+✓<br />
+Every action item has an owner and a date<br />
+✓<br />
+Open questions called out<br />
+×<br />
+Headline in the first three lines<br />
+(date pushed to line 5)<br />
+Without skill<br />
+✓<br />
+✓<br />
+×<br />
+✓<br />
+3/4<br />
+Exec check-in<br />
+Launch moved to June 12<br />
+— QA needs another two weeks for the new auth flow, and shipping on May 28 would land us with a partial release.<br />
+Customer comms are on hold until the date is locked. Sam will circulate the revised plan by Monday May 5.<br />
+Open: does the new date affect the Q2 commit?<br />
+— flagged for finance to confirm.<br />
+House rules<br />
+✓<br />
+Leads with decisions<br />
+✓<br />
+Every action item has an owner and a date<br />
+×<br />
+Open questions called out<br />
+(buried in prose)<br />
+✓<br />
+Headline in the first three lines<br />
+Which one would you send?<br />
+One thing you'd tell Claude to change<br />
+That's a full eval round.<br />
+When it's your skill, Claude takes your picks and feedback and revises it for you.<br />
+For each pair: pick the version you'd actually send, and write one line of feedback you'd give Claude. That's the whole loop.</p>
+<h3 id="whats-next_11">What’s next</h3>
+<p>In the next lesson, you'll move from "this works for me" to "this works for the team" — the patterns and choices that turn personal workflows into shared infrastructure.</p>
+<h4 id="feedback_11">Feedback</h4>
+<p>As you progress through the course, we'd love to hear how you're using concepts from it in your work, plus any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_11">Acknowledgments and license</h4>
+<p>Copyright 2026 Anthropic. All rights reserved.</p>
+<h3 id="share-what-you-build-with-your-team">Share what you build with your team</h3>
+<p>Estimated time:<br />
+7 minutes</p>
+<h3 id="learning-objectives_12">Learning objectives</h3>
+<p>By the end of this lesson you'll be able to:<br />
+- Explain how plugins get distributed across an Enterprise organization<br />
+- Apply a few good habits for keeping a shared plugin healthy over time</p>
+<h3 id="scaling-workflows-across-your-team">Scaling workflows across your team</h3>
+<p>By this point, your team has a handful of skills that have earned their place. They started as someone's personal way of working, they've been run through evals, and they hold up on more than one person's use cases.<br />
+When you want to scale those across the whole team efficiently, you bundle them into a plugin — you covered how in Lesson 8. This lesson is about the next step: getting that plugin to everyone who needs it.</p>
+<h3 id="distributing-a-plugin-in-your-organization">Distributing a plugin in your organization</h3>
+<p>Inside a larger company, the recommended way to share a plugin is through your organization's private marketplace — a catalog of company-approved plugins that an admin manages.<br />
+In practice, distribution is a hand-off. You bring the plugin to whoever owns the marketplace for your org — that might be a team lead, an enablement or operations owner, or IT — and they publish it. When they do, they choose how it lands for everyone else:<br />
+- Available — it appears in the company Directory and people can install it if they want it.<br />
+- Installed by default — it's already there when people open Cowork; they can turn it off.<br />
+- Required — it's installed and stays on; useful for things like compliance checks that everyone needs to run the same way.<br />
+From your teammates' seat, the plugin simply shows up in their Directory labeled as coming from your company, alongside the public Anthropic ones. They can use it and turn it off (unless it's required), but they can't edit it — updates flow from whoever maintains it.<br />
+What this looks like for<br />
+you<br />
+depends on what your admin has set up. Some organizations have a marketplace running and a clear owner to hand things to; others haven't switched it on yet. Use the interactive below to find your situation and the right next step.<br />
+Distribution paths<br />
+When you go to share your plugin in Cowork,<br />
+what you see depends on how your org has set things up<br />
+. Pick the one that matches:<br />
+Path A</p>
+<h3 id="the-marketplace-exists-and-you-know-who-runs-it">The marketplace exists and you know who runs it</h3>
+<p>The path is already paved. Your job is a hand-off, not a setup.<br />
+Your next step<br />
+Bring your plugin to the<br />
+marketplace owner<br />
+— team lead, enablement, or IT. Tell them who it's for and how it should land. They'll pick one of the install levels below when they publish.<br />
+Available<br />
+In the Directory for anyone who wants it. Right for most team plugins.<br />
+Installed by default<br />
+Already on when teammates open Cowork; they can switch it off.<br />
+Required<br />
+On and stays on. Reserve for compliance or must-run-the-same-way work.<br />
+Hidden<br />
+In the marketplace but not shown in the Directory — for staging or restricted rollouts.<br />
+Once it's published, your teammates see it in their Directory labeled as coming from your company.<br />
+Your updates flow to them automatically.<br />
+Path B</p>
+<h3 id="youre-not-sure-the-marketplace-is-set-up">You're not sure the marketplace is set up</h3>
+<p>Common in orgs that just rolled out Cowork — the marketplace is an admin switch, and someone has to flip it.<br />
+Your next step<br />
+Find out<br />
+who manages Claude for your organization<br />
+— usually IT, an enablement lead, or whoever owns software tools. Ask them whether a private plugin marketplace is turned on, and who you'd hand a plugin to.<br />
+The ask, in one line:<br />
+“We've built a Cowork plugin our team wants to share — is the org marketplace turned on, and who owns it?”<br />
+Until it's live, you can still<br />
+export the plugin folder and hand it to a teammate directly<br />
+— it's just manual.<br />
+Path C</p>
+<h3 id="youre-the-admin">You're the admin</h3>
+<p>Then you're the person everyone else in this lesson is looking for.<br />
+Your next step<br />
+Head to<br />
+Organization settings → Plugins<br />
+to create your private marketplace — upload a plugin directly, or connect a GitHub repo so updates sync automatically. Then set each plugin's install preference —<br />
+Available<br />
+,<br />
+Installed by default<br />
+,<br />
+Required<br />
+, or<br />
+Hidden<br />
+— org-wide or per group.<br />
+The full admin walkthrough lives in the help center:<br />
+Manage Claude Cowork plugins for your organization<br />
+. Group-level targeting, share-event audit logs, and the rest of the admin controls are beyond what an individual contributor needs in this course.<br />
+Whichever path applies, the goal is the same: a skill that started on one laptop becomes something a teammate can install and run.<br />
+Match what you see in your org to the distribution path that fits — and who to talk to if the marketplace isn't live yet.</p>
+<h3 id="habits-worth-keeping">Habits worth keeping</h3>
+<p>A short set of practices that prevent a shared plugin from quietly going stale:<br />
+One owner.<br />
+Every shared plugin has a named person who reviews changes, runs the evals after edits, and decides when to update or retire it.<br />
+Evals before every publish.<br />
+Treat the eval loop as the gate — if the cases you care about don't hold up after a change, don't push it to everyone.<br />
+Name skills and plugins specifically.<br />
+"meeting-prep" may collide with three other meeting-prep skills across your organization's plugins directory. "sales-customer-renewal-prep" won't.<br />
+Set a review rhythm.<br />
+Quarterly is a reasonable starting point to look at what's installed, what's actually getting used, and what's gone stale. Retire what nobody runs and make amendments where people have identified opportunities for improvement.</p>
+<h3 id="lesson-reflection_4">Lesson reflection</h3>
+<p>Think about the skills you and your immediate teammates rely on most in Cowork today.<br />
+- Which two or three would be the first candidates to bundle into a team plugin?<br />
+- Who in your organization is the person you'd bring that plugin to — the one who could get it onto the marketplace?<br />
+If you don't know the answer to the second question yet, that's your real next step.</p>
+<h3 id="whats-next_12">What’s next</h3>
+<p>In the final lesson, you'll get a quick recap of the arc you've just been through and the next moves to keep the momentum going.</p>
+<h4 id="feedback_12">Feedback</h4>
+<p>As you progress through the course, we'd love to hear how you're using concepts from it in your work, plus any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_12">Acknowledgments and license</h4>
+<p>Copyright 2026 Anthropic. All rights reserved.</p>
+<h3 id="wrap-up-and-next-steps">Wrap up and next steps</h3>
+<p>Estimated time:<br />
+5 minutes</p>
+<h3 id="learning-objectives_13">Learning objectives</h3>
+<p>By the end of this lesson you'll be able to:<br />
+- Recall the arc of Cowork 101 and what each module gave you<br />
+- Pick the next moves that keep you using Cowork after the course ends</p>
+<h3 id="what-youve-covered">What you've covered</h3>
+<p>What you've covered<br />
+Module 1</p>
+<h3 id="meet-claude-cowork">Meet Claude Cowork</h3>
+<p>What Cowork is, how it differs from Chat and Code, the kinds of work it's built for, and your first real task.<br />
+Module 2</p>
+<h3 id="make-claude-cowork-yours">Make Claude Cowork Yours</h3>
+<p>Global instructions, projects, skills, and plugins — how much more capable Cowork becomes when it knows what you know, has access to what you have access to, and does things the way your team does.<br />
+Module 3</p>
+<h3 id="use-claude-wherever-you-work">Use Claude wherever you work</h3>
+<p>Cowork in your browser via Claude in Chrome, and inside Word, Excel, PowerPoint, and Outlook via Claude in M365.<br />
+Module 4</p>
+<h3 id="sharing-and-safety-in-claude-cowork">Sharing and safety in Claude Cowork</h3>
+<p>Working with autonomy responsibly, validating what you build, and turning personal workflows into team infrastructure.<br />
+Hand off a task, get a polished deliverable.<br />
+The throughline: Cowork goes beyond chat to allow you to delegate real work. Everything else in the course builds on that.</p>
+<h3 id="try-it-now_7">Try it now</h3>
+<p>Pick<br />
+one<br />
+of these to do this week.<br />
+Set up memory.<br />
+Write a five-sentence global instructions block, or create a project for a stream of work you're already in.<br />
+Schedule a task or set up Dispatch.<br />
+Take a recurring deliverable and put it on a cadence. Or set up Dispatch so that the next time something comes to mind off-hours, you can hand it to Cowork.<br />
+Install a plugin.<br />
+Go to<br />
+Customize → Plugins<br />
+, install the plugin closest to your role, and run it against this week's version of your work.<br />
+Try Claude in Chrome or M365.<br />
+Pick the surface that aligns with where most of your real work happens, install it, and use it on one task.<br />
+Share something you built.<br />
+Share a use case you found valuable, a workflow that produced great results, or a skill you've built with your team. You could be the unlock they need to get more comfortable working with Claude.</p>
+<h3 id="go-deeper_1">Go deeper</h3>
+<p>A few learning paths worth knowing about:<br />
+AI Fluency: Framework &amp; Foundations<br />
+.<br />
+The foundations of working effectively with AI — prompting, evaluating output, knowing when AI is and isn't the right tool.<br />
+AI Capabilities and Limitations<br />
+.<br />
+A deeper survey of what generative AI tools can do across modalities and surfaces.<br />
+Claude 101<br />
+.<br />
+The companion course on using Claude across all surfaces.<br />
+Claude use-case library<br />
+.<br />
+Filter to Claude Cowork for ideas and inspiration on what to delegate next.</p>
+<h4 id="feedback_13">Feedback</h4>
+<p>As you progress through the course, we'd love to hear how you're using concepts from it in your work, plus any feedback you may have. Share your feedback<br />
+here<br />
+.</p>
+<h4 id="acknowledgments-and-license_13">Acknowledgments and license</h4>
+<p>Copyright 2026 Anthropic. All rights reserved.</p></div>
+</div>
+
+<div id="tab-quiz" class="tab-content">
+  <div class="md-body"><h1 id="introduction-to-claude-cowork-quiz-guide">Introduction to Claude Cowork — Quiz Guide</h1>
+<p><em>All quiz questions with answer choices (correct answer marked with ✓).</em></p>
+<hr />
+<h2 id="advanced-features">Advanced Features</h2>
+<h3 id="quiz-on-claude-cowork">Quiz on Claude Cowork</h3>
+<p><em>Quiz questions could not be extracted.</em></p></div>
+</div>
+
+<div id="tab-videos" class="tab-content">
+  
+<div class="video-speed-bar">
+  <span class="speed-label">Speed:</span>
+  <button class="speed-btn" data-speed="0.5">0.5&times;</button>
+  <button class="speed-btn" data-speed="0.75">0.75&times;</button>
+  <button class="speed-btn active" data-speed="1">1&times;</button>
+  <button class="speed-btn" data-speed="1.25">1.25&times;</button>
+  <button class="speed-btn" data-speed="1.5">1.5&times;</button>
+  <button class="speed-btn" data-speed="1.75">1.75&times;</button>
+  <button class="speed-btn" data-speed="2">2&times;</button>
+  <span class="video-total">7 videos</span>
+</div>
+<div class="chapter-section"><div class="chapter-title">Foundations</div><div class="video-grid"><div class="video-card"><div class="video-title">What is Claude Cowork</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/UAmKyyZ-b9E?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">What Claude Cowork can do for you</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/b-ntWZqHF78?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Hand Claude Cowork your first task</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/Lbml7IuGJYw?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div><div class="chapter-section"><div class="chapter-title">Advanced Features</div><div class="video-grid"><div class="video-card"><div class="video-title">Skills: Teach Claude Cowork your way</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/kS1MJFZWMq4?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Plugins: Encode your team expertise</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/v5IOHK5xFlc?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Claude in Chrome</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/IypXvHej9eY?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Claude for Microsoft 365</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/F6dzjaBCBtU?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div>
+<script>
+const jwPlayers = [];
+let currentSpeed = 1.0;
+
+jwPlayers.forEach(p => {
+  p.on('play', function() { try { this.setPlaybackRate(currentSpeed); } catch(e) {} });
+});
+function applySpeed(rate) {
+  currentSpeed = rate;
+  jwPlayers.forEach(p => { try { p.setPlaybackRate(rate); } catch(e) {} });
+}
+document.querySelectorAll('.video-speed-bar .speed-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.video-speed-bar .speed-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    applySpeed(parseFloat(this.dataset.speed));
+  });
+});
+</script>
+</div>
+
+
+
+<script>
+document.getElementById('tabBar').addEventListener('click', function(e) {
+  const btn = e.target.closest('.tab-btn');
+  if (!btn) return;
+  const tab = btn.dataset.tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+});
+</script>
+</body>
+</html>

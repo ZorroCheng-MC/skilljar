@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anthropic Academy — Course Library</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --bg2: #1e293b;
+    --bg3: #162032;
+    --border: #2d3f55;
+    --accent: #7c3aed;
+    --accent2: #a855f7;
+    --green: #10b981;
+    --red: #ef4444;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --code-bg: #0d1526;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         background: var(--bg); color: var(--text); line-height: 1.6; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Header ── */
+  .site-header {
+    background: #0a0f1e;
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; align-items: center; gap: 0;
+    height: 60px; position: sticky; top: 0; z-index: 200;
+  }
+  .site-logo {
+    font-size: 15px; font-weight: 700; color: var(--text);
+    letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px;
+    white-space: nowrap;
+  }
+  .site-logo .logo-icon {
+    width: 28px; height: 28px; background: linear-gradient(135deg, #f97316, #ef4444);
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 900; color: #fff; flex-shrink: 0;
+  }
+  .breadcrumb { font-size: 13px; color: var(--text3); margin-left: 16px; display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: var(--text2); }
+  .breadcrumb .sep { color: var(--text3); }
+  .header-meta { margin-left: auto; font-size: 12px; color: var(--text3); }
+
+  /* ── Tab navigation ── */
+  .tab-bar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; gap: 0; overflow-x: auto;
+    position: sticky; top: 60px; z-index: 100;
+  }
+  .tab-btn {
+    padding: 14px 22px; font-size: 14px; font-weight: 500;
+    color: var(--text2); background: none; border: none;
+    border-bottom: 2px solid transparent; cursor: pointer;
+    white-space: nowrap; transition: all 0.15s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent); }
+
+  /* ── Tab content ── */
+  .tab-content { display: none; max-width: 960px; margin: 0 auto; padding: 36px 32px; }
+  .tab-content.active { display: block; }
+
+  /* ── Study Guide / Quiz markdown rendering ── */
+  .md-body h1 { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+  .md-body h2 {
+    font-size: 20px; font-weight: 700; color: #c8a2f8;
+    border-left: 3px solid var(--accent); padding-left: 12px;
+    margin: 36px 0 16px;
+  }
+  .md-body h3 {
+    font-size: 16px; font-weight: 600; color: var(--text);
+    margin: 24px 0 10px; padding-top: 4px;
+  }
+  .md-body p { color: var(--text); margin-bottom: 14px; }
+  .md-body em { color: var(--text2); }
+  .md-body strong { color: var(--text); }
+  .md-body hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  .md-body ul, .md-body ol { padding-left: 22px; margin-bottom: 14px; }
+  .md-body li { color: var(--text); margin-bottom: 4px; }
+  .md-body code {
+    background: var(--code-bg); color: #7dd3fc;
+    padding: 2px 6px; border-radius: 4px; font-size: 13px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  }
+  .md-body pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px; overflow-x: auto; margin-bottom: 16px;
+  }
+  .md-body pre code { background: none; padding: 0; color: #e2e8f0; }
+  .md-body table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 14px; }
+  .md-body th { background: var(--bg2); color: var(--accent2); padding: 8px 12px;
+                text-align: left; border: 1px solid var(--border); }
+  .md-body td { padding: 8px 12px; border: 1px solid var(--border); color: var(--text); }
+  .md-body tr:nth-child(even) td { background: var(--bg3); }
+  .md-body blockquote {
+    border-left: 3px solid var(--accent); padding: 8px 16px;
+    background: var(--bg2); border-radius: 0 6px 6px 0; margin-bottom: 14px;
+  }
+
+  /* ── Quiz ── */
+  .md-body li.correct {
+    background: rgba(16, 185, 129, 0.12);
+    border-left: 2px solid var(--green);
+    padding: 4px 10px; border-radius: 4px; list-style: none;
+    color: #6ee7b7; font-weight: 500;
+  }
+  .md-body li.incorrect { color: var(--text2); }
+  .md-body li.correct::before { content: ''; }
+
+  /* ── Videos tab ── */
+  .video-speed-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 16px;
+    margin-bottom: 28px; flex-wrap: wrap;
+  }
+  .speed-label { font-size: 13px; color: var(--text2); }
+  .speed-btn {
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
+    padding: 4px 12px; border-radius: 20px; cursor: pointer;
+    font-size: 12px; transition: all 0.15s;
+  }
+  .speed-btn:hover { background: #2a3a55; color: var(--text); }
+  .speed-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .video-total { margin-left: auto; font-size: 12px; color: var(--text3); }
+  .chapter-section { margin-bottom: 36px; }
+  .chapter-title {
+    font-size: 17px; font-weight: 700; color: #c8a2f8;
+    border-left: 3px solid var(--accent); padding-left: 12px;
+    margin-bottom: 14px;
+  }
+  .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
+  .video-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+  }
+  .video-title {
+    padding: 9px 13px; font-size: 13px; font-weight: 500; color: var(--text2);
+    background: var(--bg3); border-bottom: 1px solid var(--border);
+  }
+  .yt-wrap { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
+  .yt-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  /* ── Notebooks tab ── */
+  .nb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 32px; }
+  .nb-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px;
+    transition: border-color 0.15s;
+  }
+  .nb-card:hover { border-color: var(--accent); }
+  .nb-name { font-size: 13px; font-weight: 600; color: var(--text); word-break: break-all; }
+  .nb-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nb-link {
+    font-size: 11px; padding: 3px 10px; border-radius: 12px;
+    border: 1px solid var(--border); color: var(--text2);
+    background: var(--bg3); transition: all 0.15s;
+  }
+  .nb-link:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+  .nb-link.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .nb-link.primary:hover { background: var(--accent2); }
+  .section-note {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 18px; font-size: 13px; color: var(--text2);
+    margin-bottom: 24px;
+  }
+  .section-title { font-size: 16px; font-weight: 700; color: var(--text); margin: 24px 0 12px; }
+  .file-list { display: flex; flex-direction: column; gap: 8px; }
+  .file-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+  }
+  .file-icon { font-size: 18px; }
+  .file-name { font-size: 13px; color: var(--text); flex: 1; }
+  .file-link { font-size: 12px; color: var(--accent2); }
+
+  /* ── Index page cards ── */
+  .index-hero { padding: 60px 32px 40px; text-align: center; }
+  .index-hero h1 { font-size: 36px; font-weight: 800; color: var(--text); margin-bottom: 12px; }
+  .index-hero p { font-size: 16px; color: var(--text2); max-width: 520px; margin: 0 auto; }
+  .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                  gap: 20px; max-width: 1200px; margin: 0 auto; padding: 0 32px 60px; }
+  .course-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 10px;
+    text-decoration: none; transition: all 0.2s; color: inherit;
+  }
+  .course-card:hover { border-color: var(--accent); transform: translateY(-2px);
+                       box-shadow: 0 8px 24px rgba(124,58,237,0.15); text-decoration: none; }
+  .card-emoji { font-size: 32px; }
+  .card-title { font-size: 16px; font-weight: 700; color: var(--text); }
+  .card-meta { font-size: 12px; color: var(--text3); display: flex; gap: 12px; flex-wrap: wrap; }
+  .card-tag { background: var(--bg3); border: 1px solid var(--border);
+              padding: 2px 8px; border-radius: 10px; color: var(--text2); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-logo">
+    <div class="logo-icon">A</div>
+    Anthropic Academy
+  </div>
+  <div class="header-meta">9 courses</div>
+</header>
+
+<div class="index-hero">
+  <h1>Course Library</h1>
+  <p>Study guides, quiz prep, video players, and hands-on notebooks — all offline, no login required.</p>
+</div>
+
+<div class="courses-grid">
+  <a class="course-card" href="building-with-claude-api/index.html"><div class="card-emoji">🔧</div><div class="card-title">Building with the Claude API</div><div class="card-meta"><span class="card-tag">🎬 74 videos</span><span class="card-tag">📝 64 questions</span><span class="card-tag">📓 27 notebooks</span></div></a><a class="course-card" href="claude-101/index.html"><div class="card-emoji">🎓</div><div class="card-title">Claude 101</div><div class="card-meta"><span class="card-tag">🎬 4 videos</span></div></a><a class="course-card" href="claude-code-101/index.html"><div class="card-emoji">💻</div><div class="card-title">Claude Code 101</div><div class="card-meta"><span class="card-tag">🎬 12 videos</span><span class="card-tag">📝 7 questions</span></div></a><a class="course-card" href="claude-cowork/index.html"><div class="card-emoji">🤝</div><div class="card-title">Introduction to Claude Cowork</div><div class="card-meta"><span class="card-tag">🎬 7 videos</span></div></a><a class="course-card" href="claude-code-in-action/index.html"><div class="card-emoji">⚡</div><div class="card-title">Claude Code in Action</div><div class="card-meta"><span class="card-tag">🎬 15 videos</span><span class="card-tag">📝 8 questions</span></div></a><a class="course-card" href="intro-to-mcp/index.html"><div class="card-emoji">🔌</div><div class="card-title">Introduction to MCP</div><div class="card-meta"><span class="card-tag">🎬 11 videos</span><span class="card-tag">📝 7 questions</span></div></a><a class="course-card" href="mcp-advanced/index.html"><div class="card-emoji">🚀</div><div class="card-title">MCP Advanced Topics</div><div class="card-meta"><span class="card-tag">🎬 8 videos</span><span class="card-tag">📝 7 questions</span></div></a><a class="course-card" href="claude-bedrock/index.html"><div class="card-emoji">☁️</div><div class="card-title">Claude with Amazon Bedrock</div><div class="card-meta"><span class="card-tag">🎬 71 videos</span><span class="card-tag">📝 45 questions</span></div></a><a class="course-card" href="claude-vertex/index.html"><div class="card-emoji">🌐</div><div class="card-title">Claude with Google Vertex AI</div><div class="card-meta"><span class="card-tag">🎬 81 videos</span><span class="card-tag">📝 52 questions</span></div></a>
+</div>
+
+</body>
+</html>

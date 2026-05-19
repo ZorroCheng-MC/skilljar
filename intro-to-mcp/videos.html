@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introduction to Model Context Protocol — Video Player</title>
+<script src="https://cdn.jwplayer.com/libraries/Akyo8gQO.js"></script>
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e8e8e8; }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: #1a1a2e; border-bottom: 1px solid #333;
+    padding: 12px 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .topbar h1 { font-size: 16px; font-weight: 600; color: #e8e8e8; flex: 1; }
+  .speed-label { font-size: 13px; color: #aaa; white-space: nowrap; }
+  .speed-widget { display: flex; gap: 6px; align-items: center; }
+  .speed-btn {
+    background: #2a2a3e; border: 1px solid #444; color: #ccc;
+    padding: 5px 11px; border-radius: 20px; cursor: pointer;
+    font-size: 12px; transition: all 0.15s;
+  }
+  .speed-btn:hover { background: #3a3a5e; color: #fff; }
+  .speed-btn.active { background: #5865f2; border-color: #5865f2; color: #fff; font-weight: 600; }
+
+  .content { max-width: 1400px; margin: 0 auto; padding: 32px 24px; }
+  .chapter { margin-bottom: 40px; }
+  .chapter h2 {
+    font-size: 18px; font-weight: 700; color: #c8a2f8;
+    border-left: 3px solid #5865f2; padding-left: 12px;
+    margin-bottom: 16px;
+  }
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 16px;
+  }
+  .video-card {
+    background: #1a1a2e; border-radius: 10px; overflow: hidden;
+    border: 1px solid #2a2a3e;
+  }
+  .video-title {
+    padding: 10px 14px;
+    font-size: 13px; font-weight: 500; color: #ccc;
+    background: #16162a;
+    border-bottom: 1px solid #2a2a3e;
+  }
+  .stats { text-align: center; color: #666; font-size: 12px; padding: 8px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Introduction to Model Context Protocol</h1>
+  <span class="speed-label">Speed:</span>
+  <div class="speed-widget" id="speedWidget">
+    <button class="speed-btn" data-speed="0.5">0.5&times;</button>
+    <button class="speed-btn" data-speed="0.75">0.75&times;</button>
+    <button class="speed-btn active" data-speed="1">1&times;</button>
+    <button class="speed-btn" data-speed="1.25">1.25&times;</button>
+    <button class="speed-btn" data-speed="1.5">1.5&times;</button>
+    <button class="speed-btn" data-speed="1.75">1.75&times;</button>
+    <button class="speed-btn" data-speed="2">2&times;</button>
+  </div>
+  <span class="stats">11 videos</span>
+</div>
+
+<div class="content">
+<section class="chapter"><h2>MCP Fundamentals</h2><div class="video-grid">
+<div class="video-card"><div class="video-title">Introducing MCP</div><div id="jwp-0"></div></div>
+<div class="video-card"><div class="video-title">MCP clients</div><div id="jwp-1"></div></div>
+<div class="video-card"><div class="video-title">Project setup</div><div id="jwp-2"></div></div>
+<div class="video-card"><div class="video-title">Defining tools with MCP</div><div id="jwp-3"></div></div>
+<div class="video-card"><div class="video-title">The server inspector</div><div id="jwp-4"></div></div>
+</div></section>
+<section class="chapter"><h2>MCP Primitives</h2><div class="video-grid">
+<div class="video-card"><div class="video-title">Implementing a client</div><div id="jwp-5"></div></div>
+<div class="video-card"><div class="video-title">Defining resources</div><div id="jwp-6"></div></div>
+<div class="video-card"><div class="video-title">Accessing resources</div><div id="jwp-7"></div></div>
+<div class="video-card"><div class="video-title">Defining prompts</div><div id="jwp-8"></div></div>
+<div class="video-card"><div class="video-title">Prompts in the client</div><div id="jwp-9"></div></div>
+<div class="video-card"><div class="video-title">MCP review</div><div id="jwp-10"></div></div>
+</div></section>
+</div>
+
+<script>
+const jwPlayers = [];
+const ytPlayers = [];
+let currentSpeed = 1.0;
+
+// JW Player setup
+  jwPlayers.push(jwplayer('jwp-0').setup({playlist:'https://cdn.jwplayer.com/v2/media/4vuPZkGf',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-1').setup({playlist:'https://cdn.jwplayer.com/v2/media/lD9pJECt',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-2').setup({playlist:'https://cdn.jwplayer.com/v2/media/V0ugJQ2w',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-3').setup({playlist:'https://cdn.jwplayer.com/v2/media/FBu6iTjn',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-4').setup({playlist:'https://cdn.jwplayer.com/v2/media/MVLgtQpv',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-5').setup({playlist:'https://cdn.jwplayer.com/v2/media/j2PUF6Fx',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-6').setup({playlist:'https://cdn.jwplayer.com/v2/media/IhbXDBxu',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-7').setup({playlist:'https://cdn.jwplayer.com/v2/media/hA05m4TZ',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-8').setup({playlist:'https://cdn.jwplayer.com/v2/media/iTkIPnL7',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-9').setup({playlist:'https://cdn.jwplayer.com/v2/media/97X42Z8O',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-10').setup({playlist:'https://cdn.jwplayer.com/v2/media/uVeYx90Y',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+
+// JW Player: apply speed on play
+jwPlayers.forEach(p => {
+  p.on('play', function() { try { this.setPlaybackRate(currentSpeed); } catch(e) {} });
+});
+
+// YouTube IFrame API
+var onYouTubeIframeAPIReady = function() {
+
+};
+
+function applySpeed(rate) {
+  currentSpeed = rate;
+  jwPlayers.forEach(p => { try { p.setPlaybackRate(rate); } catch(e) {} });
+  ytPlayers.forEach(p => { try { p.setPlaybackRate(rate); } catch(e) {} });
+}
+
+document.getElementById('speedWidget').addEventListener('click', function(e) {
+  const btn = e.target.closest('.speed-btn');
+  if (!btn) return;
+  document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applySpeed(parseFloat(btn.dataset.speed));
+});
+</script>
+</body>
+</html>

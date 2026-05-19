@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude 101 — Video Player</title>
+
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e8e8e8; }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: #1a1a2e; border-bottom: 1px solid #333;
+    padding: 12px 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .topbar h1 { font-size: 16px; font-weight: 600; color: #e8e8e8; flex: 1; }
+  .speed-label { font-size: 13px; color: #aaa; white-space: nowrap; }
+  .speed-widget { display: flex; gap: 6px; align-items: center; }
+  .speed-btn {
+    background: #2a2a3e; border: 1px solid #444; color: #ccc;
+    padding: 5px 11px; border-radius: 20px; cursor: pointer;
+    font-size: 12px; transition: all 0.15s;
+  }
+  .speed-btn:hover { background: #3a3a5e; color: #fff; }
+  .speed-btn.active { background: #5865f2; border-color: #5865f2; color: #fff; font-weight: 600; }
+
+  .content { max-width: 1400px; margin: 0 auto; padding: 32px 24px; }
+  .chapter { margin-bottom: 40px; }
+  .chapter h2 {
+    font-size: 18px; font-weight: 700; color: #c8a2f8;
+    border-left: 3px solid #5865f2; padding-left: 12px;
+    margin-bottom: 16px;
+  }
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 16px;
+  }
+  .video-card {
+    background: #1a1a2e; border-radius: 10px; overflow: hidden;
+    border: 1px solid #2a2a3e;
+  }
+  .video-title {
+    padding: 10px 14px;
+    font-size: 13px; font-weight: 500; color: #ccc;
+    background: #16162a;
+    border-bottom: 1px solid #2a2a3e;
+  }
+  .stats { text-align: center; color: #666; font-size: 12px; padding: 8px; }
+  .yt-wrap { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
+  .yt-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Claude 101</h1>
+  <span class="speed-label">Speed:</span>
+  <div class="speed-widget" id="speedWidget">
+    <button class="speed-btn" data-speed="0.5">0.5&times;</button>
+    <button class="speed-btn" data-speed="0.75">0.75&times;</button>
+    <button class="speed-btn active" data-speed="1">1&times;</button>
+    <button class="speed-btn" data-speed="1.25">1.25&times;</button>
+    <button class="speed-btn" data-speed="1.5">1.5&times;</button>
+    <button class="speed-btn" data-speed="1.75">1.75&times;</button>
+    <button class="speed-btn" data-speed="2">2&times;</button>
+  </div>
+  <span class="stats">4 videos</span>
+</div>
+
+<div class="content">
+<section class="chapter"><h2>Claude 101</h2><div class="video-grid">
+<div class="video-card"><div class="video-title">Getting better results</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/Zzn-g8lvLMA?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div>
+<div class="video-card"><div class="video-title">Introduction to projects</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/GJ5jTgcbRHA?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div>
+<div class="video-card"><div class="video-title">Working with skills</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/LpGpwhORWr0?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div>
+<div class="video-card"><div class="video-title">Other ways to work with Claude</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/s-avRazvmLg?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div>
+</div></section>
+</div>
+
+<script>
+const jwPlayers = [];
+let currentSpeed = 1.0;
+
+// JW Player setup
+
+
+// JW Player: apply speed on play
+jwPlayers.forEach(p => {
+  p.on('play', function() { try { this.setPlaybackRate(currentSpeed); } catch(e) {} });
+});
+
+function applySpeed(rate) {
+  currentSpeed = rate;
+  jwPlayers.forEach(p => { try { p.setPlaybackRate(rate); } catch(e) {} });
+  // YouTube: use YouTube's built-in speed control (gear icon in player)
+}
+
+document.getElementById('speedWidget').addEventListener('click', function(e) {
+  const btn = e.target.closest('.speed-btn');
+  if (!btn) return;
+  document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applySpeed(parseFloat(btn.dataset.speed));
+});
+</script>
+</body>
+</html>

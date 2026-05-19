@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Building with the Claude API — Video Player</title>
+<script src="https://cdn.jwplayer.com/libraries/Akyo8gQO.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e8e8e8; }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: #1a1a2e; border-bottom: 1px solid #333;
+    padding: 12px 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .topbar h1 { font-size: 16px; font-weight: 600; color: #e8e8e8; flex: 1; }
+  .speed-label { font-size: 13px; color: #aaa; white-space: nowrap; }
+  .speed-widget { display: flex; gap: 6px; align-items: center; }
+  .speed-btn {
+    background: #2a2a3e; border: 1px solid #444; color: #ccc;
+    padding: 5px 11px; border-radius: 20px; cursor: pointer;
+    font-size: 12px; transition: all 0.15s;
+  }
+  .speed-btn:hover { background: #3a3a5e; color: #fff; }
+  .speed-btn.active { background: #5865f2; border-color: #5865f2; color: #fff; font-weight: 600; }
+
+  .content { max-width: 1400px; margin: 0 auto; padding: 32px 24px; }
+  .chapter { margin-bottom: 40px; }
+  .chapter h2 {
+    font-size: 18px; font-weight: 700; color: #c8a2f8;
+    border-left: 3px solid #5865f2; padding-left: 12px;
+    margin-bottom: 16px;
+  }
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 16px;
+  }
+  .video-card {
+    background: #1a1a2e; border-radius: 10px; overflow: hidden;
+    border: 1px solid #2a2a3e;
+  }
+  .video-title {
+    padding: 10px 14px;
+    font-size: 13px; font-weight: 500; color: #ccc;
+    background: #16162a;
+    border-bottom: 1px solid #2a2a3e;
+  }
+  .stats { text-align: center; color: #666; font-size: 12px; padding: 8px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Building with the Claude API</h1>
+  <span class="speed-label">Speed:</span>
+  <div class="speed-widget" id="speedWidget">
+    <button class="speed-btn" data-speed="0.5">0.5&times;</button>
+    <button class="speed-btn" data-speed="0.75">0.75&times;</button>
+    <button class="speed-btn active" data-speed="1">1&times;</button>
+    <button class="speed-btn" data-speed="1.25">1.25&times;</button>
+    <button class="speed-btn" data-speed="1.5">1.5&times;</button>
+    <button class="speed-btn" data-speed="1.75">1.75&times;</button>
+    <button class="speed-btn" data-speed="2">2&times;</button>
+  </div>
+  <span class="stats">74 videos</span>
+</div>
+
+<div class="content">
+<section class="chapter"><h2>Introduction</h2><div class="video-grid">
+  <div class="video-card">
+    <div class="video-title">Overview of Claude models</div>
+    <div id="jwp-0"></div>
+  </div>
+</div></section>
+<section class="chapter"><h2>Accessing Claude with the API</h2><div class="video-grid">
+  <div class="video-card">
+    <div class="video-title">Accessing the API</div>
+    <div id="jwp-1"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Making a request</div>
+    <div id="jwp-2"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Multi-Turn conversations</div>
+    <div id="jwp-3"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Chat exercise</div>
+    <div id="jwp-4"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">System prompts</div>
+    <div id="jwp-5"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">System prompts exercise</div>
+    <div id="jwp-6"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Temperature</div>
+    <div id="jwp-7"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Response streaming</div>
+    <div id="jwp-8"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Structured data</div>
+    <div id="jwp-9"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Structured data exercise</div>
+    <div id="jwp-10"></div>
+  </div>
+</div></section>
+<section class="chapter"><h2>Prompt evaluation</h2><div class="video-grid">
+  <div class="video-card">
+    <div class="video-title">Prompt evaluation</div>
+    <div id="jwp-11"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">A typical eval workflow</div>
+    <div id="jwp-12"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Generating test datasets</div>
+    <div id="jwp-13"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Running the eval</div>
+    <div id="jwp-14"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Model based grading</div>
+    <div id="jwp-15"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Code based grading</div>
+    <div id="jwp-16"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Exercise on prompt evals</div>
+    <div id="jwp-17"></div>
+  </div>
+</div></section>
+<section class="chapter"><h2>Prompt engineering techniques</h2><div class="video-grid">
+  <div class="video-card">
+    <div class="video-title">Prompt engineering</div>
+    <div id="jwp-18"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Being clear and direct</div>
+    <div id="jwp-19"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Being specific</div>
+    <div id="jwp-20"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Structure with XML tags</div>
+    <div id="jwp-21"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Providing examples</div>
+    <div id="jwp-22"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Exercise on prompting</div>
+    <div id="jwp-23"></div>
+  </div>
+</div></section>
+<section class="chapter"><h2>Tool use with Claude</h2><div class="video-grid">
+  <div class="video-card">
+    <div class="video-title">Introducing tool use</div>
+    <div id="jwp-24"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Project overview</div>
+    <div id="jwp-25"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Tool functions</div>
+    <div id="jwp-26"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Tool schemas</div>
+    <div id="jwp-27"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Handling message blocks</div>
+    <div id="jwp-28"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Sending tool results</div>
+    <div id="jwp-29"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Multi-turn conversations with tools</div>
+    <div id="jwp-30"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Implementing multiple turns</div>
+    <div id="jwp-31"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Using multiple tools</div>
+    <div id="jwp-32"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Fine grained tool calling</div>
+    <div id="jwp-33"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">The text edit tool</div>
+    <div id="jwp-34"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">The web search tool</div>
+    <div id="jwp-35"></div>
+  </div>
+</div></section>
+<section class="chapter"><h2>RAG and Agentic Search</h2><div class="video-grid">
+  <div class="video-card">
+    <div class="video-title">Introducing RAG</div>
+    <div id="jwp-36"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Text chunking strategies</div>
+    <div id="jwp-37"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Text embeddings</div>
+    <div id="jwp-38"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">The full RAG flow</div>
+    <div id="jwp-39"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Implementing the RAG flow</div>
+    <div id="jwp-40"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">BM25 lexical search</div>
+    <div id="jwp-41"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">A Multi-Index RAG pipeline</div>
+    <div id="jwp-42"></div>
+  </div>
+</div></section>
+<section class="chapter"><h2>Features of Claude</h2><div class="video-grid">
+  <div class="video-card">
+    <div class="video-title">Extended thinking</div>
+    <div id="jwp-43"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Image support</div>
+    <div id="jwp-44"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">PDF support</div>
+    <div id="jwp-45"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Citations</div>
+    <div id="jwp-46"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Prompt caching</div>
+    <div id="jwp-47"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Rules of prompt caching</div>
+    <div id="jwp-48"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Prompt caching in action</div>
+    <div id="jwp-49"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Code execution and the Files API</div>
+    <div id="jwp-50"></div>
+  </div>
+</div></section>
+<section class="chapter"><h2>Model Context Protocol</h2><div class="video-grid">
+  <div class="video-card">
+    <div class="video-title">Introducing MCP</div>
+    <div id="jwp-51"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">MCP clients</div>
+    <div id="jwp-52"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Project setup</div>
+    <div id="jwp-53"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Defining tools with MCP</div>
+    <div id="jwp-54"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">The server inspector</div>
+    <div id="jwp-55"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Implementing a client</div>
+    <div id="jwp-56"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Defining resources</div>
+    <div id="jwp-57"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Accessing resources</div>
+    <div id="jwp-58"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Defining prompts</div>
+    <div id="jwp-59"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Prompts in the client</div>
+    <div id="jwp-60"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">MCP review</div>
+    <div id="jwp-61"></div>
+  </div>
+</div></section>
+<section class="chapter"><h2>Anthropic apps - Claude Code and computer use</h2><div class="video-grid">
+  <div class="video-card">
+    <div class="video-title">Anthropic apps</div>
+    <div id="jwp-62"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Claude Code setup</div>
+    <div id="jwp-63"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Claude Code in action</div>
+    <div id="jwp-64"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Enhancements with MCP servers</div>
+    <div id="jwp-65"></div>
+  </div>
+</div></section>
+<section class="chapter"><h2>Agents and workflows</h2><div class="video-grid">
+  <div class="video-card">
+    <div class="video-title">Agents and workflows</div>
+    <div id="jwp-66"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Parallelization workflows</div>
+    <div id="jwp-67"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Chaining workflows</div>
+    <div id="jwp-68"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Routing workflows</div>
+    <div id="jwp-69"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Agents and tools</div>
+    <div id="jwp-70"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Environment inspection</div>
+    <div id="jwp-71"></div>
+  </div>
+  <div class="video-card">
+    <div class="video-title">Workflows vs agents</div>
+    <div id="jwp-72"></div>
+  </div>
+</div></section>
+<section class="chapter"><h2>Wrapping up!</h2><div class="video-grid">
+  <div class="video-card">
+    <div class="video-title">Course Wrap Up</div>
+    <div id="jwp-73"></div>
+  </div>
+</div></section>
+</div>
+
+<script>
+const players = [];
+let currentSpeed = 1.0;
+
+
+    players.push(jwplayer('jwp-0').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/EvdaPJYI',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-1').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/Ju43Csrd',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-2').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/LXX0R5AO',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-3').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/6owq0WNb',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-4').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/PW8oVjfp',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-5').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/9LaPc46s',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-6').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/7nj15ANp',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-7').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/D87GKJt3',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-8').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/WyvqnwvX',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-9').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/eNpA5r39',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-10').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/Jn5Cyd1Q',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-11').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/rDzbbZeh',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-12').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/325SRQ3R',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-13').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/C6PbktjE',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-14').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/SNKtDKBn',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-15').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/HDMgUptf',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-16').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/6i4D8v9S',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-17').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/0TnV7jUw',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-18').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/YKw5dl7A',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-19').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/5Y4oj2lw',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-20').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/egQ7zod3',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-21').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/9iyUFyZm',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-22').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/Nn7anupZ',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-23').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/hYMCWYnk',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-24').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/EYMBO8qx',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-25').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/qekJHNw6',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-26').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/CmUEtvCu',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-27').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/6yq2xFtz',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-28').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/pZ50oXe4',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-29').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/0jrBmtEo',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-30').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/fcAvqQsK',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-31').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/c5RmeDQS',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-32').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/OkoVWP3Y',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-33').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/aAOMIPU7',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-34').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/fFoetGxi',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-35').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/e28I99Xg',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-36').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/0dYp9ofW',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-37').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/DYqTq9hh',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-38').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/eXm6NTy1',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-39').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/43CcXvQd',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-40').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/T9PBheNV',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-41').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/YkRuRt6F',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-42').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/Imw0Myvw',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-43').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/LRMLW8RN',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-44').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/ujsNfqDk',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-45').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/RY83XMZb',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-46').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/jPirK34o',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-47').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/D1OCgJNm',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-48').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/iYim3gm0',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-49').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/ir6DA8Ye',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-50').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/C9T2ygXC',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-51').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/uDieeg3M',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-52').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/lpMciDcp',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-53').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/ll51cIj6',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-54').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/eLnsfV8v',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-55').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/gU5FjxTI',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-56').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/g63nVOui',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-57').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/zUd3OYzJ',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-58').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/fgaF4wQr',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-59').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/gFC96wgt',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-60').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/xQu08m25',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-61').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/y9xXQ4lc',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-62').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/RDrbOkSe',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-63').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/gPMxaOUi',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-64').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/ycVWyQsw',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-65').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/ZonvuQFz',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-66').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/ZVhWpyWr',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-67').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/vGiRBtXS',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-68').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/HsDhRagL',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-69').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/YygsngXd',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-70').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/cLG8V8Al',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-71').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/ynbin0iz',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-72').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/G2t6x6rY',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+    players.push(jwplayer('jwp-73').setup({
+      playlist: 'https://cdn.jwplayer.com/v2/media/FlKckv4Z',
+      width: '100%',
+      aspectratio: '16:9',
+      displaytitle: false,
+      stretching: 'uniform'
+    }));
+
+players.forEach(p => {
+  p.on('play', function() {
+    try { this.setPlaybackRate(currentSpeed); } catch(e) {}
+  });
+});
+
+document.getElementById('speedWidget').addEventListener('click', function(e) {
+  const btn = e.target.closest('.speed-btn');
+  if (!btn) return;
+  currentSpeed = parseFloat(btn.dataset.speed);
+  document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  players.forEach(p => {
+    try { p.setPlaybackRate(currentSpeed); } catch(e) {}
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCP Advanced Topics — Anthropic Academy</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --bg2: #1e293b;
+    --bg3: #162032;
+    --border: #2d3f55;
+    --accent: #7c3aed;
+    --accent2: #a855f7;
+    --green: #10b981;
+    --red: #ef4444;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --code-bg: #0d1526;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         background: var(--bg); color: var(--text); line-height: 1.6; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Header ── */
+  .site-header {
+    background: #0a0f1e;
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; align-items: center; gap: 0;
+    height: 60px; position: sticky; top: 0; z-index: 200;
+  }
+  .site-logo {
+    font-size: 15px; font-weight: 700; color: var(--text);
+    letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px;
+    white-space: nowrap;
+  }
+  .site-logo .logo-icon {
+    width: 28px; height: 28px; background: linear-gradient(135deg, #f97316, #ef4444);
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 900; color: #fff; flex-shrink: 0;
+  }
+  .breadcrumb { font-size: 13px; color: var(--text3); margin-left: 16px; display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: var(--text2); }
+  .breadcrumb .sep { color: var(--text3); }
+  .header-meta { margin-left: auto; font-size: 12px; color: var(--text3); }
+
+  /* ── Tab navigation ── */
+  .tab-bar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; gap: 0; overflow-x: auto;
+    position: sticky; top: 60px; z-index: 100;
+  }
+  .tab-btn {
+    padding: 14px 22px; font-size: 14px; font-weight: 500;
+    color: var(--text2); background: none; border: none;
+    border-bottom: 2px solid transparent; cursor: pointer;
+    white-space: nowrap; transition: all 0.15s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent); }
+
+  /* ── Tab content ── */
+  .tab-content { display: none; max-width: 960px; margin: 0 auto; padding: 36px 32px; }
+  .tab-content.active { display: block; }
+
+  /* ── Study Guide / Quiz markdown rendering ── */
+  .md-body h1 { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+  .md-body h2 {
+    font-size: 20px; font-weight: 700; color: #c8a2f8;
+    border-left: 3px solid var(--accent); padding-left: 12px;
+    margin: 36px 0 16px;
+  }
+  .md-body h3 {
+    font-size: 16px; font-weight: 600; color: var(--text);
+    margin: 24px 0 10px; padding-top: 4px;
+  }
+  .md-body p { color: var(--text); margin-bottom: 14px; }
+  .md-body em { color: var(--text2); }
+  .md-body strong { color: var(--text); }
+  .md-body hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  .md-body ul, .md-body ol { padding-left: 22px; margin-bottom: 14px; }
+  .md-body li { color: var(--text); margin-bottom: 4px; }
+  .md-body code {
+    background: var(--code-bg); color: #7dd3fc;
+    padding: 2px 6px; border-radius: 4px; font-size: 13px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  }
+  .md-body pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px; overflow-x: auto; margin-bottom: 16px;
+  }
+  .md-body pre code { background: none; padding: 0; color: #e2e8f0; }
+  .md-body table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 14px; }
+  .md-body th { background: var(--bg2); color: var(--accent2); padding: 8px 12px;
+                text-align: left; border: 1px solid var(--border); }
+  .md-body td { padding: 8px 12px; border: 1px solid var(--border); color: var(--text); }
+  .md-body tr:nth-child(even) td { background: var(--bg3); }
+  .md-body blockquote {
+    border-left: 3px solid var(--accent); padding: 8px 16px;
+    background: var(--bg2); border-radius: 0 6px 6px 0; margin-bottom: 14px;
+  }
+
+  /* ── Quiz ── */
+  .md-body li.correct {
+    background: rgba(16, 185, 129, 0.12);
+    border-left: 2px solid var(--green);
+    padding: 4px 10px; border-radius: 4px; list-style: none;
+    color: #6ee7b7; font-weight: 500;
+  }
+  .md-body li.incorrect { color: var(--text2); }
+  .md-body li.correct::before { content: ''; }
+
+  /* ── Videos tab ── */
+  .video-speed-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 16px;
+    margin-bottom: 28px; flex-wrap: wrap;
+  }
+  .speed-label { font-size: 13px; color: var(--text2); }
+  .speed-btn {
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
+    padding: 4px 12px; border-radius: 20px; cursor: pointer;
+    font-size: 12px; transition: all 0.15s;
+  }
+  .speed-btn:hover { background: #2a3a55; color: var(--text); }
+  .speed-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .video-total { margin-left: auto; font-size: 12px; color: var(--text3); }
+  .chapter-section { margin-bottom: 36px; }
+  .chapter-title {
+    font-size: 17px; font-weight: 700; color: #c8a2f8;
+    border-left: 3px solid var(--accent); padding-left: 12px;
+    margin-bottom: 14px;
+  }
+  .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
+  .video-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+  }
+  .video-title {
+    padding: 9px 13px; font-size: 13px; font-weight: 500; color: var(--text2);
+    background: var(--bg3); border-bottom: 1px solid var(--border);
+  }
+  .yt-wrap { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
+  .yt-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  /* ── Notebooks tab ── */
+  .nb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 32px; }
+  .nb-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px;
+    transition: border-color 0.15s;
+  }
+  .nb-card:hover { border-color: var(--accent); }
+  .nb-name { font-size: 13px; font-weight: 600; color: var(--text); word-break: break-all; }
+  .nb-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nb-link {
+    font-size: 11px; padding: 3px 10px; border-radius: 12px;
+    border: 1px solid var(--border); color: var(--text2);
+    background: var(--bg3); transition: all 0.15s;
+  }
+  .nb-link:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+  .nb-link.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .nb-link.primary:hover { background: var(--accent2); }
+  .section-note {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 18px; font-size: 13px; color: var(--text2);
+    margin-bottom: 24px;
+  }
+  .section-title { font-size: 16px; font-weight: 700; color: var(--text); margin: 24px 0 12px; }
+  .file-list { display: flex; flex-direction: column; gap: 8px; }
+  .file-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+  }
+  .file-icon { font-size: 18px; }
+  .file-name { font-size: 13px; color: var(--text); flex: 1; }
+  .file-link { font-size: 12px; color: var(--accent2); }
+
+  /* ── Index page cards ── */
+  .index-hero { padding: 60px 32px 40px; text-align: center; }
+  .index-hero h1 { font-size: 36px; font-weight: 800; color: var(--text); margin-bottom: 12px; }
+  .index-hero p { font-size: 16px; color: var(--text2); max-width: 520px; margin: 0 auto; }
+  .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                  gap: 20px; max-width: 1200px; margin: 0 auto; padding: 0 32px 60px; }
+  .course-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 10px;
+    text-decoration: none; transition: all 0.2s; color: inherit;
+  }
+  .course-card:hover { border-color: var(--accent); transform: translateY(-2px);
+                       box-shadow: 0 8px 24px rgba(124,58,237,0.15); text-decoration: none; }
+  .card-emoji { font-size: 32px; }
+  .card-title { font-size: 16px; font-weight: 700; color: var(--text); }
+  .card-meta { font-size: 12px; color: var(--text3); display: flex; gap: 12px; flex-wrap: wrap; }
+  .card-tag { background: var(--bg3); border: 1px solid var(--border);
+              padding: 2px 8px; border-radius: 10px; color: var(--text2); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-logo">
+    <div class="logo-icon">A</div>
+    Anthropic Academy
+  </div>
+  <div class="breadcrumb">
+    <span class="sep">›</span>
+    <a href="../index.html">All Courses</a>
+    <span class="sep">›</span>
+    <span>🚀 MCP Advanced Topics</span>
+  </div>
+  <div class="header-meta">8 videos · 7 quiz questions</div>
+</header>
+
+<div class="tab-bar" id="tabBar">
+  <button class="tab-btn active" data-tab="study">📚 Study Guide</button>
+  <button class="tab-btn" data-tab="quiz">📝 Quiz</button>
+  <button class="tab-btn" data-tab="videos">🎬 Videos</button>
+  
+</div>
+
+<div id="tab-study" class="tab-content active">
+  <div class="md-body"><h1 id="model-context-protocol-advanced-topics-study-guide">Model Context Protocol: Advanced Topics — Study Guide</h1>
+<p><em>Full course notes compiled from all lessons.</em></p>
+<hr />
+<h2 id="advanced-patterns">Advanced Patterns</h2>
+<h3 id="lets-get-started">Let's get started!</h3>
+<p><em>Video lesson — no text notes.</em></p>
+<h3 id="sampling">Sampling</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="sampling-walkthrough">Sampling walkthrough</h3>
+<p><em>Video lesson — no text notes.</em></p>
+<h3 id="log-and-progress-notifications">Log and progress notifications</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="notifications-walkthrough">Notifications walkthrough</h3>
+<p><em>Video lesson — no text notes.</em></p>
+<h3 id="roots">Roots</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="roots-walkthrough">Roots walkthrough</h3>
+<p><em>Video lesson — no text notes.</em></p>
+<h3 id="survey">Survey</h3>
+<p>Loading...</p>
+<h2 id="transport-layer">Transport Layer</h2>
+<h3 id="json-message-types">JSON message types</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="the-stdio-transport">The STDIO transport</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="the-streamablehttp-transport">The StreamableHTTP transport</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="streamablehttp-in-depth">StreamableHTTP in depth</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="state-and-the-streamablehttp-transport">State and the StreamableHTTP transport</h3>
+<p>This video is still being processed. Please check back later and refresh the page.<br />
+Uh oh! Something went wrong, please try again.</p>
+<h3 id="wrapping-up">Wrapping up</h3>
+<p><em>Video lesson — no text notes.</em></p></div>
+</div>
+
+<div id="tab-quiz" class="tab-content">
+  <div class="md-body"><h1 id="model-context-protocol-advanced-topics-quiz-guide">Model Context Protocol: Advanced Topics — Quiz Guide</h1>
+<p><em>All quiz questions with answer choices (correct answer marked with ✓).</em></p>
+<hr />
+<h2 id="transport-layer">Transport Layer</h2>
+<h3 id="assessment-on-mcp-concepts">Assessment on MCP concepts</h3>
+<p><strong>1. You're building an MCP client to connect your application to an MCP server. What are the two main components you need?</strong></p>
+<ul>
+<li class="incorrect">A) A frontend and a backend</li>
+<li class="incorrect">B) A database and a web server</li>
+<li class="incorrect">C) A REST API and a GraphQL endpoint</li>
+<li class="correct">D) An MCP Client class and a Client Session ✓</li>
+</ul>
+<p><strong>2. Your MCP client needs to find out what tools are available from an MCP server. What message type should it send?</strong></p>
+<ul>
+<li class="correct">A) ListToolsRequest ✓</li>
+<li class="incorrect">B) CallToolRequest</li>
+<li class="incorrect">C) ToolDiscoveryRequest</li>
+<li class="incorrect">D) GetToolsMessage</li>
+</ul>
+<p><strong>3. You've built an MCP server and want to test if your tools work correctly before connecting to a full application. What's the easiest way to do this?</strong></p>
+<ul>
+<li class="incorrect">A) Write separate test scripts for each tool</li>
+<li class="incorrect">B) Test everything manually in the terminal</li>
+<li class="correct">C) Use the built-in MCP Inspector with <code>mcp dev mcp_server.py</code> ✓</li>
+<li class="incorrect">D) Connect directly to Claude first</li>
+</ul>
+<p><strong>4. You're building a chat app where users ask Claude about their GitHub data. Without MCP, what's the main problem you'd face?</strong></p>
+<ul>
+<li class="incorrect">A) GitHub doesn't allow API access</li>
+<li class="correct">B) You'd have to write and maintain all the GitHub tool code yourself ✓</li>
+<li class="incorrect">C) Claude can't understand GitHub data</li>
+<li class="incorrect">D) Users can't ask questions about repositories</li>
+</ul>
+<p><strong>5. You're deciding how to implement a new feature in your MCP server. Users should be able to click a button to trigger a "summarize document" workflow. Which MCP primitive should you use?</strong></p>
+<ul>
+<li class="incorrect">A) Resources - because you need to fetch document data</li>
+<li class="incorrect">B) Functions - because it involves processing</li>
+<li class="correct">C) Prompts - because users control when to start the workflow ✓</li>
+<li class="incorrect">D) Tools - because the AI needs new capabilities</li>
+</ul>
+<p><strong>6. You're using the Python MCP SDK to create a tool that reads files. What's the easiest way to define this tool?</strong></p>
+<ul>
+<li class="correct">A) Use the @mcp.tool() decorator on a Python function ✓</li>
+<li class="incorrect">B) Create a separate configuration file</li>
+<li class="incorrect">C) Write JSON schemas manually</li>
+<li class="incorrect">D) Send HTTP requests to register the tool</li>
+</ul>
+<p><strong>7. You want to create a resource that fetches different documents based on their ID, like docs://documents/report.pdf. What type of resource should you use?</strong></p>
+<ul>
+<li class="correct">A) A templated resource with parameters in the URI ✓</li>
+<li class="incorrect">B) A tool instead of a resource</li>
+<li class="incorrect">C) A direct resource with a static URI</li>
+<li class="incorrect">D) A database query resource</li>
+</ul></div>
+</div>
+
+<div id="tab-videos" class="tab-content">
+  <script src="https://cdn.jwplayer.com/libraries/Akyo8gQO.js"></script>
+<div class="video-speed-bar">
+  <span class="speed-label">Speed:</span>
+  <button class="speed-btn" data-speed="0.5">0.5&times;</button>
+  <button class="speed-btn" data-speed="0.75">0.75&times;</button>
+  <button class="speed-btn active" data-speed="1">1&times;</button>
+  <button class="speed-btn" data-speed="1.25">1.25&times;</button>
+  <button class="speed-btn" data-speed="1.5">1.5&times;</button>
+  <button class="speed-btn" data-speed="1.75">1.75&times;</button>
+  <button class="speed-btn" data-speed="2">2&times;</button>
+  <span class="video-total">8 videos</span>
+</div>
+<div class="chapter-section"><div class="chapter-title">Advanced Patterns</div><div class="video-grid"><div class="video-card"><div class="video-title">Sampling</div><div id="jwp-0"></div></div><div class="video-card"><div class="video-title">Log and progress notifications</div><div id="jwp-1"></div></div><div class="video-card"><div class="video-title">Roots</div><div id="jwp-2"></div></div></div></div><div class="chapter-section"><div class="chapter-title">Transport Layer</div><div class="video-grid"><div class="video-card"><div class="video-title">JSON message types</div><div id="jwp-3"></div></div><div class="video-card"><div class="video-title">The STDIO transport</div><div id="jwp-4"></div></div><div class="video-card"><div class="video-title">The StreamableHTTP transport</div><div id="jwp-5"></div></div><div class="video-card"><div class="video-title">StreamableHTTP in depth</div><div id="jwp-6"></div></div><div class="video-card"><div class="video-title">State and the StreamableHTTP transport</div><div id="jwp-7"></div></div></div></div>
+<script>
+const jwPlayers = [];
+let currentSpeed = 1.0;
+  jwPlayers.push(jwplayer('jwp-0').setup({playlist:'https://cdn.jwplayer.com/v2/media/9O1zhiax',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-1').setup({playlist:'https://cdn.jwplayer.com/v2/media/S1NN5gQM',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-2').setup({playlist:'https://cdn.jwplayer.com/v2/media/THAazXK6',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-3').setup({playlist:'https://cdn.jwplayer.com/v2/media/UaJREBzo',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-4').setup({playlist:'https://cdn.jwplayer.com/v2/media/cTx3hRiA',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-5').setup({playlist:'https://cdn.jwplayer.com/v2/media/G2sDMd5D',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-6').setup({playlist:'https://cdn.jwplayer.com/v2/media/8PKjstab',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+  jwPlayers.push(jwplayer('jwp-7').setup({playlist:'https://cdn.jwplayer.com/v2/media/HvW2By5D',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
+jwPlayers.forEach(p => {
+  p.on('play', function() { try { this.setPlaybackRate(currentSpeed); } catch(e) {} });
+});
+function applySpeed(rate) {
+  currentSpeed = rate;
+  jwPlayers.forEach(p => { try { p.setPlaybackRate(rate); } catch(e) {} });
+}
+document.querySelectorAll('.video-speed-bar .speed-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.video-speed-bar .speed-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    applySpeed(parseFloat(this.dataset.speed));
+  });
+});
+</script>
+</div>
+
+
+
+<script>
+document.getElementById('tabBar').addEventListener('click', function(e) {
+  const btn = e.target.closest('.tab-btn');
+  if (!btn) return;
+  const tab = btn.dataset.tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+});
+</script>
+</body>
+</html>

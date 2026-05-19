@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code 101 — Anthropic Academy</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --bg2: #1e293b;
+    --bg3: #162032;
+    --border: #2d3f55;
+    --accent: #7c3aed;
+    --accent2: #a855f7;
+    --green: #10b981;
+    --red: #ef4444;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --code-bg: #0d1526;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         background: var(--bg); color: var(--text); line-height: 1.6; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Header ── */
+  .site-header {
+    background: #0a0f1e;
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; align-items: center; gap: 0;
+    height: 60px; position: sticky; top: 0; z-index: 200;
+  }
+  .site-logo {
+    font-size: 15px; font-weight: 700; color: var(--text);
+    letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px;
+    white-space: nowrap;
+  }
+  .site-logo .logo-icon {
+    width: 28px; height: 28px; background: linear-gradient(135deg, #f97316, #ef4444);
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 900; color: #fff; flex-shrink: 0;
+  }
+  .breadcrumb { font-size: 13px; color: var(--text3); margin-left: 16px; display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: var(--text2); }
+  .breadcrumb .sep { color: var(--text3); }
+  .header-meta { margin-left: auto; font-size: 12px; color: var(--text3); }
+
+  /* ── Tab navigation ── */
+  .tab-bar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; gap: 0; overflow-x: auto;
+    position: sticky; top: 60px; z-index: 100;
+  }
+  .tab-btn {
+    padding: 14px 22px; font-size: 14px; font-weight: 500;
+    color: var(--text2); background: none; border: none;
+    border-bottom: 2px solid transparent; cursor: pointer;
+    white-space: nowrap; transition: all 0.15s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent); }
+
+  /* ── Tab content ── */
+  .tab-content { display: none; max-width: 960px; margin: 0 auto; padding: 36px 32px; }
+  .tab-content.active { display: block; }
+
+  /* ── Study Guide / Quiz markdown rendering ── */
+  .md-body h1 { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+  .md-body h2 {
+    font-size: 20px; font-weight: 700; color: #c8a2f8;
+    border-left: 3px solid var(--accent); padding-left: 12px;
+    margin: 36px 0 16px;
+  }
+  .md-body h3 {
+    font-size: 16px; font-weight: 600; color: var(--text);
+    margin: 24px 0 10px; padding-top: 4px;
+  }
+  .md-body p { color: var(--text); margin-bottom: 14px; }
+  .md-body em { color: var(--text2); }
+  .md-body strong { color: var(--text); }
+  .md-body hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  .md-body ul, .md-body ol { padding-left: 22px; margin-bottom: 14px; }
+  .md-body li { color: var(--text); margin-bottom: 4px; }
+  .md-body code {
+    background: var(--code-bg); color: #7dd3fc;
+    padding: 2px 6px; border-radius: 4px; font-size: 13px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  }
+  .md-body pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px; overflow-x: auto; margin-bottom: 16px;
+  }
+  .md-body pre code { background: none; padding: 0; color: #e2e8f0; }
+  .md-body table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 14px; }
+  .md-body th { background: var(--bg2); color: var(--accent2); padding: 8px 12px;
+                text-align: left; border: 1px solid var(--border); }
+  .md-body td { padding: 8px 12px; border: 1px solid var(--border); color: var(--text); }
+  .md-body tr:nth-child(even) td { background: var(--bg3); }
+  .md-body blockquote {
+    border-left: 3px solid var(--accent); padding: 8px 16px;
+    background: var(--bg2); border-radius: 0 6px 6px 0; margin-bottom: 14px;
+  }
+
+  /* ── Quiz ── */
+  .md-body li.correct {
+    background: rgba(16, 185, 129, 0.12);
+    border-left: 2px solid var(--green);
+    padding: 4px 10px; border-radius: 4px; list-style: none;
+    color: #6ee7b7; font-weight: 500;
+  }
+  .md-body li.incorrect { color: var(--text2); }
+  .md-body li.correct::before { content: ''; }
+
+  /* ── Videos tab ── */
+  .video-speed-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 16px;
+    margin-bottom: 28px; flex-wrap: wrap;
+  }
+  .speed-label { font-size: 13px; color: var(--text2); }
+  .speed-btn {
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
+    padding: 4px 12px; border-radius: 20px; cursor: pointer;
+    font-size: 12px; transition: all 0.15s;
+  }
+  .speed-btn:hover { background: #2a3a55; color: var(--text); }
+  .speed-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .video-total { margin-left: auto; font-size: 12px; color: var(--text3); }
+  .chapter-section { margin-bottom: 36px; }
+  .chapter-title {
+    font-size: 17px; font-weight: 700; color: #c8a2f8;
+    border-left: 3px solid var(--accent); padding-left: 12px;
+    margin-bottom: 14px;
+  }
+  .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
+  .video-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+  }
+  .video-title {
+    padding: 9px 13px; font-size: 13px; font-weight: 500; color: var(--text2);
+    background: var(--bg3); border-bottom: 1px solid var(--border);
+  }
+  .yt-wrap { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
+  .yt-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  /* ── Notebooks tab ── */
+  .nb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 32px; }
+  .nb-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px;
+    transition: border-color 0.15s;
+  }
+  .nb-card:hover { border-color: var(--accent); }
+  .nb-name { font-size: 13px; font-weight: 600; color: var(--text); word-break: break-all; }
+  .nb-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nb-link {
+    font-size: 11px; padding: 3px 10px; border-radius: 12px;
+    border: 1px solid var(--border); color: var(--text2);
+    background: var(--bg3); transition: all 0.15s;
+  }
+  .nb-link:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+  .nb-link.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .nb-link.primary:hover { background: var(--accent2); }
+  .section-note {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 18px; font-size: 13px; color: var(--text2);
+    margin-bottom: 24px;
+  }
+  .section-title { font-size: 16px; font-weight: 700; color: var(--text); margin: 24px 0 12px; }
+  .file-list { display: flex; flex-direction: column; gap: 8px; }
+  .file-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+  }
+  .file-icon { font-size: 18px; }
+  .file-name { font-size: 13px; color: var(--text); flex: 1; }
+  .file-link { font-size: 12px; color: var(--accent2); }
+
+  /* ── Index page cards ── */
+  .index-hero { padding: 60px 32px 40px; text-align: center; }
+  .index-hero h1 { font-size: 36px; font-weight: 800; color: var(--text); margin-bottom: 12px; }
+  .index-hero p { font-size: 16px; color: var(--text2); max-width: 520px; margin: 0 auto; }
+  .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                  gap: 20px; max-width: 1200px; margin: 0 auto; padding: 0 32px 60px; }
+  .course-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 10px;
+    text-decoration: none; transition: all 0.2s; color: inherit;
+  }
+  .course-card:hover { border-color: var(--accent); transform: translateY(-2px);
+                       box-shadow: 0 8px 24px rgba(124,58,237,0.15); text-decoration: none; }
+  .card-emoji { font-size: 32px; }
+  .card-title { font-size: 16px; font-weight: 700; color: var(--text); }
+  .card-meta { font-size: 12px; color: var(--text3); display: flex; gap: 12px; flex-wrap: wrap; }
+  .card-tag { background: var(--bg3); border: 1px solid var(--border);
+              padding: 2px 8px; border-radius: 10px; color: var(--text2); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-logo">
+    <div class="logo-icon">A</div>
+    Anthropic Academy
+  </div>
+  <div class="breadcrumb">
+    <span class="sep">›</span>
+    <a href="../index.html">All Courses</a>
+    <span class="sep">›</span>
+    <span>💻 Claude Code 101</span>
+  </div>
+  <div class="header-meta">12 videos · 7 quiz questions</div>
+</header>
+
+<div class="tab-bar" id="tabBar">
+  <button class="tab-btn active" data-tab="study">📚 Study Guide</button>
+  <button class="tab-btn" data-tab="quiz">📝 Quiz</button>
+  <button class="tab-btn" data-tab="videos">🎬 Videos</button>
+  
+</div>
+
+<div id="tab-study" class="tab-content active">
+  <div class="md-body"><h1 id="claude-code-101-study-guide">Claude Code 101 — Study Guide</h1>
+<p><em>Full course notes compiled from all lessons.</em></p>
+<hr />
+<h2 id="getting-started">Getting Started</h2>
+<h3 id="what-is-claude-code">What is Claude Code?</h3>
+<p>Claude Code is an agentic coding tool that understands your codebase, edits your files, runs commands, and integrates with your existing developer tools to help you get things done faster. It's available in your terminal, Visual Studio Code, the Claude Desktop app, on the web, and in JetBrains IDEs.</p>
+<h3 id="what-separates-claude-code-from-claude">What Separates Claude Code from Claude?</h3>
+<p>If you've used Claude.ai before, you might be wondering what makes Claude Code different. Unlike Claude.ai, Claude Code has direct access to your files, your terminal, and your entire codebase. Instead of copying and pasting code back and forth, it goes in and does the work itself.<br />
+The key differentiator is that Claude Code works as an<br />
+AI Agent<br />
+.</p>
+<h3 id="what-is-an-agent">What is an Agent?</h3>
+<p>An AI Agent is software that can interact with its environment and perform actions to complete a defined goal. At its core, this works by having a large language model operating in a loop in real time. AI Agents can have access to tools, external services, or even other AI Agents to help reach their goals.</p>
+<h3 id="what-can-claude-code-actually-do">What Can Claude Code Actually Do?</h3>
+<p>Here's what that looks like in practice:<br />
+Read and understand your codebase.<br />
+You can ask Claude Code to explain a feature or trace a bug throughout your code.<br />
+Edit files across your project.<br />
+Claude Code can refactor a function and update every file that references it.<br />
+Run terminal commands.<br />
+It can execute your build script, run your tests, install packages, and use the output to decide what to do next.<br />
+Search the web.<br />
+If it needs documentation or the latest API references, it can look that up for you.</p>
+<h3 id="using-claude-code-effectively">Using Claude Code Effectively</h3>
+<p>To use Claude Code effectively, keep these three concepts in mind:<br />
+The context window.<br />
+Think of this as Claude's working memory. It can hold a lot, but not everything at once. This is where the "agentic" aspect comes in — Claude finds strategic ways to locate answers within your codebase without loading the entire thing into context.<br />
+It asks for permission.<br />
+By default, Claude Code will ask you before running commands or making changes. You're always in control, whether you prefer a hands-on or hands-off approach.<br />
+It can make mistakes.<br />
+Just like any tool, Claude Code isn't perfect. It might misunderstand your intent, introduce a bug, or over-engineer a solution. Staying in the loop helps you catch these early.</p>
+<h3 id="recap">Recap</h3>
+<p>Claude Code is an agentic coding tool. It reads your codebase, edits your files, runs commands, and connects to external tools to help you ship faster. You can use it today in your terminal, VS Code, JetBrains, and the Claude Desktop app.</p>
+<h3 id="how-claude-code-works">How Claude Code works</h3>
+<p>Claude Code is different from typical chat applications. Understanding how it works under the hood will help you use it more effectively.</p>
+<h3 id="the-agentic-loop">The Agentic Loop</h3>
+<p>Claude Code is best explained through the<br />
+agentic loop<br />
+:<br />
+- You enter a prompt into Claude Code.<br />
+- Claude gathers the context it needs by interacting with the model, which returns text or a tool call that Claude Code can execute.<br />
+- It takes action — for example, editing a file or running a command.<br />
+- It verifies the results and determines whether they achieve what your prompt set out to do.<br />
+- If they do, Claude finishes and waits for the next prompt. If they don't, it loops back and tries again until the results are complete and verifiable.<br />
+Throughout this loop, you can add context, interrupt, or steer the model to help guide it toward your goal.</p>
+<h3 id="context">Context</h3>
+<p>Claude has a<br />
+context window<br />
+that determines how much of your conversation, file contents, command outputs, and more it can store and reference. Once you reach that limit, Claude Code compacts your conversation — automatically determining what it can remove or summarize to bring the context window back down to a usable size.</p>
+<h3 id="tools">Tools</h3>
+<p>Tools are the backbone of how agents work. Most AI assistants simply take text in and return text out. Tools let Claude Code determine<br />
+when<br />
+to execute code to get closer to completing a task. This could be a file-reading tool, a web search tool, or any number of other capabilities. Claude Code uses semantic understanding to determine when to call a tool and how to use the output.</p>
+<h3 id="permissions">Permissions</h3>
+<p>Claude Code has several permission modes:<br />
+Default behavior:<br />
+Claude asks for explicit permission before editing a file or running a shell command.<br />
+Auto-accept:<br />
+Files are edited without asking, but commands still require approval.<br />
+Plan mode:<br />
+Uses read-only tools to compile a plan of action before starting any work.<br />
+All of this can be configured in your settings file. Be cautious when skipping permissions — giving Claude Code free rein to run commands means a mistake could be harder to catch before it happens.</p>
+<h3 id="recap_1">Recap</h3>
+<p>Claude Code combines several agentic concepts: an agentic loop, a managed context window, tools, and configurable permissions — all inside your terminal. It can read your codebase, take action, and verify its own work. That's what makes it fundamentally different from a chat window.</p>
+<h3 id="installing-claude-code">Installing Claude Code</h3>
+<p>Claude Code is simple to install whether you want to use it in your terminal, on the web, or in your IDE.</p>
+<h3 id="terminal">Terminal</h3>
+<p>On<br />
+macOS, Linux, or WSL<br />
+, use the curl command to install it in one go. If you prefer Homebrew, you can also use<br />
+<code>brew install</code><br />
+, but note that this method doesn't support auto-updates.<br />
+On<br />
+Windows<br />
+, there are a few options. In PowerShell, use the<br />
+<code>Invoke-RestMethod</code><br />
+command. In CMD, use the curl command. There's also a winget command available, though like Homebrew, it won't auto-update.<br />
+After installation, you should be able to run the<br />
+<code>claude</code><br />
+command. If not, restart your terminal. Navigate to your project directory and run:<br />
+<code>claude</code><br />
+You'll go through some initial setup steps like choosing your color theme and signing in with your Claude account (Pro, Max, or Enterprise) or using an API key. If your organization has a Claude Enterprise account, be sure to select that option.<br />
+Whatever directory you run<br />
+<code>claude</code><br />
+in, it will have access to that directory and all of its subfolders.</p>
+<h3 id="visual-studio-code">Visual Studio Code</h3>
+<p>Open your Extensions panel and search for "Claude Code." Look for the extension by Anthropic with the blue verification check. Hit install.<br />
+After installation, you may need to restart VS Code. Once it's running, open the command palette with<br />
+<code>Ctrl/Cmd + Shift + P</code><br />
+and search for "Claude Code Open in New Tab." You can also click the Claude logo if it's visible in your sidebar.<br />
+The VS Code extension provides a very similar experience to the terminal. You can also opt out of the UI and use the terminal experience directly in your settings.</p>
+<h3 id="jetbrains">JetBrains</h3>
+<p>Install the Claude Code plugin from the JetBrains Marketplace. After installation, restart your IDE. When you reopen it, you'll see the Claude logo. Clicking it opens a pane with the terminal experience that works alongside your editor.</p>
+<h3 id="desktop">Desktop</h3>
+<p>After installing and signing into Claude Desktop, you'll see a toggle at the top labeled "Code." The look and feel is similar to the chat side of things, but it lets you work in a specific folder, change permissions, and even work in a cloud environment.</p>
+<h3 id="web">Web</h3>
+<p>On the web, access Claude Code by going to<br />
+<code>claude.ai/code</code><br />
+, or by clicking the "Code" label in the sidebar of the chat app. This works similarly to the desktop app, but you're restricted to GitHub repositories.</p>
+<h3 id="which-one-should-i-use">Which One Should I Use?</h3>
+<p>If you want to stay on the cutting edge, the<br />
+terminal<br />
+is your best bet — features ship there first. The IDE integrations offer a nearly identical experience if you prefer Claude Code to feel more intertwined with your code editor.<br />
+Desktop<br />
+is great for letting Claude run in the background while you handle other tasks.<br />
+Claude Code on the web<br />
+is a solid option if you want to remotely work on projects through a GitHub repository.<br />
+However you want to use Claude Code is up to you.</p>
+<h3 id="your-first-prompt">Your first prompt</h3>
+<p>You talk to Claude Code like you would any AI assistant. When entering your prompt, here are some things to consider that can both protect you and make things easier.</p>
+<h3 id="auto-accept-vs-approval">Auto-Accept vs. Approval</h3>
+<p>You can choose whether Claude auto-accepts every file change it suggests, or whether it asks for your explicit permission each time. Press<br />
+<code>Shift + Tab</code><br />
+to cycle between modes.<br />
+Approval mode:<br />
+Claude asks permission each time it wants to edit a file or run a command.<br />
+Auto-accept mode:<br />
+File edits are automatically approved, but commands still require your permission.<br />
+There's no right or wrong answer — it's whatever you're comfortable with.</p>
+<h3 id="plan-mode">Plan Mode</h3>
+<p>Within the<br />
+<code>Shift + Tab</code><br />
+menu is<br />
+Plan Mode<br />
+. Plan mode takes your prompt and uses read-only tools to analyze your codebase and research your suggested implementation. It will ask clarifying questions along the way, then return a detailed plan it can execute.<br />
+Plan mode is great for planning complex changes or doing a safe code review. Many times you'll be asking Claude to handle multi-step implementations toward a feature, and this is exactly where Plan Mode excels.</p>
+<h3 id="example-add-a-dark-mode-toggle">Example: Add a Dark Mode Toggle</h3>
+<p>Let's walk through an example. Say you have an application that needs a dark mode toggle. Open the root directory of your project and run<br />
+<code>claude</code><br />
+. Press<br />
+<code>Shift + Tab</code><br />
+a couple of times to enter Plan Mode, then write a prompt like:<br />
+<code>My app needs a dark mode implemented across the entire app. Can you create a toggle switch on the header that allows a user to toggle between light mode and dark mode? I need you to find a good contrast color that works based on my existing light theme.</code><br />
+Let Claude plan it out. After reviewing the plan, if it looks good, accept it and let Claude ask you for approval at each step. At the end, you can see exactly what Claude did and how it reached its conclusions.</p>
+<h3 id="recap_2">Recap</h3>
+<p>When using Claude Code, try to be as descriptive as possible with your prompt. If you want to stay in the loop at every step, you can. Use Plan Mode to let Claude dig into the details of what you want to achieve before executing on any code.</p>
+<h3 id="the-explore-plan-code-commit-workflow">The explore → plan → code → commit workflow</h3>
+<p>If you take one thing away from this course, let it be this workflow:<br />
+Explore, Plan, Code, and Commit<br />
+. Without it, most people jump straight to asking Claude to write code — which means more course-correcting later on.</p>
+<h3 id="explore-and-plan">Explore and Plan</h3>
+<p>The fastest way to handle these first two steps is with<br />
+Plan Mode<br />
+. In plan mode, Claude can't edit files — it just reads files to gather information about how it will tackle the implementation.<br />
+To enter plan mode, press<br />
+<code>Shift + Tab</code><br />
+until you see "Plan Mode" under the text input. Then write a prompt like:<br />
+<code>I need to add WebP conversion to our image upload pipeline. Figure out where in the pipeline it should happen, whether we need new dependencies, and how to approach it.</code><br />
+Claude will read relevant files, run some web searches, and give you a plan of action. Review it and decide if it meets your criteria. If not, ask it to revise specific areas.<br />
+This is the best place to course-correct because it's before any code is written. You can also run the explore subagent without being in plan mode if you just want a general summary of your codebase without intending to make changes afterward.</p>
+<h3 id="code">Code</h3>
+<p>Once the plan looks good, select "approve" to accept it and let Claude work through the list items. You can choose whether Claude auto-accepts file edits or asks you each time.<br />
+Claude will do its best to troubleshoot before considering the plan "finished," but at times you'll need to step in. This is the benefit of working with Plan Mode — after execution, you also have the context of how you got to the results, which helps guide Claude's next decisions.<br />
+A few tips to make the coding phase smoother:<br />
+Define a success criteria.<br />
+For Claude to be confident in its results, it needs to be clear on what "correct" looks like. Make this explicit when writing your plan.<br />
+Add tools.<br />
+Tools that help Claude complete its goals remove a lot of back and forth. For example, if you're building web UIs, install the Claude in Chrome extension so Claude Code can control a browser tab and test the UI directly.<br />
+Include a test suite.<br />
+Give Claude a test suite it can continuously validate against. Claude can even write tests for you. Before handing this off, make sure the tests are a reliable source of truth to avoid false positives.<br />
+Quick tip:<br />
+If you find Claude keeps running into the same issues, ask it to save the solution to its CLAUDE.md file.</p>
+<h3 id="commit">Commit</h3>
+<p>Once you've tested the changes yourself and are happy with the results, it's time to push your code. Before you commit, run a<br />
+subagent code reviewer<br />
+to look at your work. A subagent gets a fresh pair of eyes on the codebase — it doesn't carry the bias the main agent might have from the session.<br />
+Then get Claude to generate a commit message in your style. Rinse and repeat.</p>
+<h3 id="recap_3">Recap</h3>
+<p>To be effective with Claude Code, follow the Explore, Plan, Code, and Commit workflow:<br />
+Explore<br />
+gives Claude the relevant context it needs for your project.<br />
+Plan<br />
+creates a plan of action that Claude uses to measure success.<br />
+Code<br />
+is the back and forth between you and Claude before settling on the final outcome.<br />
+Commit<br />
+helps you review and push your code so you can start on your next feature.</p>
+<h2 id="working-effectively">Working Effectively</h2>
+<h3 id="context-management">Context management</h3>
+<p>Context is Claude's working memory. Every file it reads, every command it runs, every message you send — it all takes up space in the context window.</p>
+<h3 id="what-is-the-context-window">What is the Context Window?</h3>
+<p>Think of the context window as the amount of space Claude can hold in its memory. Whenever you enter a prompt, Claude reads a file, runs a tool call, or receives a tool call result, it's all adding to the context window. Since there's a finite amount of space, it becomes important to optimize how you use it.</p>
+<h3 id="what-happens-when-context-fills-up">What Happens When Context Fills Up</h3>
+<p>When you approach the limit, the context window is automatically<br />
+compacted<br />
+. Compaction summarizes important details and removes unnecessary tool call results to free up space. Note that this process can potentially lose details.</p>
+<h3 id="commands">Commands</h3>
+<p>You can run compaction manually with the<br />
+<code>/compact</code><br />
+command. This compacts everything up to that point. It's handy when you want to free up context space while keeping a memory of what you previously worked on.<br />
+If you want to completely start from scratch with no memory of the previous session, run<br />
+<code>/clear</code><br />
+. This removes everything.<br />
+To check the state of your context, run the<br />
+<code>/context</code><br />
+command. You'll get a high-level overview of your context size, the categories taking up the most space, and a visual graphic showing the breakdown.</p>
+<h3 id="when-to-use-which">When to Use Which</h3>
+<p>A general rule of thumb:<br />
+Use<br />
+<code>/compact</code><br />
+when you're working on a specific feature and running up against the context limit but need to continue. Keeping the context relevant to your current feature is important.<br />
+Use<br />
+<code>/clear</code><br />
+when you want to start a new feature. You don't want the previous conversation to introduce bias into something new. For things you want Claude to remember across sessions, put them in your CLAUDE.md file so it doesn't have to rediscover things from scratch.</p>
+<h3 id="tips-for-saving-context-space">Tips for Saving Context Space</h3>
+<p>Be specific.<br />
+A vague prompt might seem smaller, but it actually costs more context in the long run. Without clear instructions, Claude is forced to explore your codebase more and do its own reasoning — which takes up far more context space than a detailed prompt would.<br />
+Manage your MCP servers.<br />
+MCP servers load all of their available tools into context by default, even when you're not using them. If you have servers configured for things unrelated to the current project, consider turning them off. You can also try "Skills," which work similarly to MCP servers but don't load everything into context upfront.<br />
+Use subagents.<br />
+Subagents run in parallel with your main agent but have a completely separate context window. For tasks where you only need the answer — like "where are the authentication endpoints located?" — a subagent does the work and returns just a summary to your main agent, keeping your primary context clean.</p>
+<h3 id="recap_4">Recap</h3>
+<p>Managing context within Claude Code is crucial. Use<br />
+<code>/compact</code><br />
+to summarize long sessions and<br />
+<code>/clear</code><br />
+to start fresh. To use your context window effectively: be specific with your prompts, check what's consuming your current context, and use subagents to delegate tasks where you only need the result.</p>
+<h3 id="code-review">Code review</h3>
+<p>Claude Code has a few built-in features that make your git workflow faster. Let's go through them.</p>
+<h3 id="review-with-a-subagent">Review with a Subagent</h3>
+<p>Before you push a PR, ask Claude to use a<br />
+subagent<br />
+to review your changes. The subagent runs in its own context window with fresh eyes — it doesn't carry the bias of the main agent that just spent the session writing the code.<br />
+When creating a code-reviewer subagent, restrict it to read-only tools. A reviewer should flag issues, not edit files. Check the subagent configuration into your repo so your whole team uses the same reviewer.</p>
+<h3 id="the-commit-push-pr-skill">The /commit-push-pr Skill</h3>
+<p>The<br />
+<code>/commit-push-pr</code><br />
+skill handles the commit, push, and PR creation all in one step. Instead of doing each manually, just run the skill and Claude takes care of it.<br />
+If you have a Slack MCP server configured with channels listed in your CLAUDE.md, it will automatically post the PR link to your team's channel.</p>
+<h3 id="session-linking-with-from-pr">Session Linking with --from-pr</h3>
+<p>When Claude creates a PR through<br />
+<code>gh pr create</code><br />
+, the session gets linked to that PR automatically. If you need to come back to it later — maybe to address review comments or fix a failing build — run:<br />
+<code>claude --from-pr &lt;PR_NUMBER&gt;</code><br />
+This picks up right where you left off.</p>
+<h3 id="recap_5">Recap</h3>
+<p>Use a subagent for an unbiased code review before pushing. Use<br />
+<code>/commit-push-pr</code><br />
+to handle the full commit-to-PR flow in one step. And use<br />
+<code>--from-pr</code><br />
+to resume work on a PR later. These are small features, but they remove a lot of friction from your daily workflow.</p>
+<h3 id="the-claudemd-file">The CLAUDE.md file</h3>
+<p>One of the most useful features in Claude Code is the CLAUDE.md file. It gives Claude Code persistent memory about your project.</p>
+<h3 id="the-problem-it-solves">The Problem It Solves</h3>
+<p>When you open Claude Code without a CLAUDE.md file, it starts fresh every time. It has to re-explore your codebase, figure out what dependencies are needed, and understand what features are already implemented. Sometimes it makes assumptions, which makes it harder to steer Claude in the right direction.<br />
+CLAUDE.md solves this. It's a Markdown file you add to the root of your project, and Claude Code reads it automatically every time you start a session. Think of it as an onboarding script for your codebase. The contents of the CLAUDE.md file are appended to your prompt.</p>
+<h3 id="an-example">An Example</h3>
+<p>Here's what a typical CLAUDE.md file looks like:<br />
+`# Project</p>
+<p>This is a Next.js 15 app using the App Router, Tailwind, and Drizzle ORM.</p>
+<h1 id="commands_1">Commands</h1>
+<ul>
+<li>Dev server: <code>pnpm dev</code></li>
+<li>Run tests: <code>pnpm test</code></li>
+<li>Lint: <code>pnpm lint</code></li>
+</ul>
+<h1 id="code-style">Code Style</h1>
+<ul>
+<li>Use 2-space indentation</li>
+<li>Prefer named exports</li>
+<li>All API routes go in app/api/</li>
+<li>Use server actions instead of API routes where possible`<br />
+It's straightforward. Now if you ask Claude Code to create a React component, it already knows to use Tailwind for styling and to follow your code conventions.</li>
+</ul>
+<h3 id="claudemd-is-for-teams">CLAUDE.md is for Teams</h3>
+<p>You can (and should) commit your CLAUDE.md to version control so your team benefits from it. There's actually a hierarchy of memory files depending on who they're for:<br />
+Project-level CLAUDE.md<br />
+lives in the root directory of your project. Shared with the team.<br />
+User-level CLAUDE.md<br />
+lives in your configuration folder. This one is just for you and applies across all your projects. Put your personal preferences here.</p>
+<h3 id="tips">Tips</h3>
+<p>Save corrections to memory.<br />
+If you find yourself correcting Claude repeatedly — like telling it to always use server actions instead of API routes — explicitly ask Claude to save that rule to memory. Next time you open the project, it'll know.<br />
+Reference project docs.<br />
+If you have documentation in your project that you want Claude to reference, use the<br />
+<code>@</code><br />
+symbol with the file path:<br />
+`## README.md</p>
+<p>Please read if you need more info: @README.md<code>Start without one.
+We recommend starting a project without a CLAUDE.md file so you can see where you constantly have to course-correct the model. This keeps your CLAUDE.md compact and focused on only the necessary information. When you're ready, run</code>/init`<br />
+to have Claude generate one for you.</p>
+<h3 id="recap_6">Recap</h3>
+<p>The difference between a frustrating Claude Code session and a productive one often comes down to context — and the CLAUDE.md file is how you provide that context. Start with your stack, your preferences, and your commands, then build from there as you go.</p>
+<h2 id="advanced-features">Advanced Features</h2>
+<h3 id="subagents">Subagents</h3>
+<p>Claude can delegate tasks to subagents that break them down and run component tasks in parallel, improving your context management. Each subagent operates in its own isolated context window.</p>
+<h3 id="how-it-works">How It Works</h3>
+<p>Managing context in Claude Code is important. A lot of the context window gets consumed by things like tool calls exploring your codebase or running web searches for research. What Claude discovers during that exploration isn't always relevant to the main feature you're developing.<br />
+This is where subagents come in. Claude spawns a subagent to handle a task like "explore this codebase for me." The subagent runs in parallel with its own context window, does all the exploration work, and once finished, summarizes its findings and returns that summary back to Claude.<br />
+The result: you get the answer you were looking for, without the entire journey it took to get there cluttering your main context.</p>
+<h3 id="creating-your-own-subagent">Creating Your Own Subagent</h3>
+<p>Subagents are defined in Markdown files with YAML frontmatter. The easiest way to get started is to let Claude generate one for you. Run:<br />
+<code>/agents</code><br />
+Then select "Create new agent." You'll walk through steps including choosing the scope of the agent, defining its purpose, selecting the tools it has access to, and even picking a color for it.<br />
+Claude will generate a name, description, and prompt for the subagent. This also tells Claude when to call the subagent based on the prompts you give it.</p>
+<h3 id="further-customization">Further Customization</h3>
+<p>Subagents can be customized further. Here are some highlights:<br />
+Persistent memory<br />
+lets your subagent retain memory across conversations. This is great if you're using it consistently on the same projects.<br />
+Preload skills<br />
+into subagents by adding the<br />
+<code>skill</code><br />
+key and listing skills by name. Note that unlike skills in your main conversation, the entire skill is loaded into context here.</p>
+<h3 id="recap_7">Recap</h3>
+<p>Keeping your context window clean is one of the best ways to stay productive with Claude Code. With subagents, you can run an agent in the background to handle the heavy lifting and return just the answer to your main context window.<br />
+Want to go deeper?<br />
+Check out our dedicated course:<br />
+Introduction to subagents</p>
+<h3 id="skills">Skills</h3>
+<p>Want to go deeper?<br />
+Check out our dedicated course:<br />
+Introduction to agent skills</p>
+<h3 id="mcp">MCP</h3>
+<p>MCP = Model Context Protocol, communication layer providing Claude with context and tools without requiring developers to write tedious code.</p>
+<p>Architecture: MCP client connects to MCP server. Server contains tools, resources, and prompts as internal components.</p>
+<p>Problem solved: Eliminates burden of authoring/maintaining numerous tool schemas and functions for service integrations. Example: GitHub chatbot would require implementing tools for repositories, pull requests, issues, projects - significant developer effort.</p>
+<p>Solution: MCP server handles tool definition and execution instead of your application server. MCP servers = interfaces to outside services, wrapping functionality into ready-to-use tools.</p>
+<p>Key benefits: Developers avoid writing tool schemas and function implementations themselves.</p>
+<p>Common questions:<br />
+- Who creates MCP servers? Anyone, often service providers make official implementations (AWS, etc.)<br />
+- vs direct API calls? MCP eliminates need to author tool schemas/functions yourself<br />
+- vs tool use? MCP and tool use are complementary - MCP handles WHO does the work (server vs developer), both still involve tools</p>
+<p>Core value: Shifts integration burden from application developers to MCP server maintainers.</p>
+<h3 id="hooks">Hooks</h3>
+<p>Hooks let you run commands at specific points in Claude Code's lifecycle. The key difference between hooks and everything else covered in this course is that hooks are<br />
+deterministic<br />
+— they always run.</p>
+<h3 id="why-use-hooks">Why Use Hooks</h3>
+<p>You can tell Claude in your CLAUDE.md to run Prettier after every file edit. Most of the time it will. But sometimes it won't. A hook makes it happen every single time, no exceptions.<br />
+Common use cases include:<br />
+- Auto-formatting after file edits<br />
+- Logging all executed commands for compliance<br />
+- Blocking dangerous operations like modifying production files<br />
+- Sending yourself notifications when Claude finishes a task</p>
+<h3 id="how-they-work">How They Work</h3>
+<p>Hooks are configured in your<br />
+<code>settings.json</code><br />
+. You pick an event, optionally set a matcher for which tools it applies to, and provide a command to run. The available events are:<br />
+PreToolUse<br />
+— runs before a tool call<br />
+PostToolUse<br />
+— runs after a tool call completes<br />
+UserPromptSubmit<br />
+— runs when you submit a prompt, before Claude processes it<br />
+Stop<br />
+— runs when Claude finishes responding<br />
+Notification<br />
+— runs when Claude sends a notification<br />
+You configure them through the<br />
+<code>/hooks</code><br />
+command inside Claude Code, or by editing<br />
+<code>settings.json</code><br />
+directly.</p>
+<h3 id="a-practical-example">A Practical Example</h3>
+<p>The most common hook: auto-formatting after edits. Set a<br />
+PostToolUse<br />
+hook with a matcher of<br />
+<code>"Edit|MultiEdit|Write"</code><br />
+so it fires whenever Claude modifies a file. The command checks the file extension and runs the appropriate formatter — Prettier for TypeScript, gofmt for Go, whatever your project uses.</p>
+<h3 id="blocking-with-pretooluse">Blocking with PreToolUse</h3>
+<p>PreToolUse hooks can<br />
+block tool calls<br />
+before they execute. Your hook receives the tool name and input as JSON on stdin. The exit code determines the behavior:<br />
+Exit code 0<br />
+— proceed normally.<br />
+Exit code 2<br />
+— block the action. The stderr message gets fed back to Claude as feedback so it knows why it was blocked and can adjust.<br />
+Any other exit code<br />
+— a non-blocking error that gets shown to you but doesn't stop anything.<br />
+This is how you enforce hard rules. Block writes to a production config directory. Block bash commands that contain<br />
+<code>rm -rf</code><br />
+. Block commits to main. Whatever your team needs to be<br />
+guaranteed<br />
+, not suggested.</p>
+<h3 id="sharing-hooks-with-your-team">Sharing Hooks with Your Team</h3>
+<p>Hooks configured in<br />
+<code>.claude/settings.json</code><br />
+are project-level and can be checked into your repo. This means your entire team gets the same hooks automatically. Use the<br />
+<code>CLAUDE_PROJECT_DIR</code><br />
+environment variable in your commands to reference scripts stored in your project, so they work regardless of Claude's current working directory.</p>
+<h3 id="recap_8">Recap</h3>
+<p>Hooks give you deterministic control over Claude Code's behavior. Use PostToolUse for auto-formatting and logging. Use PreToolUse to block dangerous operations. Configure them with<br />
+<code>/hooks</code><br />
+or in<br />
+<code>settings.json</code><br />
+. And check them into your repo so your team gets them too.<br />
+If something needs to happen every time without fail, don't put it in a prompt. Put it in a hook.</p></div>
+</div>
+
+<div id="tab-quiz" class="tab-content">
+  <div class="md-body"><h1 id="claude-code-101-quiz-guide">Claude Code 101 — Quiz Guide</h1>
+<p><em>All quiz questions with answer choices (correct answer marked with ✓).</em></p>
+<hr />
+<h2 id="advanced-features">Advanced Features</h2>
+<h3 id="course-quiz">Course quiz</h3>
+<p><strong>1. Claude Code works as an AI agent. What is an AI agent?</strong></p>
+<ul>
+<li class="incorrect">A) A chatbot that responds to questions in real time</li>
+<li class="incorrect">B) A code editor with built-in autocomplete features</li>
+<li class="incorrect">C) A cloud service that hosts your development projects</li>
+<li class="correct">D) AI that takes action to complete goals ✓</li>
+</ul>
+<p><strong>2. What happens when Claude Code reaches its context window limit?</strong></p>
+<ul>
+<li class="incorrect">A) It switches to a smaller, faster model to save memory</li>
+<li class="incorrect">B) It removes your oldest files to make room for new ones</li>
+<li class="correct">C) It automatically compacts your conversation to free up space ✓</li>
+<li class="incorrect">D) It stops working and asks you to restart the session</li>
+</ul>
+<p><strong>3. What is the recommended workflow for using Claude Code effectively?</strong></p>
+<ul>
+<li class="incorrect">A) Code → Test → Deploy → Monitor</li>
+<li class="correct">B) Explore → Plan → Code → Commit ✓</li>
+<li class="incorrect">C) Write → Review → Merge → Ship</li>
+<li class="incorrect">D) Prompt → Accept → Push → Repeat</li>
+</ul>
+<p><strong>4. How does Claude Code use the CLAUDE.md file?</strong></p>
+<ul>
+<li class="incorrect">A) It reads it only after you run the /init command</li>
+<li class="incorrect">B) It reads it once when you first create the project</li>
+<li class="correct">C) It reads it automatically at the start of every session ✓</li>
+<li class="incorrect">D) It only reads it when you explicitly ask it to</li>
+</ul>
+<p><strong>5. How satisfied are you with the content provided in this course?</strong></p>
+<ul>
+<li class="incorrect">A) Not at all satisfied</li>
+<li class="incorrect">B) Not very satisfied</li>
+<li class="incorrect">C) Unsure</li>
+<li class="incorrect">D) Satisfied</li>
+</ul>
+<p><strong>6. How likely are you to recommend this course to a friend or coworker?</strong></p>
+<ul>
+<li class="incorrect">A) Very unlikely</li>
+<li class="incorrect">B) Unlikely</li>
+<li class="incorrect">C) Not sure</li>
+<li class="incorrect">D) Likely</li>
+</ul>
+<p><strong>7. Is there any feedback you'd like to provide based upon your experience with this course so far?</strong></p></div>
+</div>
+
+<div id="tab-videos" class="tab-content">
+  
+<div class="video-speed-bar">
+  <span class="speed-label">Speed:</span>
+  <button class="speed-btn" data-speed="0.5">0.5&times;</button>
+  <button class="speed-btn" data-speed="0.75">0.75&times;</button>
+  <button class="speed-btn active" data-speed="1">1&times;</button>
+  <button class="speed-btn" data-speed="1.25">1.25&times;</button>
+  <button class="speed-btn" data-speed="1.5">1.5&times;</button>
+  <button class="speed-btn" data-speed="1.75">1.75&times;</button>
+  <button class="speed-btn" data-speed="2">2&times;</button>
+  <span class="video-total">12 videos</span>
+</div>
+<div class="chapter-section"><div class="chapter-title">Getting Started</div><div class="video-grid"><div class="video-card"><div class="video-title">What is Claude Code?</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/fl1DSmwQKKY?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">How Claude Code works</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/6bs5b4FltCU?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Installing Claude Code</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/0kILa02vKuI?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Your first prompt</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/gbetp6D7J_Q?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">The explore → plan → code → commit workflow</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/xJQuF02NAK8?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div><div class="chapter-section"><div class="chapter-title">Working Effectively</div><div class="video-grid"><div class="video-card"><div class="video-title">Context management</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/eW3oTyfeWZ0?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Code review</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/RKsADl0ZC3Y?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">The CLAUDE.md file</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/O0FGCxkHM-U?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div><div class="chapter-section"><div class="chapter-title">Advanced Features</div><div class="video-grid"><div class="video-card"><div class="video-title">Subagents</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/jKErNxuxPXg?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Skills</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/bjdBVZa66oU?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">MCP</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/kkBFmwkDzdo?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Hooks</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/IkaPHiMDazM?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div>
+<script>
+const jwPlayers = [];
+let currentSpeed = 1.0;
+
+jwPlayers.forEach(p => {
+  p.on('play', function() { try { this.setPlaybackRate(currentSpeed); } catch(e) {} });
+});
+function applySpeed(rate) {
+  currentSpeed = rate;
+  jwPlayers.forEach(p => { try { p.setPlaybackRate(rate); } catch(e) {} });
+}
+document.querySelectorAll('.video-speed-bar .speed-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.video-speed-bar .speed-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    applySpeed(parseFloat(this.dataset.speed));
+  });
+});
+</script>
+</div>
+
+
+
+<script>
+document.getElementById('tabBar').addEventListener('click', function(e) {
+  const btn = e.target.closest('.tab-btn');
+  if (!btn) return;
+  const tab = btn.dataset.tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+});
+</script>
+</body>
+</html>
