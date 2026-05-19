@@ -314,6 +314,60 @@
   .checklist li:last-child { border-bottom: none; }
   .check-icon { font-size: 14px; flex-shrink: 0; margin-top: 2px; }
 
+  /* ── Question cards (sample exam) ── */
+  .question-card {
+    background: var(--bg4); border: 1px solid var(--border);
+    border-radius: 10px; padding: 22px 24px; margin-bottom: 20px;
+  }
+  .question-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap;
+  }
+  .q-num {
+    font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700;
+    color: var(--coral); min-width: 28px;
+  }
+  .q-domain-tag {
+    font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px;
+    background: rgba(194,65,12,0.1); color: var(--coral); letter-spacing: 0.03em;
+  }
+  .q-scenario {
+    font-size: 11px; color: var(--text3); font-style: italic;
+  }
+  .question-text {
+    font-size: 14.5px; color: var(--text); line-height: 1.6; margin-bottom: 16px; font-weight: 500;
+  }
+  .choices { display: flex; flex-direction: column; gap: 8px; margin-bottom: 0; }
+  .choice-btn {
+    display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px;
+    border: 1.5px solid var(--border); border-radius: 8px; background: var(--bg);
+    cursor: pointer; text-align: left; font-size: 13.5px; color: var(--text);
+    font-family: 'Open Sans', sans-serif; line-height: 1.45; transition: border-color 0.15s;
+  }
+  .choice-btn:hover { border-color: var(--ink); background: var(--bg3); }
+  .choice-btn .letter {
+    font-weight: 700; color: var(--text2); flex-shrink: 0; min-width: 18px;
+  }
+  .choice-btn.correct {
+    border-color: #047857; background: rgba(4,120,87,0.08); color: var(--text);
+  }
+  .choice-btn.correct .letter { color: #047857; }
+  .choice-btn.wrong {
+    border-color: #dc2626; background: rgba(220,38,38,0.07); color: #6b7280;
+  }
+  .choice-btn.wrong .letter { color: #dc2626; }
+  .explanation-box {
+    display: none; margin-top: 14px; padding: 12px 16px;
+    background: rgba(194,65,12,0.06); border-left: 3px solid var(--coral);
+    border-radius: 0 6px 6px 0; font-size: 13px; color: var(--text2); line-height: 1.6;
+  }
+  .explanation-box strong { color: var(--coral); }
+  .q-scenario-header {
+    font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600;
+    color: var(--ink); margin: 28px 0 14px; padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+  }
+  .q-scenario-header:first-of-type { margin-top: 0; }
+
   /* ── Responsive ── */
   @media (max-width: 720px) {
     .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
@@ -379,6 +433,7 @@
 
   <div class="nav-group">
     <div class="nav-group-label">Resources</div>
+    <a class="nav-item" onclick="show('sample-questions', this)">🧪 Sample Questions</a>
     <a class="nav-item" onclick="show('courses', this)">📚 Course Library</a>
   </div>
 
@@ -1097,6 +1152,217 @@
   </div>
 </section>
 
+<!-- ─── Sample Questions ─── -->
+<section id="section-sample-questions" class="section">
+  <div class="page-title">Sample Questions</div>
+  <div class="page-subtitle">12 official questions from the CCA-F Exam Guide PDF — click a choice to check your answer.</div>
+
+  <!-- Scenario 1 -->
+  <div class="q-scenario-header">Scenario 1 — Customer Support Resolution Agent</div>
+
+  <div class="question-card" id="q1">
+    <div class="question-header">
+      <span class="q-num">Q1</span>
+      <span class="q-domain-tag">D1 + D2</span>
+      <span class="q-scenario">Task 1.4 + 2.3</span>
+    </div>
+    <div class="question-text">Production data shows 12% of cases skip <code>get_customer</code> and call <code>lookup_order</code> directly, causing misidentified accounts. What is the most effective fix?</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answer(this,'q1','A','A')"><span class="letter">A</span>Programmatic prerequisite blocking <code>lookup_order</code> and <code>process_refund</code> until <code>get_customer</code> returns a verified customer ID</button>
+      <button class="choice-btn" onclick="answer(this,'q1','B','A')"><span class="letter">B</span>Enhance the system prompt to explicitly state that <code>get_customer</code> is mandatory for all interactions</button>
+      <button class="choice-btn" onclick="answer(this,'q1','C','A')"><span class="letter">C</span>Add few-shot examples showing <code>get_customer</code> called first in every scenario</button>
+      <button class="choice-btn" onclick="answer(this,'q1','D','A')"><span class="letter">D</span>Implement a routing classifier that enables only the appropriate tools based on request type</button>
+    </div>
+    <div class="explanation-box" id="q1-exp"><strong>Why A:</strong> Programmatic enforcement provides deterministic guarantees — the tool simply cannot be called out of order. Prompt-based approaches (B, C) are probabilistic and will still fail some percentage of the time. A routing classifier (D) doesn't fix the underlying sequencing problem.</div>
+  </div>
+
+  <div class="question-card" id="q2">
+    <div class="question-header">
+      <span class="q-num">Q2</span>
+      <span class="q-domain-tag">D2</span>
+      <span class="q-scenario">Task 2.1</span>
+    </div>
+    <div class="question-text">An agent calls <code>get_customer</code> for order queries instead of <code>lookup_order</code>. Both tools have minimal descriptions. What is the most important first step?</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answer(this,'q2','A','B')"><span class="letter">A</span>Add few-shot examples (5–8) demonstrating correct tool routing decisions</button>
+      <button class="choice-btn" onclick="answer(this,'q2','B','B')"><span class="letter">B</span>Expand each tool's description with input formats, example queries, edge cases, and clear boundaries</button>
+      <button class="choice-btn" onclick="answer(this,'q2','C','B')"><span class="letter">C</span>Add a routing layer that parses input before each turn to select the correct tool</button>
+      <button class="choice-btn" onclick="answer(this,'q2','D','B')"><span class="letter">D</span>Consolidate both tools into a single <code>lookup_entity</code> tool</button>
+    </div>
+    <div class="explanation-box" id="q2-exp"><strong>Why B:</strong> Tool descriptions are the primary mechanism by which Claude selects tools — fix the root cause first. Few-shot examples (A) add weight but don't address the missing specification. Adding infrastructure (C, D) before clarifying descriptions is premature.</div>
+  </div>
+
+  <div class="question-card" id="q3">
+    <div class="question-header">
+      <span class="q-num">Q3</span>
+      <span class="q-domain-tag">D5</span>
+      <span class="q-scenario">Task 5.2</span>
+    </div>
+    <div class="question-text">The agent achieves 55% first-contact resolution (target: 80%). It escalates simple cases and handles complex ones itself — miscalibrated escalation. What is the best fix?</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answer(this,'q3','A','A')"><span class="letter">A</span>Add explicit escalation criteria with few-shot examples demonstrating correct escalation decisions to the system prompt</button>
+      <button class="choice-btn" onclick="answer(this,'q3','B','A')"><span class="letter">B</span>Implement a self-reported confidence score (1–10) and escalate when below a threshold</button>
+      <button class="choice-btn" onclick="answer(this,'q3','C','A')"><span class="letter">C</span>Train a separate classifier on historical support tickets to predict escalation need</button>
+      <button class="choice-btn" onclick="answer(this,'q3','D','A')"><span class="letter">D</span>Use sentiment analysis to detect customer frustration levels and escalate accordingly</button>
+    </div>
+    <div class="explanation-box" id="q3-exp"><strong>Why A:</strong> Explicit criteria with examples directly addresses the unclear decision boundaries causing miscalibration. Self-reported confidence (B) is known to be poorly calibrated in LLMs. A separate classifier (C) adds complexity and latency. Sentiment (D) is a proxy signal, not the root cause.</div>
+  </div>
+
+  <!-- Scenario 2 -->
+  <div class="q-scenario-header">Scenario 2 — Code Generation with Claude Code</div>
+
+  <div class="question-card" id="q4">
+    <div class="question-header">
+      <span class="q-num">Q4</span>
+      <span class="q-domain-tag">D3</span>
+      <span class="q-scenario">Task 3.2</span>
+    </div>
+    <div class="question-text">You want to create a <code>/review</code> slash command that is automatically available to every developer when they clone the repository. Where should you put it?</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answer(this,'q4','A','A')"><span class="letter">A</span>The <code>.claude/commands/</code> directory in the project repository</button>
+      <button class="choice-btn" onclick="answer(this,'q4','B','A')"><span class="letter">B</span><code>~/.claude/commands/</code> in each developer's home directory</button>
+      <button class="choice-btn" onclick="answer(this,'q4','C','A')"><span class="letter">C</span>The <code>CLAUDE.md</code> file at the project root</button>
+      <button class="choice-btn" onclick="answer(this,'q4','D','A')"><span class="letter">D</span>A <code>.claude/config.json</code> file with a commands array</button>
+    </div>
+    <div class="explanation-box" id="q4-exp"><strong>Why A:</strong> Project-scoped commands in <code>.claude/commands/</code> are version-controlled and automatically available to every developer who clones the repo. User-scoped commands (B) require each dev to set them up individually. <code>CLAUDE.md</code> (C) is for context/instructions, not slash commands. Config JSON (D) is not how commands are defined.</div>
+  </div>
+
+  <div class="question-card" id="q5">
+    <div class="question-header">
+      <span class="q-num">Q5</span>
+      <span class="q-domain-tag">D3</span>
+      <span class="q-scenario">Task 3.4</span>
+    </div>
+    <div class="question-text">You are restructuring a monolithic application into microservices — dozens of files need changes and major architectural decisions must be made. What is the best approach?</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answer(this,'q5','A','A')"><span class="letter">A</span>Enter plan mode to explore the codebase and design a full approach before making any changes</button>
+      <button class="choice-btn" onclick="answer(this,'q5','B','A')"><span class="letter">B</span>Use direct execution mode, making changes incrementally and evaluating as you go</button>
+      <button class="choice-btn" onclick="answer(this,'q5','C','A')"><span class="letter">C</span>Use direct execution mode with comprehensive upfront instructions in a single prompt</button>
+      <button class="choice-btn" onclick="answer(this,'q5','D','A')"><span class="letter">D</span>Start in direct execution mode and switch to plan mode only if unexpected complexity arises</button>
+    </div>
+    <div class="explanation-box" id="q5-exp"><strong>Why A:</strong> Plan mode is designed for complex, multi-file tasks with significant architectural decisions — it lets you review and approve the approach before any changes are made. Incremental direct execution (B, D) risks compounding mistakes across dozens of files. A single large prompt (C) lacks the review step.</div>
+  </div>
+
+  <div class="question-card" id="q6">
+    <div class="question-header">
+      <span class="q-num">Q6</span>
+      <span class="q-domain-tag">D3</span>
+      <span class="q-scenario">Task 3.3</span>
+    </div>
+    <div class="question-text">Your codebase has different conventions for React components, API handlers, database models, and test files — spread throughout the project. How should you configure Claude Code to automatically apply the correct conventions for each file type?</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answer(this,'q6','A','A')"><span class="letter">A</span>Use rule files in <code>.claude/rules/</code> with YAML frontmatter glob patterns (e.g., <code>**/*.test.tsx</code>)</button>
+      <button class="choice-btn" onclick="answer(this,'q6','B','A')"><span class="letter">B</span>Consolidate all conventions in a single root <code>CLAUDE.md</code> file</button>
+      <button class="choice-btn" onclick="answer(this,'q6','C','A')"><span class="letter">C</span>Create skills in <code>.claude/skills/</code> with conventions described in each <code>SKILL.md</code></button>
+      <button class="choice-btn" onclick="answer(this,'q6','D','A')"><span class="letter">D</span>Create a separate <code>CLAUDE.md</code> in each subdirectory with relevant conventions</button>
+    </div>
+    <div class="explanation-box" id="q6-exp"><strong>Why A:</strong> <code>.claude/rules/</code> with glob frontmatter (e.g., <code>globs: ["**/*.test.tsx"]</code>) applies conventions based on file path patterns, regardless of which directory Claude is currently in. A single CLAUDE.md (B) applies globally and can't be file-type specific. Subdirectory CLAUDE.md files (D) miss files in other directories.</div>
+  </div>
+
+  <!-- Scenario 3 -->
+  <div class="q-scenario-header">Scenario 3 — Multi-Agent Research System</div>
+
+  <div class="question-card" id="q7">
+    <div class="question-header">
+      <span class="q-num">Q7</span>
+      <span class="q-domain-tag">D1</span>
+      <span class="q-scenario">Task 1.2 + 1.6</span>
+    </div>
+    <div class="question-text">A multi-agent research system covering "creative industries" produces results focused only on visual arts, despite all subagents functioning correctly. Logs show the coordinator decomposed the topic into only visual art subtasks. What is the root cause?</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answer(this,'q7','A','B')"><span class="letter">A</span>The synthesis agent lacks instructions to identify gaps in research coverage</button>
+      <button class="choice-btn" onclick="answer(this,'q7','B','B')"><span class="letter">B</span>The coordinator's task decomposition was too narrow — it failed to cover the full domain</button>
+      <button class="choice-btn" onclick="answer(this,'q7','C','B')"><span class="letter">C</span>The web search queries were not comprehensive enough to find non-visual sources</button>
+      <button class="choice-btn" onclick="answer(this,'q7','D','B')"><span class="letter">D</span>The document analysis agent was filtering out non-visual industry sources</button>
+    </div>
+    <div class="explanation-box" id="q7-exp"><strong>Why B:</strong> The logs explicitly show the coordinator only decomposed into visual arts subtasks — the subagents worked correctly but were given the wrong assignments. The synthesis agent (A) can only synthesize what it received. Search (C) and document agents (D) can only process what they are asked to find.</div>
+  </div>
+
+  <div class="question-card" id="q8">
+    <div class="question-header">
+      <span class="q-num">Q8</span>
+      <span class="q-domain-tag">D5</span>
+      <span class="q-scenario">Task 5.3</span>
+    </div>
+    <div class="question-text">A web search subagent times out. How should you design error propagation so the coordinator can make intelligent recovery decisions?</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answer(this,'q8','A','A')"><span class="letter">A</span>Return structured error context: failure type, attempted query, any partial results, and suggested alternatives</button>
+      <button class="choice-btn" onclick="answer(this,'q8','B','A')"><span class="letter">B</span>Retry with exponential backoff; return a generic "search unavailable" message after exhaustion</button>
+      <button class="choice-btn" onclick="answer(this,'q8','C','A')"><span class="letter">C</span>Catch the timeout in the subagent and return an empty result marked as successful</button>
+      <button class="choice-btn" onclick="answer(this,'q8','D','A')"><span class="letter">D</span>Propagate the exception to a top-level handler that terminates the entire workflow</button>
+    </div>
+    <div class="explanation-box" id="q8-exp"><strong>Why A:</strong> Structured error context enables the coordinator to make intelligent recovery decisions — it can retry with a different query, use an alternative source, or adjust the research scope. Generic errors (B) leave the coordinator blind. Hiding errors as success (C) corrupts results silently. Full termination (D) is disproportionate for one timeout.</div>
+  </div>
+
+  <div class="question-card" id="q9">
+    <div class="question-header">
+      <span class="q-num">Q9</span>
+      <span class="q-domain-tag">D2</span>
+      <span class="q-scenario">Task 2.3</span>
+    </div>
+    <div class="question-text">A synthesis agent requires 2–3 verification round-trips per task (+40% latency). Analysis shows 85% are simple fact-checks; 15% require deep investigation. What is the best way to reduce this overhead?</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answer(this,'q9','A','A')"><span class="letter">A</span>Give the synthesis agent a scoped <code>verify_fact</code> tool for simple lookups; route complex cases back to the coordinator</button>
+      <button class="choice-btn" onclick="answer(this,'q9','B','A')"><span class="letter">B</span>Accumulate all verification requests and return them to the coordinator in a single batch at the end of each pass</button>
+      <button class="choice-btn" onclick="answer(this,'q9','C','A')"><span class="letter">C</span>Give the synthesis agent full access to all web search tools</button>
+      <button class="choice-btn" onclick="answer(this,'q9','D','A')"><span class="letter">D</span>Instruct the web search agent to proactively cache extra context that the synthesis agent might need</button>
+    </div>
+    <div class="explanation-box" id="q9-exp"><strong>Why A:</strong> Least-privilege design — give the synthesis agent only the tool it needs for the 85% common case, keeping it efficient and focused. Full web search access (C) is over-provisioned and expands the attack surface. Batching (B) delays the entire pass. Proactive caching (D) is unpredictable and may miss what's actually needed.</div>
+  </div>
+
+  <!-- Scenario 5 -->
+  <div class="q-scenario-header">Scenario 5 — Claude Code for Continuous Integration</div>
+
+  <div class="question-card" id="q10">
+    <div class="question-header">
+      <span class="q-num">Q10</span>
+      <span class="q-domain-tag">D3</span>
+      <span class="q-scenario">Task 3.6</span>
+    </div>
+    <div class="question-text">A CI pipeline running <code>claude "Analyze this pull request"</code> hangs indefinitely waiting for interactive input. What is the correct fix?</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answer(this,'q10','A','A')"><span class="letter">A</span>Add the <code>-p</code> flag: <code>claude -p "Analyze this pull request"</code></button>
+      <button class="choice-btn" onclick="answer(this,'q10','B','A')"><span class="letter">B</span>Set the environment variable <code>CLAUDE_HEADLESS=true</code></button>
+      <button class="choice-btn" onclick="answer(this,'q10','C','A')"><span class="letter">C</span>Redirect stdin from <code>/dev/null</code></button>
+      <button class="choice-btn" onclick="answer(this,'q10','D','A')"><span class="letter">D</span>Add the <code>--batch</code> flag</button>
+    </div>
+    <div class="explanation-box" id="q10-exp"><strong>Why A:</strong> <code>-p</code> / <code>--print</code> is the documented non-interactive (print mode) flag for Claude Code — it runs the prompt and exits without waiting for further input. <code>CLAUDE_HEADLESS</code> (B) is not a real environment variable. Redirecting stdin (C) would cause an error, not clean non-interactive behavior. <code>--batch</code> (D) does not exist.</div>
+  </div>
+
+  <div class="question-card" id="q11">
+    <div class="question-header">
+      <span class="q-num">Q11</span>
+      <span class="q-domain-tag">D4</span>
+      <span class="q-scenario">Task 4.5</span>
+    </div>
+    <div class="question-text">Your team runs two workflows: (1) a blocking pre-merge check that must complete within seconds, and (2) an overnight technical debt report that runs at 2 AM. A manager proposes switching both to the Message Batches API for 50% cost savings. How should you evaluate this?</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answer(this,'q11','A','A')"><span class="letter">A</span>Use batch processing for the technical debt reports only; keep real-time API for pre-merge checks</button>
+      <button class="choice-btn" onclick="answer(this,'q11','B','A')"><span class="letter">B</span>Switch both workflows to batch processing with a polling mechanism for status updates</button>
+      <button class="choice-btn" onclick="answer(this,'q11','C','A')"><span class="letter">C</span>Keep both workflows on the real-time API to preserve reliability</button>
+      <button class="choice-btn" onclick="answer(this,'q11','D','A')"><span class="letter">D</span>Switch both to batch with a real-time API fallback for time-sensitive requests</button>
+    </div>
+    <div class="explanation-box" id="q11-exp"><strong>Why A:</strong> The Message Batches API has a processing window of up to 24 hours — it is fundamentally unsuitable for blocking pre-merge checks that must complete in seconds. The overnight report has no latency requirement, making it a perfect fit for batch to capture the 50% savings. Switching both (B, D) risks blocking the CI pipeline indefinitely.</div>
+  </div>
+
+  <div class="question-card" id="q12">
+    <div class="question-header">
+      <span class="q-num">Q12</span>
+      <span class="q-domain-tag">D4</span>
+      <span class="q-scenario">Task 4.6</span>
+    </div>
+    <div class="question-text">A single-pass review of a 14-file PR produces inconsistent results: superficial comments on some files, missed bugs in others, and contradictory feedback across files. How should you restructure the review process?</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answer(this,'q12','A','A')"><span class="letter">A</span>Split into focused passes: per-file local analysis first, then a separate cross-file integration pass</button>
+      <button class="choice-btn" onclick="answer(this,'q12','B','A')"><span class="letter">B</span>Require developers to split large PRs into smaller ones of 3–4 files maximum</button>
+      <button class="choice-btn" onclick="answer(this,'q12','C','A')"><span class="letter">C</span>Use a higher-tier model with a larger context window to process all files at once</button>
+      <button class="choice-btn" onclick="answer(this,'q12','D','A')"><span class="letter">D</span>Run 3 independent review passes and only flag issues that appear in 2 or more runs</button>
+    </div>
+    <div class="explanation-box" id="q12-exp"><strong>Why A:</strong> Splitting directly addresses attention dilution — per-file passes ensure consistent depth for each file, and a separate integration pass catches cross-file issues. Requiring small PRs (B) is a process constraint, not a technical solution. A larger context window (C) doesn't fix attention dilution. Three passes (D) adds cost and latency without improving per-file depth.</div>
+  </div>
+
+</section>
+
 <!-- ─── Courses ─── -->
 <section id="section-courses" class="section">
   <div class="page-title">Course Library</div>
@@ -1247,6 +1513,23 @@ function show(id, el) {
   if (section) section.classList.add('active');
   if (el) el.classList.add('active');
   window.scrollTo(0, 0);
+}
+
+function answer(btn, cardId, chosen, correct) {
+  var card = document.getElementById(cardId);
+  var buttons = card.querySelectorAll('.choice-btn');
+  buttons.forEach(function(b) { b.disabled = true; });
+  if (chosen === correct) {
+    btn.classList.add('correct');
+  } else {
+    btn.classList.add('wrong');
+    buttons.forEach(function(b) {
+      var letter = b.querySelector('.letter').textContent.trim();
+      if (letter === correct) b.classList.add('correct');
+    });
+  }
+  var exp = document.getElementById(cardId + '-exp');
+  if (exp) exp.style.display = 'block';
 }
 
 // Support direct URL hashes e.g. index.html#d1
