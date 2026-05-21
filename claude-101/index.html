@@ -267,6 +267,77 @@
     padding: 24px 32px 80px 32px;
   }
 
+
+  /* ── Interactive Quiz ── */
+  .quiz-global-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0 18px; border-bottom: 1px solid var(--border); margin-bottom: 28px;
+  }
+  .quiz-bar-label { font-size: 13px; color: var(--text3); margin-right: auto; }
+  .quiz-show-btn, .quiz-reset-all-btn {
+    padding: 6px 14px; border-radius: 7px; font-size: 13px;
+    font-weight: 600; cursor: pointer; border: 1.5px solid var(--border);
+    background: var(--bg3); color: var(--text2); transition: all 0.15s;
+  }
+  .quiz-show-btn:hover, .quiz-reset-all-btn:hover {
+    border-color: var(--accent); color: var(--accent); background: rgba(194,65,12,0.06);
+  }
+  .quiz-show-btn:disabled { opacity: 0.45; cursor: default; }
+  .qs-block { margin-bottom: 44px; }
+  .qs-block-head { margin-bottom: 14px; }
+  .qs-block-head h3 { margin: 0; }
+  .qs-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 18px; margin-bottom: 10px;
+  }
+  .qs-q-text { font-size: 14px; color: var(--ink); margin-bottom: 10px; }
+  .qs-q-text strong { font-weight: 600; }
+  .qs-choices { display: flex; flex-direction: column; gap: 7px; }
+  .qs-choice {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: var(--bg4); border: 1.5px solid var(--border);
+    border-radius: 7px; padding: 9px 13px;
+    text-align: left; cursor: pointer; color: var(--text);
+    font-size: 13.5px; line-height: 1.5; width: 100%;
+    transition: border-color 0.12s, background 0.12s;
+  }
+  .qs-choice:hover:not(:disabled) { border-color: var(--accent); background: rgba(194,65,12,0.04); }
+  .qs-choice.selected  { border-color: var(--accent2); background: rgba(194,65,12,0.09); }
+  .qs-choice.correct   { border-color: #047857; background: #d1fae5; color: #065f46; cursor: default; }
+  .qs-choice.wrong     { border-color: #dc2626; background: #fee2e2; color: #991b1b; cursor: default; }
+  .qs-choice.show-ans  { border-color: #059669; background: rgba(5,150,105,0.1); color: #065f46; }
+  .qs-choice:disabled  { cursor: default; }
+  .qs-letter {
+    font-weight: 700; font-size: 12px; color: var(--text3);
+    min-width: 16px; padding-top: 1px; flex-shrink: 0;
+  }
+  .qs-choice.selected .qs-letter  { color: var(--accent); }
+  .qs-choice.correct .qs-letter   { color: #047857; }
+  .qs-choice.wrong .qs-letter     { color: #dc2626; }
+  .qs-choice.show-ans .qs-letter  { color: #059669; }
+  .qs-opt-text { flex: 1; }
+  .qs-actions { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+  .qs-submit {
+    padding: 8px 22px; border-radius: 7px; font-size: 13.5px;
+    font-weight: 600; cursor: pointer; border: none;
+    background: var(--accent); color: #fff; transition: background 0.15s;
+  }
+  .qs-submit:hover { background: var(--accent2); }
+  .qs-retry {
+    padding: 7px 16px; border-radius: 7px; font-size: 13.5px; font-weight: 500;
+    cursor: pointer; background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text2); transition: all 0.15s;
+  }
+  .qs-retry:hover { background: var(--bg2); border-color: var(--text3); }
+  .qs-score-pill {
+    font-size: 13.5px; font-weight: 700; padding: 5px 14px;
+    border-radius: 20px; background: var(--bg3); color: var(--text2);
+  }
+  .qs-score-pill.perfect     { background: #d1fae5; color: #047857; }
+  .qs-score-pill.good        { background: #fef3c7; color: #92400e; }
+  .qs-score-pill.needs-work  { background: #fee2e2; color: #b91c1c; }
+  .hidden { display: none !important; }
+
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -1554,6 +1625,182 @@ document.getElementById('tabBar').addEventListener('click', function(e) {
   sections.forEach(function(sec) { obs.observe(sec); });
 })();
 </script>
+<script>
+/* ── Interactive quiz transformation ── */
+(function() {
+  var mdBody = document.querySelector('#tab-quiz .md-body');
+  if (!mdBody || mdBody.dataset.qi) return;
+  mdBody.dataset.qi = '1';
+
+  /* ---------- parse DOM into item list ---------- */
+  var items = [];
+  var els = Array.from(mdBody.children);
+  var i = 0;
+  while (i < els.length) {
+    var el = els[i], tag = el.tagName;
+    if (tag === 'H1') {
+      items.push({t:'h1', html: el.outerHTML});
+    } else if (tag === 'HR') {
+      items.push({t:'hr', html: el.outerHTML});
+    } else if (tag === 'H2') {
+      items.push({t:'h2', id: el.id, html: el.outerHTML});
+    } else if (tag === 'H3') {
+      items.push({t:'h3', id: el.id, html: el.outerHTML});
+    } else if (tag === 'P') {
+      var st = el.querySelector('strong');
+      var nextEl = els[i + 1];
+      if (st && /^\d+\./.test(st.textContent.trim()) && nextEl && nextEl.tagName === 'UL') {
+        var lis = Array.from(nextEl.querySelectorAll('li'));
+        var opts = [], correctLetter = '';
+        lis.forEach(function(li) {
+          var raw = li.textContent.replace(/✓\s*$/, '').trim();
+          var letter = raw.charAt(0);
+          var optHtml = li.innerHTML.replace(/^[A-Z]\)\s*/, '').replace(/\s*✓\s*$/, '').trim();
+          var isCorrect = li.classList.contains('correct');
+          if (isCorrect) correctLetter = letter;
+          opts.push({letter: letter, html: optHtml});
+        });
+        items.push({t:'q', qHtml: el.innerHTML, opts: opts, correct: correctLetter});
+        i += 2; continue;
+      } else {
+        items.push({t:'p', html: el.outerHTML});
+      }
+    } else {
+      items.push({t:'other', html: el.outerHTML});
+    }
+    i++;
+  }
+
+  /* ---------- render interactive HTML ---------- */
+  var html = '';
+  var secIdx = 0, qIdx = 0, inSec = false;
+
+  html += '<div class="quiz-global-bar">' +
+    '<span class="quiz-bar-label">Select an answer per question, then submit each section.</span>' +
+    '<button class="quiz-show-btn" onclick="qzRevealAll(this)">Show All Answers</button>' +
+    '<button class="quiz-reset-all-btn" onclick="qzResetAll()">Reset All</button>' +
+    '</div>';
+
+  function closeSec() {
+    if (!inSec) return;
+    html += '<div class="qs-actions">' +
+      '<button class="qs-submit" onclick="qzSubmit(this)">Submit</button>' +
+      '<button class="qs-retry hidden" onclick="qzRetry(this)">Try Again</button>' +
+      '<span class="qs-score-pill hidden"></span>' +
+      '</div></div>';
+    secIdx++; qIdx = 0; inSec = false;
+  }
+
+  items.forEach(function(item) {
+    if (item.t === 'h1' || item.t === 'hr' || item.t === 'p' || item.t === 'other') {
+      if (!inSec) html += item.html;
+    } else if (item.t === 'h2') {
+      closeSec();
+      html += item.html;
+    } else if (item.t === 'h3') {
+      closeSec();
+      html += '<div class="qs-block" data-sec="' + secIdx + '">';
+      html += '<div class="qs-block-head">' + item.html + '</div>';
+      inSec = true;
+    } else if (item.t === 'q' && inSec) {
+      var qid = 'qc' + secIdx + '_' + qIdx;
+      html += '<div class="qs-card" id="' + qid + '" data-correct="' + item.correct + '">';
+      html += '<p class="qs-q-text">' + item.qHtml + '</p><div class="qs-choices">';
+      item.opts.forEach(function(o) {
+        html += '<button class="qs-choice" data-letter="' + o.letter +
+          '" onclick="qzChoose(this)"><span class="qs-letter">' + o.letter +
+          '</span><span class="qs-opt-text">' + o.html + '</span></button>';
+      });
+      html += '</div></div>';
+      qIdx++;
+    }
+  });
+  closeSec();
+  mdBody.innerHTML = html;
+
+  /* ---------- interaction functions ---------- */
+  window.qzChoose = function(btn) {
+    var card = btn.closest('.qs-card');
+    if (card.classList.contains('done')) return;
+    card.querySelectorAll('.qs-choice').forEach(function(b) { b.classList.remove('selected'); });
+    btn.classList.add('selected');
+  };
+
+  window.qzSubmit = function(btn) {
+    var block = btn.closest('.qs-block');
+    var cards = block.querySelectorAll('.qs-card');
+    var correct = 0, scored = 0;
+    cards.forEach(function(card) {
+      card.classList.add('done');
+      var cl = card.dataset.correct;
+      card.querySelectorAll('.qs-choice').forEach(function(b) { b.disabled = true; });
+      if (!cl) return;
+      scored++;
+      var sel = card.querySelector('.qs-choice.selected');
+      if (sel && sel.dataset.letter === cl) {
+        sel.classList.add('correct'); correct++;
+      } else {
+        if (sel) sel.classList.add('wrong');
+        card.querySelectorAll('.qs-choice').forEach(function(b) {
+          if (b.dataset.letter === cl) b.classList.add('show-ans');
+        });
+      }
+    });
+    if (scored > 0) {
+      var pill = block.querySelector('.qs-score-pill');
+      pill.textContent = correct + ' / ' + scored;
+      var cls = correct === scored ? 'perfect' : correct / scored >= 0.5 ? 'good' : 'needs-work';
+      pill.className = 'qs-score-pill ' + cls;
+    }
+    btn.classList.add('hidden');
+    block.querySelector('.qs-retry').classList.remove('hidden');
+  };
+
+  window.qzRetry = function(btn) {
+    var block = btn.closest('.qs-block');
+    block.querySelectorAll('.qs-card').forEach(function(card) {
+      card.classList.remove('done');
+      card.querySelectorAll('.qs-choice').forEach(function(b) {
+        b.className = 'qs-choice'; b.disabled = false;
+      });
+    });
+    var pill = block.querySelector('.qs-score-pill');
+    pill.className = 'qs-score-pill hidden';
+    btn.classList.add('hidden');
+    block.querySelector('.qs-submit').classList.remove('hidden');
+  };
+
+  window.qzRevealAll = function(btn) {
+    document.querySelectorAll('#tab-quiz .qs-card:not(.done)').forEach(function(card) {
+      var cl = card.dataset.correct; if (!cl) return;
+      card.querySelectorAll('.qs-choice').forEach(function(b) {
+        if (b.dataset.letter === cl) b.classList.add('show-ans');
+      });
+    });
+    btn.textContent = 'Answers Shown'; btn.disabled = true;
+  };
+
+  window.qzResetAll = function() {
+    document.querySelectorAll('#tab-quiz .qs-block').forEach(function(block) {
+      block.querySelectorAll('.qs-card').forEach(function(card) {
+        card.classList.remove('done');
+        card.querySelectorAll('.qs-choice').forEach(function(b) {
+          b.className = 'qs-choice'; b.disabled = false;
+        });
+      });
+      var pill = block.querySelector('.qs-score-pill');
+      if (pill) pill.className = 'qs-score-pill hidden';
+      var sub = block.querySelector('.qs-submit');
+      if (sub) sub.classList.remove('hidden');
+      var ret = block.querySelector('.qs-retry');
+      if (ret) ret.classList.add('hidden');
+    });
+    var showBtn = document.querySelector('#tab-quiz .quiz-show-btn');
+    if (showBtn) { showBtn.textContent = 'Show All Answers'; showBtn.disabled = false; }
+  };
+})();
+</script>
+
 <script>
 (function() {
   var toc = document.getElementById('quiz-toc');
