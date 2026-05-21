@@ -267,6 +267,11 @@
     padding: 24px 32px 80px 32px;
   }
 
+
+  /* Study guide embedded video */
+  .study-video-wrap { width: 100%; margin: 4px 0 20px; aspect-ratio: 16/9; background: #000; }
+  .study-video-wrap > div { width: 100%; height: 100%; }
+
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -367,8 +372,7 @@ Stop_reason = why model stopped generating</p>
 - chat(messages) = sends message history to API and returns response</p>
 <p>Without message history = responses lack context and continuity. With complete history = Claude maintains conversation context and provides relevant follow-ups.</p>
 <h3 id="chat-bot-exercise">Chat bot exercise</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-0"></div></div>
 <h3 id="system-prompts">System prompts</h3>
 <p>System Prompts = technique to customize Claude's response style and tone by assigning it a specific role or behavior pattern.</p>
 <p>Implementation = pass system prompt as plain string to create function using system keyword argument.</p>
@@ -378,8 +382,7 @@ Uh oh! Something went wrong, please try again.</p>
 <p>Technical implementation = create params dictionary, conditionally add system key if prompt provided, pass params to create function with ** unpacking. Handle None case by excluding system parameter entirely.</p>
 <p>Use case example = Math tutor that gives guidance/hints rather than complete solutions, encouraging student thinking over direct answers.</p>
 <h3 id="system-prompt-exercise">System prompt exercise</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-1"></div></div>
 <h3 id="temperature">Temperature</h3>
 <p>Temperature = parameter (0-1) that controls randomness in Claude's text generation by influencing token selection probabilities.</p>
 <p>Text generation process: Input text → tokenization → probability assignment to possible next tokens → token selection based on probabilities → repeat.</p>
@@ -521,8 +524,7 @@ Final message: stream.get_final_message() assembles all chunks for storage</p>
 - Enables measurement of both correctness and technical validity</p>
 <p>Key Limitation = requires known expected format for proper validator selection</p>
 <h3 id="exercise-on-prompt-evals">Exercise on prompt evals</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-2"></div></div>
 <h2 id="prompt-engineering">Prompt Engineering</h2>
 <h3 id="prompt-engineering_1">Prompt engineering</h3>
 <p>Prompt Engineering = improving prompts to get more reliable, higher-quality outputs from language models.</p>
@@ -582,8 +584,7 @@ Type B (Steps) = provide specific steps for model to follow in reasoning process
 - Place examples after main instructions/guidelines</p>
 <p>Effectiveness boost: Combine examples with explanations of what makes them ideal to reinforce desired output characteristics.</p>
 <h3 id="exercise-on-prompting">Exercise on prompting</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-3"></div></div>
 <h2 id="tool-use">Tool Use</h2>
 <h3 id="introducing-tool-use">Introducing tool use</h3>
 <p>Tool use = method for Claude to access external information beyond training data.</p>
@@ -617,11 +618,9 @@ def get_current_datetime(date_format="%Y%m%d %H:%M:%S"):<br />
 <p>Tool function workflow: Claude identifies need for information → calls tool function → receives result or error → may retry with corrections if error occurred.</p>
 <p>Purpose: Extend Claude's capabilities beyond its training data by providing access to real-time information like current datetime, weather, etc.</p>
 <h3 id="json-schema-for-tools">JSON Schema for tools</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-4"></div></div>
 <h3 id="handling-tool-use-responses">Handling tool use responses</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-5"></div></div>
 <h3 id="running-tool-functions">Running tool functions</h3>
 <p>Tool Functions = Python functions executed automatically when Claude needs extra information to help users.</p>
 <p>Key characteristics:<br />
@@ -674,11 +673,9 @@ def get_current_datetime(date_format="%Y%m%d %H:%M:%S"):<br />
 - chat(messages) = sends message history to API and returns response</p>
 <p>Without message history = responses lack context and continuity. With complete history = Claude maintains conversation context and provides relevant follow-ups.</p>
 <h3 id="adding-multiple-tools">Adding multiple tools</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-6"></div></div>
 <h3 id="batch-tool-use">Batch tool use</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-7"></div></div>
 <h3 id="structured-data-with-tools">Structured data with tools</h3>
 <p>Structured Data Generation = technique using assistant message prefilling + stop sequences to get raw output without Claude's natural explanatory headers/footers.</p>
 <p>Problem = Claude automatically adds markdown formatting, headers, commentary when generating JSON/code/structured content. Users often want just the raw data for copy/paste functionality.</p>
@@ -691,11 +688,9 @@ Uh oh! Something went wrong, please try again.</p>
 <p>Application = Works for any structured data type (JSON, Python code, lists, etc.), not just JSON. Use whenever you need clean, parseable output without explanatory text.</p>
 <p>Key benefit = Output can be directly used/copied without manual selection or parsing of unwanted text.</p>
 <h3 id="flexible-tool-extraction">Flexible tool extraction</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-8"></div></div>
 <h3 id="the-text-editor-tool">The text editor tool</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-9"></div></div>
 <h2 id="rag-and-agentic-search">RAG and Agentic Search</h2>
 <h3 id="introducing-retrieval-augmented-generation">Introducing Retrieval Augmented Generation</h3>
 <p>RAG = Retrieval Augmented Generation technique for querying large documents using language models.</p>
@@ -790,8 +785,7 @@ Step 7: Prompt Assembly = Combine user question with retrieved relevant text chu
 <p>Implementation = Both semantic and lexical search systems use similar APIs (add_document, search functions) making them easy to combine.</p>
 <p>Next step = Merge results from both search systems to get benefits of semantic understanding plus exact term matching.</p>
 <h3 id="a-multi-search-rag-pipeline">A multi-search RAG pipeline</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-10"></div></div>
 <h3 id="reranking-results">Reranking results</h3>
 <p>Reranking = post-processing step that uses LLM to reorder search results by relevance after initial retrieval.</p>
 <p>Process: Run vector + BM25 search → merge results → pass to LLM with prompt asking to rank documents by relevance → get reordered results.</p>
@@ -1022,12 +1016,10 @@ Get prompt = await self.session.get_prompt(prompt_name, arguments), return resul
 5. Returns messages array for direct feeding to LLM</p>
 <p>Key concept: Prompts are server-defined templates that clients can invoke with specific arguments to generate contextualized instructions for LLMs. Arguments flow from client call → prompt function → interpolated prompt text → LLM consumption.</p>
 <h3 id="mcp-review">MCP review</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-11"></div></div>
 <h2 id="anthropic-apps-and-agents">Anthropic Apps and Agents</h2>
 <h3 id="agents-overview">Agents overview</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-12"></div></div>
 <h3 id="claude-code-setup">Claude Code setup</h3>
 <p>Claude Code = terminal-based coding assistant program that helps with code-related tasks</p>
 <p>Core capabilities = search/read/edit files + advanced tools (web fetching, terminal access) + MCP client support for expanded functionality via MCP servers</p>
@@ -1141,8 +1133,7 @@ Uh oh! Something went wrong, please try again.</p>
 <p>Setup requirement = Reference implementation available for local testing</p>
 <p>Example workflow: User describes testing requirements → Claude navigates to application → Executes test cases → Reports pass/fail results with detailed findings</p>
 <h3 id="qualities-of-agents">Qualities of agents</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-13"></div></div>
 <h3 id="course-wrap-up">Course wrap up</h3>
 <p><em>Video lesson — no text notes.</em></p></div>
     </div>
@@ -1499,9 +1490,9 @@ Uh oh! Something went wrong, please try again.</p>
   <span class="speed-label">Speed:</span>
   <button class="speed-btn" data-speed="0.5">0.5&times;</button>
   <button class="speed-btn" data-speed="0.75">0.75&times;</button>
-  <button class="speed-btn active" data-speed="1">1&times;</button>
+  <button class="speed-btn" data-speed="1">1&times;</button>
   <button class="speed-btn" data-speed="1.25">1.25&times;</button>
-  <button class="speed-btn" data-speed="1.5">1.5&times;</button>
+  <button class="speed-btn active" data-speed="1.5">1.5&times;</button>
   <button class="speed-btn" data-speed="1.75">1.75&times;</button>
   <button class="speed-btn" data-speed="2">2&times;</button>
   <span class="video-total">71 videos</span>
@@ -1514,7 +1505,7 @@ Uh oh! Something went wrong, please try again.</p>
 </div>
 <script>
 const jwPlayers = [];
-let currentSpeed = 1.0;
+let currentSpeed = 1.5;
   jwPlayers.push(jwplayer('jwp-0').setup({playlist:'https://cdn.jwplayer.com/v2/media/jI15s29u',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
   jwPlayers.push(jwplayer('jwp-1').setup({playlist:'https://cdn.jwplayer.com/v2/media/fHW3vrEe',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
   jwPlayers.push(jwplayer('jwp-2').setup({playlist:'https://cdn.jwplayer.com/v2/media/WZfVrXpY',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
@@ -1744,6 +1735,20 @@ document.getElementById('tabBar').addEventListener('click', function(e) {
     });
   }, { rootMargin: '-112px 0px -55% 0px', threshold: 0 });
   headings.forEach(function(h) { if (h.id) obs.observe(h); });
+})();
+</script>
+<script>
+(function() {
+  var sgPlayers = [{id:'sg-jwp-0',media:'jIDW8lGe'},{id:'sg-jwp-1',media:'02clfR48'},{id:'sg-jwp-2',media:'fNlJq9oL'},{id:'sg-jwp-3',media:'7JTK8xyp'},{id:'sg-jwp-4',media:'TJVycwih'},{id:'sg-jwp-5',media:'SmAEl9b8'},{id:'sg-jwp-6',media:'AVYtdSho'},{id:'sg-jwp-7',media:'YRx98Q7X'},{id:'sg-jwp-8',media:'r3VkxeGY'},{id:'sg-jwp-9',media:'8KXWsUp4'},{id:'sg-jwp-10',media:'YEOigr13'},{id:'sg-jwp-11',media:'iVMjH27y'},{id:'sg-jwp-12',media:'btmjanJx'},{id:'sg-jwp-13',media:'WdmqOCWa'}];
+  function initSG() {
+    if (typeof jwplayer === 'undefined') { return setTimeout(initSG, 150); }
+    sgPlayers.forEach(function(p) {
+      var el = document.getElementById(p.id);
+      if (!el) return;
+      jwplayer(p.id).setup({playlist:'https://cdn.jwplayer.com/v2/media/'+p.media,width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'});
+    });
+  }
+  initSG();
 })();
 </script>
 </body>

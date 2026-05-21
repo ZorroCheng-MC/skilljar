@@ -267,6 +267,11 @@
     padding: 24px 32px 80px 32px;
   }
 
+
+  /* Study guide embedded video */
+  .study-video-wrap { width: 100%; margin: 4px 0 20px; aspect-ratio: 16/9; background: #000; }
+  .study-video-wrap > div { width: 100%; height: 100%; }
+
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -302,11 +307,9 @@
 <hr />
 <h2 id="introduction">Introduction</h2>
 <h3 id="introduction_1">Introduction</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-0"></div></div>
 <h3 id="what-is-a-coding-assistant">What is a coding assistant?</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-1"></div></div>
 <h3 id="claude-code-in-action">Claude Code in action</h3>
 <p>Claude Code = AI coding assistant that functions as a collaborative engineer on projects, not just a code generator.</p>
 <p>Key capabilities: project setup, feature design, code writing, testing, deployment, error fixing in production.</p>
@@ -359,35 +362,26 @@ Uh oh! Something went wrong, please try again.</p>
 <p>Expected outcome = working chat interface that responds to basic queries, ready for MCP feature additions.</p>
 <h2 id="core-workflow">Core Workflow</h2>
 <h3 id="adding-context">Adding context</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-2"></div></div>
 <h3 id="making-changes">Making changes</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-3"></div></div>
 <h3 id="course-satisfaction-survey">Course satisfaction survey</h3>
 <p>Loading...</p>
 <h3 id="controlling-context">Controlling context</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-4"></div></div>
 <h3 id="custom-commands">Custom commands</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-5"></div></div>
 <h3 id="mcp-servers-with-claude-code">MCP servers with Claude Code</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-6"></div></div>
 <h3 id="github-integration">Github integration</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-7"></div></div>
 <h2 id="hooks">Hooks</h2>
 <h3 id="introducing-hooks">Introducing hooks</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-8"></div></div>
 <h3 id="defining-hooks">Defining hooks</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-9"></div></div>
 <h3 id="implementing-a-hook">Implementing a hook</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-10"></div></div>
 <h3 id="gotchas-around-hooks">Gotchas around hooks</h3>
 <p>You may notice that after running the<br />
 <code>npm run setup</code><br />
@@ -426,8 +420,7 @@ file, and rename it to<br />
 .<br />
 This script allows us to share settings.json files but still use the recommended absolute paths!</p>
 <h3 id="useful-hooks">Useful hooks!</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-11"></div></div>
 <h3 id="another-useful-hook">Another useful hook</h3>
 <p>There are more hooks beyond the<br />
 <code>PreToolUse</code><br />
@@ -521,11 +514,9 @@ file, which allows you to inspect exactly what would have been fed into your com
 This makes it a lot easier for you to understand what data your command should inspect.</p>
 <h2 id="sdk-and-wrap-up">SDK and Wrap Up</h2>
 <h3 id="the-claude-code-sdk">The Claude Code SDK</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-12"></div></div>
 <h3 id="summary-and-next-steps">Summary and next steps</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p></div>
+<div class="study-video-wrap"><div id="sg-jwp-13"></div></div></div>
     </div>
   </div>
 </div>
@@ -606,9 +597,9 @@ Uh oh! Something went wrong, please try again.</p></div>
   <span class="speed-label">Speed:</span>
   <button class="speed-btn" data-speed="0.5">0.5&times;</button>
   <button class="speed-btn" data-speed="0.75">0.75&times;</button>
-  <button class="speed-btn active" data-speed="1">1&times;</button>
+  <button class="speed-btn" data-speed="1">1&times;</button>
   <button class="speed-btn" data-speed="1.25">1.25&times;</button>
-  <button class="speed-btn" data-speed="1.5">1.5&times;</button>
+  <button class="speed-btn active" data-speed="1.5">1.5&times;</button>
   <button class="speed-btn" data-speed="1.75">1.75&times;</button>
   <button class="speed-btn" data-speed="2">2&times;</button>
   <span class="video-total">15 videos</span>
@@ -621,7 +612,7 @@ Uh oh! Something went wrong, please try again.</p></div>
 </div>
 <script>
 const jwPlayers = [];
-let currentSpeed = 1.0;
+let currentSpeed = 1.5;
   jwPlayers.push(jwplayer('jwp-0').setup({playlist:'https://cdn.jwplayer.com/v2/media/rLVnV1aS',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
   jwPlayers.push(jwplayer('jwp-1').setup({playlist:'https://cdn.jwplayer.com/v2/media/WQnSCLF3',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
   jwPlayers.push(jwplayer('jwp-2').setup({playlist:'https://cdn.jwplayer.com/v2/media/3IQrknws',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
@@ -795,6 +786,20 @@ document.getElementById('tabBar').addEventListener('click', function(e) {
     });
   }, { rootMargin: '-112px 0px -55% 0px', threshold: 0 });
   headings.forEach(function(h) { if (h.id) obs.observe(h); });
+})();
+</script>
+<script>
+(function() {
+  var sgPlayers = [{id:'sg-jwp-0',media:'rLVnV1aS'},{id:'sg-jwp-1',media:'WQnSCLF3'},{id:'sg-jwp-2',media:'wWHe1PIF'},{id:'sg-jwp-3',media:'v2XzmjpP'},{id:'sg-jwp-4',media:'pIw5RYqx'},{id:'sg-jwp-5',media:'ChNLn8eT'},{id:'sg-jwp-6',media:'EkzVe83z'},{id:'sg-jwp-7',media:'ZzNXo5m0'},{id:'sg-jwp-8',media:'3uGhMBFx'},{id:'sg-jwp-9',media:'qzgBYFlx'},{id:'sg-jwp-10',media:'WpOJxKsp'},{id:'sg-jwp-11',media:'fXIRG62r'},{id:'sg-jwp-12',media:'T2S0k8f2'},{id:'sg-jwp-13',media:'IiL1DO8v'}];
+  function initSG() {
+    if (typeof jwplayer === 'undefined') { return setTimeout(initSG, 150); }
+    sgPlayers.forEach(function(p) {
+      var el = document.getElementById(p.id);
+      if (!el) return;
+      jwplayer(p.id).setup({playlist:'https://cdn.jwplayer.com/v2/media/'+p.media,width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'});
+    });
+  }
+  initSG();
 })();
 </script>
 </body>

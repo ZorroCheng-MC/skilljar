@@ -267,6 +267,11 @@
     padding: 24px 32px 80px 32px;
   }
 
+
+  /* Study guide embedded video */
+  .study-video-wrap { width: 100%; margin: 4px 0 20px; aspect-ratio: 16/9; background: #000; }
+  .study-video-wrap > div { width: 100%; height: 100%; }
+
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -302,8 +307,7 @@
 <hr />
 <h2 id="introduction">Introduction</h2>
 <h3 id="welcome-to-the-course">Welcome to the course</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-0"></div></div>
 <h3 id="overview-of-claude-models">Overview of Claude models</h3>
 <p>Claude has three model families optimized for different priorities:</p>
 <p>Opus = highest intelligence model for complex, multi-step tasks requiring deep reasoning and planning. Trade-off: higher cost and latency.</p>
@@ -402,8 +406,7 @@ That's it! The Anthropic SDK will automatically use these credentials when attem
 - chat(messages) = sends message history to API and returns response</p>
 <p>Without message history = responses lack context and continuity. With complete history = Claude maintains conversation context and provides relevant follow-ups.</p>
 <h3 id="chat-exercise">Chat exercise</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-1"></div></div>
 <h3 id="system-prompts">System prompts</h3>
 <p>System Prompts = technique to customize Claude's response style and tone by assigning it a specific role or behavior pattern.</p>
 <p>Implementation = pass system prompt as plain string to create function using system keyword argument.</p>
@@ -563,8 +566,7 @@ Final message: stream.get_final_message() assembles all chunks for storage</p>
 - Enables measurement of both correctness and technical validity</p>
 <p>Key Limitation = requires known expected format for proper validator selection</p>
 <h3 id="exercise-on-prompt-evals">Exercise on prompt evals</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-2"></div></div>
 <h2 id="prompt-engineering">Prompt Engineering</h2>
 <h3 id="prompt-engineering_1">Prompt engineering</h3>
 <p>Prompt Engineering = improving prompts to get more reliable, higher-quality outputs from language models.</p>
@@ -624,8 +626,7 @@ Type B (Steps) = provide specific steps for model to follow in reasoning process
 - Place examples after main instructions/guidelines</p>
 <p>Effectiveness boost: Combine examples with explanations of what makes them ideal to reinforce desired output characteristics.</p>
 <h3 id="exercise-on-prompting">Exercise on prompting</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-3"></div></div>
 <h2 id="tool-use">Tool Use</h2>
 <h3 id="introducing-tool-use">Introducing tool use</h3>
 <p>Tool use = method for Claude to access external information beyond training data.</p>
@@ -1187,8 +1188,7 @@ Get prompt = await self.session.get_prompt(prompt_name, arguments), return resul
 5. Returns messages array for direct feeding to LLM</p>
 <p>Key concept: Prompts are server-defined templates that clients can invoke with specific arguments to generate contextualized instructions for LLMs. Arguments flow from client call → prompt function → interpolated prompt text → LLM consumption.</p>
 <h3 id="mcp-review">MCP review</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-4"></div></div>
 <h2 id="anthropic-apps-and-agents">Anthropic Apps and Agents</h2>
 <h3 id="anthropic-apps">Anthropic apps</h3>
 <p>Anthropic Apps = two deployed applications by Anthropic: Claude Code and Computer Use.</p>
@@ -1385,8 +1385,7 @@ Uh oh! Something went wrong, please try again.</p>
 <p>Recommendation: Prioritize workflows for reliability. Use agents only when flexibility truly required. Users want 100% working products over fancy agents.</p>
 <p>Core principle: Solve problems reliably first, innovation second.</p>
 <h3 id="course-wrap-up">Course Wrap Up</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p></div>
+<div class="study-video-wrap"><div id="sg-jwp-5"></div></div></div>
     </div>
   </div>
 </div>
@@ -1791,9 +1790,9 @@ Uh oh! Something went wrong, please try again.</p></div>
   <span class="speed-label">Speed:</span>
   <button class="speed-btn" data-speed="0.5">0.5&times;</button>
   <button class="speed-btn" data-speed="0.75">0.75&times;</button>
-  <button class="speed-btn active" data-speed="1">1&times;</button>
+  <button class="speed-btn" data-speed="1">1&times;</button>
   <button class="speed-btn" data-speed="1.25">1.25&times;</button>
-  <button class="speed-btn" data-speed="1.5">1.5&times;</button>
+  <button class="speed-btn active" data-speed="1.5">1.5&times;</button>
   <button class="speed-btn" data-speed="1.75">1.75&times;</button>
   <button class="speed-btn" data-speed="2">2&times;</button>
   <span class="video-total">81 videos</span>
@@ -1806,7 +1805,7 @@ Uh oh! Something went wrong, please try again.</p></div>
 </div>
 <script>
 const jwPlayers = [];
-let currentSpeed = 1.0;
+let currentSpeed = 1.5;
   jwPlayers.push(jwplayer('jwp-0').setup({playlist:'https://cdn.jwplayer.com/v2/media/yKpOmQb9',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
   jwPlayers.push(jwplayer('jwp-1').setup({playlist:'https://cdn.jwplayer.com/v2/media/GF7rZk65',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
   jwPlayers.push(jwplayer('jwp-2').setup({playlist:'https://cdn.jwplayer.com/v2/media/6iBnqKQF',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
@@ -2046,6 +2045,20 @@ document.getElementById('tabBar').addEventListener('click', function(e) {
     });
   }, { rootMargin: '-112px 0px -55% 0px', threshold: 0 });
   headings.forEach(function(h) { if (h.id) obs.observe(h); });
+})();
+</script>
+<script>
+(function() {
+  var sgPlayers = [{id:'sg-jwp-0',media:'yKpOmQb9'},{id:'sg-jwp-1',media:'wZ2W60oe'},{id:'sg-jwp-2',media:'uVMdD8U9'},{id:'sg-jwp-3',media:'hlYSjyD6'},{id:'sg-jwp-4',media:'OaxFntPE'},{id:'sg-jwp-5',media:'5YnCUsKU'}];
+  function initSG() {
+    if (typeof jwplayer === 'undefined') { return setTimeout(initSG, 150); }
+    sgPlayers.forEach(function(p) {
+      var el = document.getElementById(p.id);
+      if (!el) return;
+      jwplayer(p.id).setup({playlist:'https://cdn.jwplayer.com/v2/media/'+p.media,width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'});
+    });
+  }
+  initSG();
 })();
 </script>
 </body>

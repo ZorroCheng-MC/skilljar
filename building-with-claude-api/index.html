@@ -267,6 +267,11 @@
     padding: 24px 32px 80px 32px;
   }
 
+
+  /* Study guide embedded video */
+  .study-video-wrap { width: 100%; margin: 4px 0 20px; aspect-ratio: 16/9; background: #000; }
+  .study-video-wrap > div { width: 100%; height: 100%; }
+
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -382,8 +387,7 @@ If you accidentally close the window, delete the old key and generate it again.<
 - chat(messages) = sends message history to API and returns response</p>
 <p>Without message history = responses lack context and continuity. With complete history = Claude maintains conversation context and provides relevant follow-ups.</p>
 <h3 id="chat-exercise">Chat exercise</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-0"></div></div>
 <h3 id="system-prompts">System prompts</h3>
 <p>System Prompts = technique to customize Claude's response style and tone by assigning it a specific role or behavior pattern.</p>
 <p>Implementation = pass system prompt as plain string to create function using system keyword argument.</p>
@@ -525,8 +529,7 @@ Final message: stream.get_final_message() assembles all chunks for storage</p>
 - Enables measurement of both correctness and technical validity</p>
 <p>Key Limitation = requires known expected format for proper validator selection</p>
 <h3 id="exercise-on-prompt-evals">Exercise on prompt evals</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-1"></div></div>
 <h2 id="prompt-engineering-techniques">Prompt engineering techniques</h2>
 <h3 id="prompt-engineering">Prompt engineering</h3>
 <p>Prompt Engineering = improving prompts to get more reliable, higher-quality outputs from language models.</p>
@@ -586,8 +589,7 @@ Type B (Steps) = provide specific steps for model to follow in reasoning process
 - Place examples after main instructions/guidelines</p>
 <p>Effectiveness boost: Combine examples with explanations of what makes them ideal to reinforce desired output characteristics.</p>
 <h3 id="exercise-on-prompting">Exercise on prompting</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-2"></div></div>
 <h2 id="tool-use-with-claude">Tool use with Claude</h2>
 <h3 id="introducing-tool-use">Introducing tool use</h3>
 <p>Tool use = method for Claude to access external information beyond training data.</p>
@@ -745,8 +747,7 @@ def get_current_datetime(date_format="%Y%m%d %H:%M:%S"):<br />
 <p>Message Structure = Assistant responses can contain multiple blocks: text blocks + tool use blocks in same message.</p>
 <p>Scalability = After initial framework setup, adding new tools becomes simple pattern of schema + routing + implementation.</p>
 <h3 id="fine-grained-tool-calling">Fine grained tool calling</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-3"></div></div>
 <h3 id="the-text-edit-tool">The text edit tool</h3>
 <p>Text Editor Tool = built-in Claude tool for file/text operations (read, write, create, replace, undo files/directories)</p>
 <p>Key characteristics:<br />
@@ -794,8 +795,7 @@ Uh oh! Something went wrong, please try again.</p>
 <p>Use Case Example: Restricting to NIH.gov for medical/exercise advice ensures scientifically-backed information vs generic web content.</p>
 <h2 id="rag-and-agentic-search">RAG and Agentic Search</h2>
 <h3 id="introducing-rag">Introducing RAG</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-4"></div></div>
 <h3 id="text-chunking-strategies">Text chunking strategies</h3>
 <p>Text Chunking Strategies = process of dividing documents into smaller pieces for RAG pipelines</p>
 <p>Core Problem: Chunking quality directly impacts RAG performance. Poor chunking leads to irrelevant context retrieval (e.g., medical "bug" text retrieved for software engineering query about bugs).</p>
@@ -1106,8 +1106,7 @@ Get prompt = await self.session.get_prompt(prompt_name, arguments), return resul
 5. Returns messages array for direct feeding to LLM</p>
 <p>Key concept: Prompts are server-defined templates that clients can invoke with specific arguments to generate contextualized instructions for LLMs. Arguments flow from client call → prompt function → interpolated prompt text → LLM consumption.</p>
 <h3 id="mcp-review">MCP review</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p>
+<div class="study-video-wrap"><div id="sg-jwp-5"></div></div>
 <h2 id="anthropic-apps-claude-code-and-computer-use">Anthropic apps - Claude Code and computer use</h2>
 <h3 id="anthropic-apps">Anthropic apps</h3>
 <p>Anthropic Apps = two deployed applications by Anthropic: Claude Code and Computer Use.</p>
@@ -1236,8 +1235,7 @@ Uh oh! Something went wrong, please try again.</p>
 <h2 id="final-assessment">Final assessment</h2>
 <h2 id="wrapping-up">Wrapping up!</h2>
 <h3 id="course-wrap-up">Course Wrap Up</h3>
-<p>This video is still being processed. Please check back later and refresh the page.<br />
-Uh oh! Something went wrong, please try again.</p></div>
+<div class="study-video-wrap"><div id="sg-jwp-6"></div></div></div>
     </div>
   </div>
 </div>
@@ -1725,9 +1723,9 @@ Uh oh! Something went wrong, please try again.</p></div>
   <span class="speed-label">Speed:</span>
   <button class="speed-btn" data-speed="0.5">0.5&times;</button>
   <button class="speed-btn" data-speed="0.75">0.75&times;</button>
-  <button class="speed-btn active" data-speed="1">1&times;</button>
+  <button class="speed-btn" data-speed="1">1&times;</button>
   <button class="speed-btn" data-speed="1.25">1.25&times;</button>
-  <button class="speed-btn" data-speed="1.5">1.5&times;</button>
+  <button class="speed-btn active" data-speed="1.5">1.5&times;</button>
   <button class="speed-btn" data-speed="1.75">1.75&times;</button>
   <button class="speed-btn" data-speed="2">2&times;</button>
   <span class="video-total">74 videos</span>
@@ -1740,7 +1738,7 @@ Uh oh! Something went wrong, please try again.</p></div>
 </div>
 <script>
 const jwPlayers = [];
-let currentSpeed = 1.0;
+let currentSpeed = 1.5;
   jwPlayers.push(jwplayer('jwp-0').setup({playlist:'https://cdn.jwplayer.com/v2/media/EvdaPJYI',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
   jwPlayers.push(jwplayer('jwp-1').setup({playlist:'https://cdn.jwplayer.com/v2/media/Ju43Csrd',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
   jwPlayers.push(jwplayer('jwp-2').setup({playlist:'https://cdn.jwplayer.com/v2/media/LXX0R5AO',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
@@ -1973,6 +1971,20 @@ document.getElementById('tabBar').addEventListener('click', function(e) {
     });
   }, { rootMargin: '-112px 0px -55% 0px', threshold: 0 });
   headings.forEach(function(h) { if (h.id) obs.observe(h); });
+})();
+</script>
+<script>
+(function() {
+  var sgPlayers = [{id:'sg-jwp-0',media:'PW8oVjfp'},{id:'sg-jwp-1',media:'0TnV7jUw'},{id:'sg-jwp-2',media:'hYMCWYnk'},{id:'sg-jwp-3',media:'aAOMIPU7'},{id:'sg-jwp-4',media:'0dYp9ofW'},{id:'sg-jwp-5',media:'y9xXQ4lc'},{id:'sg-jwp-6',media:'FlKckv4Z'}];
+  function initSG() {
+    if (typeof jwplayer === 'undefined') { return setTimeout(initSG, 150); }
+    sgPlayers.forEach(function(p) {
+      var el = document.getElementById(p.id);
+      if (!el) return;
+      jwplayer(p.id).setup({playlist:'https://cdn.jwplayer.com/v2/media/'+p.media,width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'});
+    });
+  }
+  initSG();
 })();
 </script>
 </body>

@@ -1419,9 +1419,9 @@ here<br />
   <span class="speed-label">Speed:</span>
   <button class="speed-btn" data-speed="0.5">0.5&times;</button>
   <button class="speed-btn" data-speed="0.75">0.75&times;</button>
-  <button class="speed-btn active" data-speed="1">1&times;</button>
+  <button class="speed-btn" data-speed="1">1&times;</button>
   <button class="speed-btn" data-speed="1.25">1.25&times;</button>
-  <button class="speed-btn" data-speed="1.5">1.5&times;</button>
+  <button class="speed-btn active" data-speed="1.5">1.5&times;</button>
   <button class="speed-btn" data-speed="1.75">1.75&times;</button>
   <button class="speed-btn" data-speed="2">2&times;</button>
   <span class="video-total">4 videos</span>
@@ -1434,7 +1434,7 @@ here<br />
 </div>
 <script>
 const jwPlayers = [];
-let currentSpeed = 1.0;
+let currentSpeed = 1.5;
 
 jwPlayers.forEach(p => {
   p.on('play', function() { try { this.setPlaybackRate(currentSpeed); } catch(e) {} });
