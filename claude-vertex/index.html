@@ -70,8 +70,47 @@
   .tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent); }
 
   /* ── Tab content ── */
-  .tab-content { display: none; max-width: 960px; margin: 0 auto; padding: 36px 32px; }
+  .tab-content { display: none; }
   .tab-content.active { display: block; }
+
+  /* Study guide two-column layout */
+  .study-layout {
+    display: flex; align-items: flex-start;
+  }
+  .study-toc {
+    width: 224px; flex-shrink: 0;
+    position: sticky; top: 112px;
+    height: calc(100vh - 112px);
+    overflow-y: auto; overflow-x: hidden;
+    padding: 20px 0 40px;
+    border-right: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .study-toc::-webkit-scrollbar { width: 3px; }
+  .study-toc::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .toc-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text3); padding: 0 18px 10px; display: block;
+  }
+  .toc-link {
+    display: block; padding: 5px 18px 5px 18px;
+    font-size: 13px; color: var(--text2); line-height: 1.4;
+    cursor: pointer; text-decoration: none;
+    border-left: 2px solid transparent; transition: color 0.12s, background 0.12s;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .toc-link:hover { color: var(--ink); background: var(--bg2); text-decoration: none; }
+  .toc-link.h2 { font-weight: 600; color: var(--ink); margin-top: 6px; }
+  .toc-link.h3 { padding-left: 30px; font-size: 12.5px; }
+  .toc-link.active {
+    color: var(--accent); border-left-color: var(--accent);
+    background: rgba(194,65,12,0.06);
+  }
+  .study-content {
+    flex: 1; min-width: 0;
+    padding: 36px 44px 80px 36px;
+    max-width: 800px;
+  }
 
   /* ── Study Guide / Quiz markdown rendering ── */
   .md-body h1 { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
@@ -234,6 +273,9 @@
 </div>
 
 <div id="tab-study" class="tab-content active">
+  <div class="study-layout">
+    <nav class="study-toc" id="study-toc"></nav>
+    <div class="study-content">
   <div class="md-body"><h1 id="claude-with-google-clouds-vertex-ai-study-guide">Claude with Google Cloud's Vertex AI — Study Guide</h1>
 <p><em>Full course notes compiled from all lessons.</em></p>
 <hr />
@@ -1324,6 +1366,8 @@ Uh oh! Something went wrong, please try again.</p>
 <h3 id="course-wrap-up">Course Wrap Up</h3>
 <p>This video is still being processed. Please check back later and refresh the page.<br />
 Uh oh! Something went wrong, please try again.</p></div>
+    </div>
+  </div>
 </div>
 
 <div id="tab-quiz" class="tab-content">
@@ -1715,7 +1759,8 @@ Uh oh! Something went wrong, please try again.</p></div>
 </div>
 
 <div id="tab-videos" class="tab-content">
-  <script src="https://cdn.jwplayer.com/libraries/Akyo8gQO.js"></script>
+  <script src="https://cdn.jwplayer.com/libraries/Akyo8gQO.js">
+</script>
 <div class="video-speed-bar">
   <span class="speed-label">Speed:</span>
   <button class="speed-btn" data-speed="0.5">0.5&times;</button>
@@ -1841,6 +1886,53 @@ document.getElementById('tabBar').addEventListener('click', function(e) {
   btn.classList.add('active');
   document.getElementById('tab-' + tab).classList.add('active');
 });
+</script>
+<script>
+/* Study Guide TOC */
+(function() {
+  var toc = document.getElementById('study-toc');
+  if (!toc) return;
+
+  var lbl = document.createElement('span');
+  lbl.className = 'toc-label';
+  lbl.textContent = 'Contents';
+  toc.appendChild(lbl);
+
+  var headings = Array.from(document.querySelectorAll('#tab-study .md-body h2, #tab-study .md-body h3'));
+  headings.forEach(function(h) {
+    if (!h.id) return;
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/[#¶]/g, '').trim();
+    a.className = 'toc-link ' + (h.tagName === 'H2' ? 'h2' : 'h3');
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      var rect = h.getBoundingClientRect();
+      window.scrollTo({ top: rect.top + window.scrollY - 120, behavior: 'smooth' });
+    });
+    toc.appendChild(a);
+  });
+
+  var links = toc.querySelectorAll('.toc-link');
+  if (!links.length) return;
+
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (!entry.isIntersecting) return;
+      var id = entry.target.id;
+      links.forEach(function(l) { l.classList.remove('active'); });
+      var a = toc.querySelector('[href="#' + id + '"]');
+      if (a) {
+        a.classList.add('active');
+        var tr = toc.getBoundingClientRect();
+        var ar = a.getBoundingClientRect();
+        if (ar.bottom > tr.bottom || ar.top < tr.top) a.scrollIntoView({ block: 'nearest' });
+      }
+    });
+  }, { rootMargin: '-112px 0px -55% 0px', threshold: 0 });
+
+  headings.forEach(function(h) { if (h.id) obs.observe(h); });
+})();
 </script>
 </body>
 </html>
