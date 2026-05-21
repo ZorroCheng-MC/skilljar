@@ -343,6 +343,34 @@
   .qs-score-pill.needs-work  { background: #fee2e2; color: #b91c1c; }
   .hidden { display: none !important; }
 
+
+  /* ── Video watch tracking ── */
+  .video-title {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .vid-title-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .watch-toggle {
+    flex-shrink: 0; font-size: 10.5px; font-weight: 600;
+    padding: 2px 7px; border-radius: 10px; cursor: pointer;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--text3); transition: all 0.15s; white-space: nowrap;
+  }
+  .watch-toggle:hover { border-color: var(--accent); color: var(--accent); }
+  .watch-toggle.is-watched { border-color: #047857; color: #047857; background: rgba(4,120,87,0.08); }
+  .video-card { transition: opacity 0.2s; }
+  .video-card.watched { opacity: 0.5; }
+  .video-card.watched:hover { opacity: 0.85; }
+  .chapter-title { display: flex; align-items: center; gap: 10px; }
+  .ch-prog {
+    font-size: 11px; font-weight: 700; padding: 2px 8px;
+    border-radius: 10px; background: var(--bg3); color: var(--text3); white-space: nowrap;
+  }
+  .ch-prog.ch-partial { background: #fef3c7; color: #92400e; }
+  .ch-prog.ch-done    { background: #d1fae5; color: #047857; }
+  .toc-progress {
+    font-size: 10px; color: var(--text3); padding: 0 18px 10px; display: block;
+  }
+
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -961,5 +989,92 @@ document.getElementById('tabBar').addEventListener('click', function(e) {
   initSG();
 })();
 </script>
+<script>
+/* ── Video watch tracking ── */
+(function() {
+  var PATH = location.pathname;
+  function sk(id) { return 'sj:w:' + PATH + ':' + id; }
+  function isW(id) { return localStorage.getItem(sk(id)) === '1'; }
+  function setW(id, v) { v ? localStorage.setItem(sk(id), '1') : localStorage.removeItem(sk(id)); }
+
+  function applyCard(card, id, watched) {
+    card.classList.toggle('watched', watched);
+    var btn = card.querySelector('.watch-toggle');
+    if (!btn) return;
+    btn.textContent = watched ? '✓ Watched' : 'Mark watched';
+    btn.classList.toggle('is-watched', watched);
+  }
+
+  function updateChapter(sec) {
+    if (!sec) return;
+    var total = sec.querySelectorAll('.video-card').length;
+    var done  = sec.querySelectorAll('.video-card.watched').length;
+    var titleEl = sec.querySelector('.chapter-title');
+    if (!titleEl) return;
+    var pill = titleEl.querySelector('.ch-prog');
+    if (!pill) { pill = document.createElement('span'); pill.className = 'ch-prog'; titleEl.appendChild(pill); }
+    if (done === 0)     { pill.textContent = ''; pill.className = 'ch-prog'; }
+    else if (done === total) { pill.textContent = '✓ Done'; pill.className = 'ch-prog ch-done'; }
+    else                { pill.textContent = done + ' / ' + total; pill.className = 'ch-prog ch-partial'; }
+  }
+
+  function updateTocOverall() {
+    var tab = document.getElementById('tab-videos');
+    if (!tab) return;
+    var total = tab.querySelectorAll('.video-card').length;
+    var done  = tab.querySelectorAll('.video-card.watched').length;
+    /* Update or create overall progress label below the CHAPTERS toc-label */
+    var toc = document.getElementById('video-toc');
+    if (!toc) return;
+    var prog = toc.querySelector('.toc-progress');
+    if (!prog) {
+      prog = document.createElement('span');
+      prog.className = 'toc-progress';
+      /* insert after the first .toc-label */
+      var lbl = toc.querySelector('.toc-label');
+      if (lbl) lbl.after(prog); else toc.prepend(prog);
+    }
+    prog.textContent = done === total && total > 0
+      ? '✓ All ' + total + ' videos watched'
+      : done + ' / ' + total + ' watched';
+  }
+
+  function init() {
+    var tab = document.getElementById('tab-videos');
+    if (!tab) return;
+
+    tab.querySelectorAll('.video-card').forEach(function(card) {
+      var jwpEl = card.querySelector('[id^="jwp-"]');
+      if (!jwpEl) return;
+      var id = jwpEl.id;
+
+      /* Restructure video-title to support flex layout */
+      var titleEl = card.querySelector('.video-title');
+      if (titleEl && !titleEl.querySelector('.watch-toggle')) {
+        var rawText = titleEl.textContent.trim();
+        titleEl.innerHTML =
+          '<span class="vid-title-text">' + rawText + '</span>' +
+          '<button class="watch-toggle"></button>';
+        titleEl.querySelector('.watch-toggle').addEventListener('click', function(e) {
+          e.stopPropagation();
+          var nowWatched = !card.classList.contains('watched');
+          setW(id, nowWatched);
+          applyCard(card, id, nowWatched);
+          updateChapter(card.closest('.chapter-section'));
+          updateTocOverall();
+        });
+      }
+
+      applyCard(card, id, isW(id));
+    });
+
+    tab.querySelectorAll('.chapter-section').forEach(updateChapter);
+    updateTocOverall();
+  }
+
+  init();
+})();
+</script>
+
 </body>
 </html>
