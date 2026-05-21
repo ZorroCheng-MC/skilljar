@@ -123,9 +123,10 @@
   /* ── Videos tab ── */
   .video-speed-bar {
     display: flex; align-items: center; gap: 10px;
-    background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 10px; padding: 10px 16px;
-    margin-bottom: 28px; flex-wrap: wrap;
+    background: var(--bg2); border-bottom: 1px solid var(--border);
+    padding: 10px 32px;
+    margin-bottom: 0; flex-wrap: wrap;
+    position: sticky; top: 120px; z-index: 90;
   }
   .speed-label { font-size: 13px; color: var(--text2); }
   .speed-btn {
