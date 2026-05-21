@@ -441,6 +441,9 @@ Uh oh! Something went wrong, please try again.</p></div>
 </div>
 
 <div id="tab-quiz" class="tab-content">
+<div class="study-layout">
+<nav class="study-toc" id="quiz-toc"></nav>
+<div class="study-content">
   <div class="md-body"><h1 id="introduction-to-model-context-protocol-quiz-guide">Introduction to Model Context Protocol — Quiz Guide</h1>
 <p><em>All quiz questions with answer choices (correct answer marked with ✓).</em></p>
 <hr />
@@ -495,6 +498,8 @@ Uh oh! Something went wrong, please try again.</p></div>
 <li class="incorrect">C) A direct resource with a static URI</li>
 <li class="incorrect">D) A database query resource</li>
 </ul></div>
+</div>
+</div>
 </div>
 
 <div id="tab-videos" class="tab-content">
@@ -648,6 +653,47 @@ document.getElementById('tabBar').addEventListener('click', function(e) {
     });
   }, { rootMargin: '-168px 0px -55% 0px', threshold: 0 });
   sections.forEach(function(sec) { obs.observe(sec); });
+})();
+</script>
+<script>
+(function() {
+  var toc = document.getElementById('quiz-toc');
+  if (!toc) return;
+  var lbl = document.createElement('span');
+  lbl.className = 'toc-label';
+  lbl.textContent = 'Contents';
+  toc.appendChild(lbl);
+  var headings = Array.from(document.querySelectorAll('#tab-quiz .md-body h2, #tab-quiz .md-body h3'));
+  headings.forEach(function(h) {
+    if (!h.id) return;
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/[#¶]/g, '').trim();
+    a.className = 'toc-link ' + (h.tagName === 'H2' ? 'h2' : 'h3');
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      var rect = h.getBoundingClientRect();
+      window.scrollTo({ top: rect.top + window.scrollY - 120, behavior: 'smooth' });
+    });
+    toc.appendChild(a);
+  });
+  var links = toc.querySelectorAll('.toc-link');
+  if (!links.length) return;
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (!entry.isIntersecting) return;
+      var id = entry.target.id;
+      links.forEach(function(l) { l.classList.remove('active'); });
+      var a = toc.querySelector('[href="#' + id + '"]');
+      if (a) {
+        a.classList.add('active');
+        var tr = toc.getBoundingClientRect();
+        var ar = a.getBoundingClientRect();
+        if (ar.bottom > tr.bottom || ar.top < tr.top) a.scrollIntoView({ block: 'nearest' });
+      }
+    });
+  }, { rootMargin: '-112px 0px -55% 0px', threshold: 0 });
+  headings.forEach(function(h) { if (h.id) obs.observe(h); });
 })();
 </script>
 </body>
