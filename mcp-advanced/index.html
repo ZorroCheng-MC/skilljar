@@ -246,6 +246,27 @@
   .card-meta { font-size: 12px; color: var(--text3); display: flex; gap: 12px; flex-wrap: wrap; }
   .card-tag { background: var(--bg3); border: 1px solid var(--border);
               padding: 2px 8px; border-radius: 10px; color: var(--text2); }
+
+  /* Video tab two-column layout */
+  .video-layout {
+    display: flex; align-items: flex-start;
+  }
+  .video-toc {
+    width: 224px; flex-shrink: 0;
+    position: sticky; top: 168px;
+    height: calc(100vh - 168px);
+    overflow-y: auto; overflow-x: hidden;
+    padding: 20px 0 40px;
+    border-right: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .video-toc::-webkit-scrollbar { width: 3px; }
+  .video-toc::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .video-content {
+    flex: 1; min-width: 0;
+    padding: 24px 32px 80px 32px;
+  }
+
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -392,7 +413,12 @@ Uh oh! Something went wrong, please try again.</p>
   <button class="speed-btn" data-speed="2">2&times;</button>
   <span class="video-total">8 videos</span>
 </div>
-<div class="chapter-section"><div class="chapter-title">Advanced Patterns</div><div class="video-grid"><div class="video-card"><div class="video-title">Sampling</div><div id="jwp-0"></div></div><div class="video-card"><div class="video-title">Log and progress notifications</div><div id="jwp-1"></div></div><div class="video-card"><div class="video-title">Roots</div><div id="jwp-2"></div></div></div></div><div class="chapter-section"><div class="chapter-title">Transport Layer</div><div class="video-grid"><div class="video-card"><div class="video-title">JSON message types</div><div id="jwp-3"></div></div><div class="video-card"><div class="video-title">The STDIO transport</div><div id="jwp-4"></div></div><div class="video-card"><div class="video-title">The StreamableHTTP transport</div><div id="jwp-5"></div></div><div class="video-card"><div class="video-title">StreamableHTTP in depth</div><div id="jwp-6"></div></div><div class="video-card"><div class="video-title">State and the StreamableHTTP transport</div><div id="jwp-7"></div></div></div></div>
+<div class="video-layout">
+<nav class="video-toc" id="video-toc"></nav>
+<div class="video-content">
+<div class="chapter-section" id="ch-advanced-patterns"><div class="chapter-title">Advanced Patterns</div><div class="video-grid"><div class="video-card"><div class="video-title">Sampling</div><div id="jwp-0"></div></div><div class="video-card"><div class="video-title">Log and progress notifications</div><div id="jwp-1"></div></div><div class="video-card"><div class="video-title">Roots</div><div id="jwp-2"></div></div></div></div><div class="chapter-section" id="ch-transport-layer"><div class="chapter-title">Transport Layer</div><div class="video-grid"><div class="video-card"><div class="video-title">JSON message types</div><div id="jwp-3"></div></div><div class="video-card"><div class="video-title">The STDIO transport</div><div id="jwp-4"></div></div><div class="video-card"><div class="video-title">The StreamableHTTP transport</div><div id="jwp-5"></div></div><div class="video-card"><div class="video-title">StreamableHTTP in depth</div><div id="jwp-6"></div></div><div class="video-card"><div class="video-title">State and the StreamableHTTP transport</div><div id="jwp-7"></div></div></div></div>
+</div>
+</div>
 <script>
 const jwPlayers = [];
 let currentSpeed = 1.0;
@@ -479,6 +505,48 @@ document.getElementById('tabBar').addEventListener('click', function(e) {
   }, { rootMargin: '-112px 0px -55% 0px', threshold: 0 });
 
   headings.forEach(function(h) { if (h.id) obs.observe(h); });
+})();
+</script>
+<script>
+(function() {
+  var toc = document.getElementById('video-toc');
+  if (!toc) return;
+  var lbl = document.createElement('span');
+  lbl.className = 'toc-label';
+  lbl.textContent = 'Chapters';
+  toc.appendChild(lbl);
+  var sections = Array.from(document.querySelectorAll('#tab-videos .chapter-section[id]'));
+  sections.forEach(function(sec) {
+    var titleEl = sec.querySelector('.chapter-title');
+    if (!titleEl) return;
+    var a = document.createElement('a');
+    a.href = '#' + sec.id;
+    a.textContent = titleEl.textContent.trim();
+    a.className = 'toc-link h2';
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      var rect = sec.getBoundingClientRect();
+      window.scrollTo({ top: rect.top + window.scrollY - 175, behavior: 'smooth' });
+    });
+    toc.appendChild(a);
+  });
+  var links = toc.querySelectorAll('.toc-link');
+  if (!links.length) return;
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (!entry.isIntersecting) return;
+      var id = entry.target.id;
+      links.forEach(function(l) { l.classList.remove('active'); });
+      var a = toc.querySelector('[href="#' + id + '"]');
+      if (a) {
+        a.classList.add('active');
+        var tr = toc.getBoundingClientRect();
+        var ar = a.getBoundingClientRect();
+        if (ar.bottom > tr.bottom || ar.top < tr.top) a.scrollIntoView({ block: 'nearest' });
+      }
+    });
+  }, { rootMargin: '-168px 0px -55% 0px', threshold: 0 });
+  sections.forEach(function(sec) { obs.observe(sec); });
 })();
 </script>
 </body>

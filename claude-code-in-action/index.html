@@ -246,6 +246,27 @@
   .card-meta { font-size: 12px; color: var(--text3); display: flex; gap: 12px; flex-wrap: wrap; }
   .card-tag { background: var(--bg3); border: 1px solid var(--border);
               padding: 2px 8px; border-radius: 10px; color: var(--text2); }
+
+  /* Video tab two-column layout */
+  .video-layout {
+    display: flex; align-items: flex-start;
+  }
+  .video-toc {
+    width: 224px; flex-shrink: 0;
+    position: sticky; top: 168px;
+    height: calc(100vh - 168px);
+    overflow-y: auto; overflow-x: hidden;
+    padding: 20px 0 40px;
+    border-right: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .video-toc::-webkit-scrollbar { width: 3px; }
+  .video-toc::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .video-content {
+    flex: 1; min-width: 0;
+    padding: 24px 32px 80px 32px;
+  }
+
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -587,7 +608,12 @@ Uh oh! Something went wrong, please try again.</p></div>
   <button class="speed-btn" data-speed="2">2&times;</button>
   <span class="video-total">15 videos</span>
 </div>
-<div class="chapter-section"><div class="chapter-title">Introduction</div><div class="video-grid"><div class="video-card"><div class="video-title">Introduction</div><div id="jwp-0"></div></div><div class="video-card"><div class="video-title">What is a coding assistant?</div><div id="jwp-1"></div></div><div class="video-card"><div class="video-title">Claude Code in action</div><div id="jwp-2"></div></div></div></div><div class="chapter-section"><div class="chapter-title">Core Workflow</div><div class="video-grid"><div class="video-card"><div class="video-title">Adding context</div><div id="jwp-3"></div></div><div class="video-card"><div class="video-title">Making changes</div><div id="jwp-4"></div></div><div class="video-card"><div class="video-title">Controlling context</div><div id="jwp-5"></div></div><div class="video-card"><div class="video-title">Custom commands</div><div id="jwp-6"></div></div><div class="video-card"><div class="video-title">MCP servers with Claude Code</div><div id="jwp-7"></div></div><div class="video-card"><div class="video-title">Github integration</div><div id="jwp-8"></div></div></div></div><div class="chapter-section"><div class="chapter-title">Hooks</div><div class="video-grid"><div class="video-card"><div class="video-title">Introducing hooks</div><div id="jwp-9"></div></div><div class="video-card"><div class="video-title">Defining hooks</div><div id="jwp-10"></div></div><div class="video-card"><div class="video-title">Implementing a hook</div><div id="jwp-11"></div></div><div class="video-card"><div class="video-title">Useful hooks!</div><div id="jwp-12"></div></div></div></div><div class="chapter-section"><div class="chapter-title">SDK and Wrap Up</div><div class="video-grid"><div class="video-card"><div class="video-title">The Claude Code SDK</div><div id="jwp-13"></div></div><div class="video-card"><div class="video-title">Summary and next steps</div><div id="jwp-14"></div></div></div></div>
+<div class="video-layout">
+<nav class="video-toc" id="video-toc"></nav>
+<div class="video-content">
+<div class="chapter-section" id="ch-introduction"><div class="chapter-title">Introduction</div><div class="video-grid"><div class="video-card"><div class="video-title">Introduction</div><div id="jwp-0"></div></div><div class="video-card"><div class="video-title">What is a coding assistant?</div><div id="jwp-1"></div></div><div class="video-card"><div class="video-title">Claude Code in action</div><div id="jwp-2"></div></div></div></div><div class="chapter-section" id="ch-core-workflow"><div class="chapter-title">Core Workflow</div><div class="video-grid"><div class="video-card"><div class="video-title">Adding context</div><div id="jwp-3"></div></div><div class="video-card"><div class="video-title">Making changes</div><div id="jwp-4"></div></div><div class="video-card"><div class="video-title">Controlling context</div><div id="jwp-5"></div></div><div class="video-card"><div class="video-title">Custom commands</div><div id="jwp-6"></div></div><div class="video-card"><div class="video-title">MCP servers with Claude Code</div><div id="jwp-7"></div></div><div class="video-card"><div class="video-title">Github integration</div><div id="jwp-8"></div></div></div></div><div class="chapter-section" id="ch-hooks"><div class="chapter-title">Hooks</div><div class="video-grid"><div class="video-card"><div class="video-title">Introducing hooks</div><div id="jwp-9"></div></div><div class="video-card"><div class="video-title">Defining hooks</div><div id="jwp-10"></div></div><div class="video-card"><div class="video-title">Implementing a hook</div><div id="jwp-11"></div></div><div class="video-card"><div class="video-title">Useful hooks!</div><div id="jwp-12"></div></div></div></div><div class="chapter-section" id="ch-sdk-and-wrap-up"><div class="chapter-title">SDK and Wrap Up</div><div class="video-grid"><div class="video-card"><div class="video-title">The Claude Code SDK</div><div id="jwp-13"></div></div><div class="video-card"><div class="video-title">Summary and next steps</div><div id="jwp-14"></div></div></div></div>
+</div>
+</div>
 <script>
 const jwPlayers = [];
 let currentSpeed = 1.0;
@@ -681,6 +707,48 @@ document.getElementById('tabBar').addEventListener('click', function(e) {
   }, { rootMargin: '-112px 0px -55% 0px', threshold: 0 });
 
   headings.forEach(function(h) { if (h.id) obs.observe(h); });
+})();
+</script>
+<script>
+(function() {
+  var toc = document.getElementById('video-toc');
+  if (!toc) return;
+  var lbl = document.createElement('span');
+  lbl.className = 'toc-label';
+  lbl.textContent = 'Chapters';
+  toc.appendChild(lbl);
+  var sections = Array.from(document.querySelectorAll('#tab-videos .chapter-section[id]'));
+  sections.forEach(function(sec) {
+    var titleEl = sec.querySelector('.chapter-title');
+    if (!titleEl) return;
+    var a = document.createElement('a');
+    a.href = '#' + sec.id;
+    a.textContent = titleEl.textContent.trim();
+    a.className = 'toc-link h2';
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      var rect = sec.getBoundingClientRect();
+      window.scrollTo({ top: rect.top + window.scrollY - 175, behavior: 'smooth' });
+    });
+    toc.appendChild(a);
+  });
+  var links = toc.querySelectorAll('.toc-link');
+  if (!links.length) return;
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (!entry.isIntersecting) return;
+      var id = entry.target.id;
+      links.forEach(function(l) { l.classList.remove('active'); });
+      var a = toc.querySelector('[href="#' + id + '"]');
+      if (a) {
+        a.classList.add('active');
+        var tr = toc.getBoundingClientRect();
+        var ar = a.getBoundingClientRect();
+        if (ar.bottom > tr.bottom || ar.top < tr.top) a.scrollIntoView({ block: 'nearest' });
+      }
+    });
+  }, { rootMargin: '-168px 0px -55% 0px', threshold: 0 });
+  sections.forEach(function(sec) { obs.observe(sec); });
 })();
 </script>
 </body>

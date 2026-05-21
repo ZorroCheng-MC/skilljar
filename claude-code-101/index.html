@@ -246,6 +246,27 @@
   .card-meta { font-size: 12px; color: var(--text3); display: flex; gap: 12px; flex-wrap: wrap; }
   .card-tag { background: var(--bg3); border: 1px solid var(--border);
               padding: 2px 8px; border-radius: 10px; color: var(--text2); }
+
+  /* Video tab two-column layout */
+  .video-layout {
+    display: flex; align-items: flex-start;
+  }
+  .video-toc {
+    width: 224px; flex-shrink: 0;
+    position: sticky; top: 168px;
+    height: calc(100vh - 168px);
+    overflow-y: auto; overflow-x: hidden;
+    padding: 20px 0 40px;
+    border-right: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .video-toc::-webkit-scrollbar { width: 3px; }
+  .video-toc::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .video-content {
+    flex: 1; min-width: 0;
+    padding: 24px 32px 80px 32px;
+  }
+
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -731,7 +752,12 @@ If something needs to happen every time without fail, don't put it in a prompt. 
   <button class="speed-btn" data-speed="2">2&times;</button>
   <span class="video-total">12 videos</span>
 </div>
-<div class="chapter-section"><div class="chapter-title">Getting Started</div><div class="video-grid"><div class="video-card"><div class="video-title">What is Claude Code?</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/fl1DSmwQKKY?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">How Claude Code works</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/6bs5b4FltCU?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Installing Claude Code</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/0kILa02vKuI?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Your first prompt</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/gbetp6D7J_Q?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">The explore → plan → code → commit workflow</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/xJQuF02NAK8?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div><div class="chapter-section"><div class="chapter-title">Working Effectively</div><div class="video-grid"><div class="video-card"><div class="video-title">Context management</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/eW3oTyfeWZ0?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Code review</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/RKsADl0ZC3Y?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">The CLAUDE.md file</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/O0FGCxkHM-U?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div><div class="chapter-section"><div class="chapter-title">Advanced Features</div><div class="video-grid"><div class="video-card"><div class="video-title">Subagents</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/jKErNxuxPXg?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Skills</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/bjdBVZa66oU?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">MCP</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/kkBFmwkDzdo?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Hooks</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/IkaPHiMDazM?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div>
+<div class="video-layout">
+<nav class="video-toc" id="video-toc"></nav>
+<div class="video-content">
+<div class="chapter-section" id="ch-getting-started"><div class="chapter-title">Getting Started</div><div class="video-grid"><div class="video-card"><div class="video-title">What is Claude Code?</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/fl1DSmwQKKY?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">How Claude Code works</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/6bs5b4FltCU?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Installing Claude Code</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/0kILa02vKuI?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Your first prompt</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/gbetp6D7J_Q?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">The explore → plan → code → commit workflow</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/xJQuF02NAK8?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div><div class="chapter-section" id="ch-working-effectively"><div class="chapter-title">Working Effectively</div><div class="video-grid"><div class="video-card"><div class="video-title">Context management</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/eW3oTyfeWZ0?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Code review</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/RKsADl0ZC3Y?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">The CLAUDE.md file</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/O0FGCxkHM-U?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div><div class="chapter-section" id="ch-advanced-features"><div class="chapter-title">Advanced Features</div><div class="video-grid"><div class="video-card"><div class="video-title">Subagents</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/jKErNxuxPXg?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Skills</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/bjdBVZa66oU?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">MCP</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/kkBFmwkDzdo?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Hooks</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/IkaPHiMDazM?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div>
+</div>
+</div>
 <script>
 const jwPlayers = [];
 let currentSpeed = 1.0;
@@ -811,6 +837,48 @@ document.getElementById('tabBar').addEventListener('click', function(e) {
   btn.classList.add('active');
   document.getElementById('tab-' + tab).classList.add('active');
 });
+</script>
+<script>
+(function() {
+  var toc = document.getElementById('video-toc');
+  if (!toc) return;
+  var lbl = document.createElement('span');
+  lbl.className = 'toc-label';
+  lbl.textContent = 'Chapters';
+  toc.appendChild(lbl);
+  var sections = Array.from(document.querySelectorAll('#tab-videos .chapter-section[id]'));
+  sections.forEach(function(sec) {
+    var titleEl = sec.querySelector('.chapter-title');
+    if (!titleEl) return;
+    var a = document.createElement('a');
+    a.href = '#' + sec.id;
+    a.textContent = titleEl.textContent.trim();
+    a.className = 'toc-link h2';
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      var rect = sec.getBoundingClientRect();
+      window.scrollTo({ top: rect.top + window.scrollY - 175, behavior: 'smooth' });
+    });
+    toc.appendChild(a);
+  });
+  var links = toc.querySelectorAll('.toc-link');
+  if (!links.length) return;
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (!entry.isIntersecting) return;
+      var id = entry.target.id;
+      links.forEach(function(l) { l.classList.remove('active'); });
+      var a = toc.querySelector('[href="#' + id + '"]');
+      if (a) {
+        a.classList.add('active');
+        var tr = toc.getBoundingClientRect();
+        var ar = a.getBoundingClientRect();
+        if (ar.bottom > tr.bottom || ar.top < tr.top) a.scrollIntoView({ block: 'nearest' });
+      }
+    });
+  }, { rootMargin: '-168px 0px -55% 0px', threshold: 0 });
+  sections.forEach(function(sec) { obs.observe(sec); });
+})();
 </script>
 </body>
 </html>

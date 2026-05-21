@@ -246,6 +246,27 @@
   .card-meta { font-size: 12px; color: var(--text3); display: flex; gap: 12px; flex-wrap: wrap; }
   .card-tag { background: var(--bg3); border: 1px solid var(--border);
               padding: 2px 8px; border-radius: 10px; color: var(--text2); }
+
+  /* Video tab two-column layout */
+  .video-layout {
+    display: flex; align-items: flex-start;
+  }
+  .video-toc {
+    width: 224px; flex-shrink: 0;
+    position: sticky; top: 168px;
+    height: calc(100vh - 168px);
+    overflow-y: auto; overflow-x: hidden;
+    padding: 20px 0 40px;
+    border-right: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .video-toc::-webkit-scrollbar { width: 3px; }
+  .video-toc::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .video-content {
+    flex: 1; min-width: 0;
+    padding: 24px 32px 80px 32px;
+  }
+
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -1400,7 +1421,12 @@ here<br />
   <button class="speed-btn" data-speed="2">2&times;</button>
   <span class="video-total">4 videos</span>
 </div>
-<div class="chapter-section"><div class="chapter-title">Claude 101</div><div class="video-grid"><div class="video-card"><div class="video-title">Getting better results</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/Zzn-g8lvLMA?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Introduction to projects</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/GJ5jTgcbRHA?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Working with skills</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/LpGpwhORWr0?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Other ways to work with Claude</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/s-avRazvmLg?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div>
+<div class="video-layout">
+<nav class="video-toc" id="video-toc"></nav>
+<div class="video-content">
+<div class="chapter-section" id="ch-claude-101"><div class="chapter-title">Claude 101</div><div class="video-grid"><div class="video-card"><div class="video-title">Getting better results</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/Zzn-g8lvLMA?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Introduction to projects</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/GJ5jTgcbRHA?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Working with skills</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/LpGpwhORWr0?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Other ways to work with Claude</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/s-avRazvmLg?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div>
+</div>
+</div>
 <script>
 const jwPlayers = [];
 let currentSpeed = 1.0;
@@ -1480,6 +1506,48 @@ document.getElementById('tabBar').addEventListener('click', function(e) {
   btn.classList.add('active');
   document.getElementById('tab-' + tab).classList.add('active');
 });
+</script>
+<script>
+(function() {
+  var toc = document.getElementById('video-toc');
+  if (!toc) return;
+  var lbl = document.createElement('span');
+  lbl.className = 'toc-label';
+  lbl.textContent = 'Chapters';
+  toc.appendChild(lbl);
+  var sections = Array.from(document.querySelectorAll('#tab-videos .chapter-section[id]'));
+  sections.forEach(function(sec) {
+    var titleEl = sec.querySelector('.chapter-title');
+    if (!titleEl) return;
+    var a = document.createElement('a');
+    a.href = '#' + sec.id;
+    a.textContent = titleEl.textContent.trim();
+    a.className = 'toc-link h2';
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      var rect = sec.getBoundingClientRect();
+      window.scrollTo({ top: rect.top + window.scrollY - 175, behavior: 'smooth' });
+    });
+    toc.appendChild(a);
+  });
+  var links = toc.querySelectorAll('.toc-link');
+  if (!links.length) return;
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (!entry.isIntersecting) return;
+      var id = entry.target.id;
+      links.forEach(function(l) { l.classList.remove('active'); });
+      var a = toc.querySelector('[href="#' + id + '"]');
+      if (a) {
+        a.classList.add('active');
+        var tr = toc.getBoundingClientRect();
+        var ar = a.getBoundingClientRect();
+        if (ar.bottom > tr.bottom || ar.top < tr.top) a.scrollIntoView({ block: 'nearest' });
+      }
+    });
+  }, { rootMargin: '-168px 0px -55% 0px', threshold: 0 });
+  sections.forEach(function(sec) { obs.observe(sec); });
+})();
 </script>
 </body>
 </html>
