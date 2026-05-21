@@ -175,7 +175,11 @@
   }
   .speed-btn:hover { background: var(--bg3); color: var(--text); }
   .speed-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
-  .video-total { margin-left: auto; font-size: 12px; color: var(--text3); }
+  .video-total { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .vid-prog-text { font-size: 12px; font-weight: 600; color: var(--ink); }
+  .vid-prog-bar-wrap { width: 64px; height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+  .vid-prog-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; width: 0%; }
+  .vid-prog-bar-fill.complete { background: #047857; }
   .chapter-section { margin-bottom: 36px; }
   .chapter-title {
     font-size: 17px; font-weight: 700; color: var(--ink);
@@ -365,8 +369,23 @@
   .ch-prog.ch-partial { background: #fef3c7; color: #92400e; }
   .ch-prog.ch-done    { background: #d1fae5; color: #047857; }
   .toc-progress {
-    font-size: 10px; color: var(--text3); padding: 0 18px 10px; display: block;
+    padding: 10px 14px 14px; display: block;
+    border-bottom: 1px solid var(--border); margin-bottom: 4px;
   }
+  .toc-prog-row {
+    display: flex; align-items: baseline; gap: 5px; margin-bottom: 7px;
+  }
+  .toc-prog-count {
+    font-size: 18px; font-weight: 700; color: var(--ink); line-height: 1;
+  }
+  .toc-prog-label { font-size: 11px; color: var(--text3); }
+  .toc-prog-bar {
+    height: 5px; background: var(--bg3); border-radius: 3px; overflow: hidden;
+  }
+  .toc-prog-fill {
+    height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.3s;
+  }
+  .toc-prog-fill.complete { background: #047857; }
 
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1848,7 +1867,7 @@ here<br />
   <button class="speed-btn active" data-speed="1.5">1.5&times;</button>
   <button class="speed-btn" data-speed="1.75">1.75&times;</button>
   <button class="speed-btn" data-speed="2">2&times;</button>
-  <span class="video-total">7 videos</span>
+  <span class="video-total"><span class="vid-prog-text"><span class="vid-prog-watched">0</span> / 7 watched</span><span class="vid-prog-bar-wrap"><span class="vid-prog-bar-fill"></span></span></span>
 </div>
 <div class="video-layout">
 <nav class="video-toc" id="video-toc"></nav>
@@ -2234,15 +2253,24 @@ document.getElementById('tabBar').addEventListener('click', function(e) {
     if (!toc) return;
     var prog = toc.querySelector('.toc-progress');
     if (!prog) {
-      prog = document.createElement('span');
+      prog = document.createElement('div');
       prog.className = 'toc-progress';
-      /* insert after the first .toc-label */
+      prog.innerHTML = '<div class="toc-prog-row"><span class="toc-prog-count"></span><span class="toc-prog-label">watched</span></div><div class="toc-prog-bar"><div class="toc-prog-fill"></div></div>';
       var lbl = toc.querySelector('.toc-label');
       if (lbl) lbl.after(prog); else toc.prepend(prog);
     }
-    prog.textContent = done === total && total > 0
-      ? '✓ All ' + total + ' videos watched'
-      : done + ' / ' + total + ' watched';
+    var pct = total > 0 ? Math.round(done / total * 100) : 0;
+    prog.querySelector('.toc-prog-count').textContent = done + ' / ' + total;
+    var fill = prog.querySelector('.toc-prog-fill');
+    fill.style.width = pct + '%';
+    fill.className = 'toc-prog-fill' + (done === total && total > 0 ? ' complete' : '');
+    var countEl = document.querySelector('.vid-prog-watched');
+    if (countEl) countEl.textContent = done;
+    var barFill = document.querySelector('.vid-prog-bar-fill');
+    if (barFill) {
+      barFill.style.width = (total > 0 ? Math.round(done / total * 100) : 0) + '%';
+      barFill.className = 'vid-prog-bar-fill' + (done === total && total > 0 ? ' complete' : '');
+    }
   }
 
   function init() {
