@@ -168,6 +168,12 @@
   .vid-prog-bar-wrap { width: 64px; height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
   .vid-prog-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; width: 0%; }
   .vid-prog-bar-fill.complete { background: #047857; }
+  .exam-tag {
+    display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.02em;
+    background: #c2410c; color: #fff;
+    padding: 1px 7px; border-radius: 8px; margin-left: 6px;
+    white-space: nowrap; flex-shrink: 0;
+  }
   #tab-videos.exam-only .video-card:not(.exam-essential) { display:none; }
   #tab-videos.exam-only .chapter-section:not(:has(.exam-essential)) { display:none; }
   .chapter-section { margin-bottom: 36px; }
@@ -1072,6 +1078,18 @@ function applySpeed(rate) {
     }
   }
   sel.addEventListener('change', function() { applyFilter(this.value === 'exam'); });
+})();
+</script>
+<script>
+/* ── Exam tags on all video cards (entire course is exam-essential) ── */
+(function() {
+  document.querySelectorAll('#tab-videos .video-card').forEach(function(card) {
+    var titleEl = card.querySelector('.video-title');
+    if (!titleEl || titleEl.querySelector('.exam-tag')) return;
+    var tag = document.createElement('span'); tag.className = 'exam-tag'; tag.textContent = '★ Exam';
+    var toggle = titleEl.querySelector('.watch-toggle');
+    if (toggle) titleEl.insertBefore(tag, toggle); else titleEl.appendChild(tag);
+  });
 })();
 </script>
 </body>
