@@ -574,11 +574,11 @@
 <!-- ─── Study Plan ─── -->
 <section id="section-study-plan" class="section">
   <div class="page-title">Study Plan</div>
-  <div class="page-subtitle">Courses sorted by combined exam domain weight — highest coverage first</div>
+  <div class="page-subtitle">Each domain assigned to its primary course — weights sum to 100%</div>
 
   <div class="info-card highlight">
     <div class="info-card-title">📌 Strategy</div>
-    <p style="margin:0;font-size:13.5px">Start with the <strong>🔴 Must</strong> courses in priority order. The <em>Weight %</em> column shows the combined exam domain weight each course directly covers. Courses with overlapping domains (e.g. D3) are worth studying for both.</p>
+    <p style="margin:0;font-size:13.5px">Start with the <strong>🔴 Must</strong> courses sorted by exam weight. Each domain is assigned to the course that covers it most deeply. 🟡 Foundation courses are prerequisites — study them first, but their domain weight is already counted in the primary course.</p>
   </div>
 
   <div class="section-heading">Course Priority & Domain Coverage</div>
@@ -587,7 +587,7 @@
       <tr>
         <th>Priority</th>
         <th>Course</th>
-        <th>Domains</th>
+        <th>Primary Domains</th>
         <th>Weight %</th>
         <th>Est. Time</th>
         <th>Focus Note</th>
@@ -596,27 +596,19 @@
     <tbody>
       <tr>
         <td><span class="pri pri-must">🔴 Must</span></td>
-        <td><a href="building-with-claude-api/index.html">🔧 Building with the Claude API</a></td>
-        <td>D2 · D4 · D5</td>
-        <td class="wt-cell"><span class="wt-num">53%</span><span class="wt-bar-wrap"><span class="wt-bar-fill" style="width:66%"></span></span></td>
-        <td>~5 hrs</td>
-        <td>Tool use (D2), prompt eng &amp; structured output (D4), context windows &amp; batches (D5)</td>
-      </tr>
-      <tr>
-        <td><span class="pri pri-must">🔴 Must</span></td>
         <td><a href="claude-code-in-action/index.html">⚡ Claude Code in Action</a></td>
         <td>D1 · D3</td>
         <td class="wt-cell"><span class="wt-num">47%</span><span class="wt-bar-wrap"><span class="wt-bar-fill" style="width:59%"></span></span></td>
         <td>~4 hrs</td>
-        <td>Agentic control flow &amp; hooks (D1), Claude Code config &amp; Agent SDK (D3)</td>
+        <td>Agentic control flow &amp; hooks (D1 27%), Claude Code config &amp; Agent SDK (D3 20%)</td>
       </tr>
       <tr>
-        <td><span class="pri pri-imp">🟡 Important</span></td>
-        <td><a href="claude-code-101/index.html">💻 Claude Code 101</a></td>
-        <td>D3</td>
-        <td class="wt-cell"><span class="wt-num">20%</span><span class="wt-bar-wrap"><span class="wt-bar-fill" style="width:25%"></span></span></td>
-        <td>~1.5 hrs</td>
-        <td>Foundation before Claude Code in Action; CLAUDE.md, memory, slash commands</td>
+        <td><span class="pri pri-must">🔴 Must</span></td>
+        <td><a href="building-with-claude-api/index.html">🔧 Building with the Claude API</a></td>
+        <td>D4 · D5</td>
+        <td class="wt-cell"><span class="wt-num">35%</span><span class="wt-bar-wrap"><span class="wt-bar-fill" style="width:44%"></span></span></td>
+        <td>~5 hrs</td>
+        <td>Prompt eng &amp; structured output (D4 20%), context windows &amp; batches (D5 15%)</td>
       </tr>
       <tr>
         <td><span class="pri pri-must">🔴 Must</span></td>
@@ -624,23 +616,32 @@
         <td>D2</td>
         <td class="wt-cell"><span class="wt-num">18%</span><span class="wt-bar-wrap"><span class="wt-bar-fill" style="width:23%"></span></span></td>
         <td>~2 hrs</td>
-        <td>Tool descriptions, error patterns, tool_choice — deep dive on D2</td>
+        <td>Tool descriptions, error patterns, tool_choice — primary D2 course (18%)</td>
       </tr>
-      <tr>
-        <td><span class="pri pri-imp">🟡 Important</span></td>
-        <td><a href="intro-to-mcp/index.html">🔌 Introduction to MCP</a></td>
-        <td>D2</td>
-        <td class="wt-cell"><span class="wt-num">18%</span><span class="wt-bar-wrap"><span class="wt-bar-fill" style="width:23%"></span></span></td>
+      <tr style="background:var(--bg2)">
+        <td><span class="pri pri-imp">🟡 Foundation</span></td>
+        <td><a href="claude-code-101/index.html">💻 Claude Code 101</a></td>
+        <td style="color:var(--text3)">D3 prereq</td>
+        <td class="wt-cell" style="color:var(--text3)">—</td>
         <td>~1.5 hrs</td>
-        <td>Foundation before MCP Advanced; MCP server config &amp; protocol basics</td>
+        <td>Study before Claude Code in Action — CLAUDE.md basics, memory, slash commands</td>
+      </tr>
+      <tr style="background:var(--bg2)">
+        <td><span class="pri pri-imp">🟡 Foundation</span></td>
+        <td><a href="intro-to-mcp/index.html">🔌 Introduction to MCP</a></td>
+        <td style="color:var(--text3)">D2 prereq</td>
+        <td class="wt-cell" style="color:var(--text3)">—</td>
+        <td>~1.5 hrs</td>
+        <td>Study before MCP Advanced — MCP protocol basics &amp; server config</td>
+      </tr>
+      <tr style="font-weight:700;background:var(--bg3)">
+        <td colspan="3" style="text-align:right;font-size:12px;color:var(--text2);font-weight:600">Total exam coverage</td>
+        <td class="wt-cell"><span class="wt-num">100%</span><span class="wt-bar-wrap"><span class="wt-bar-fill" style="width:100%;background:var(--d4)"></span></span></td>
+        <td></td>
+        <td style="font-size:12px;color:var(--text2);font-weight:400">D1 27% + D2 18% + D3 20% + D4 20% + D5 15%</td>
       </tr>
     </tbody>
   </table>
-
-  <div class="info-card" style="background:var(--bg4);border:1px solid var(--border)">
-    <div class="info-card-title">ℹ️ Why weights don't add up to 100%</div>
-    <p style="margin:0;font-size:13px;color:var(--text2)">The <em>Weight %</em> column shows the combined exam domain weight each course covers — not its unique share. Since some domains appear in multiple courses (D3 in both CC101 and CCI; D2 in both API and MCP courses), rows add up to more than 100%. The exam domains themselves sum exactly to 100%: D1 <strong style="color:var(--d1)">27%</strong> + D2 <strong style="color:var(--d2)">18%</strong> + D3 <strong style="color:var(--d3)">20%</strong> + D4 <strong style="color:var(--d4)">20%</strong> + D5 <strong style="color:var(--d5)">15%</strong> = 100%.</p>
-  </div>
 
   <div class="info-card success" style="margin-top:14px">
     <div class="info-card-title">✅ Known Gap: Agent SDK Multi-Agent Patterns (D1)</div>
