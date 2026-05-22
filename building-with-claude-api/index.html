@@ -163,15 +163,10 @@
     margin-bottom: 0; flex-wrap: wrap;
     position: sticky; top: 120px; z-index: 90;
   }
+  .spd-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
   .speed-label { font-size: 13px; color: var(--text2); }
-  .speed-btn {
-    background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
-    padding: 4px 12px; border-radius: 20px; cursor: pointer;
-    font-size: 12px; transition: all 0.15s;
-  }
-  .speed-btn:hover { background: var(--bg3); color: var(--text); }
-  .speed-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
-  .video-total { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .speed-select { font-size: 12px; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg2); color: var(--text2); cursor: pointer; }
+  .video-total { display: flex; align-items: center; gap: 8px; }
   .vid-prog-text { font-size: 12px; font-weight: 600; color: var(--ink); }
   .vid-prog-bar-wrap { width: 64px; height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
   .vid-prog-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; width: 0%; }
@@ -1851,18 +1846,22 @@ Get prompt = await self.session.get_prompt(prompt_name, arguments), return resul
   <script src="https://cdn.jwplayer.com/libraries/Akyo8gQO.js">
 </script>
 <div class="video-speed-bar">
-  <span class="speed-label">Speed:</span>
-  <button class="speed-btn" data-speed="0.5">0.5&times;</button>
-  <button class="speed-btn" data-speed="0.75">0.75&times;</button>
-  <button class="speed-btn" data-speed="1">1&times;</button>
-  <button class="speed-btn" data-speed="1.25">1.25&times;</button>
-  <button class="speed-btn active" data-speed="1.5">1.5&times;</button>
-  <button class="speed-btn" data-speed="1.75">1.75&times;</button>
-  <button class="speed-btn" data-speed="2">2&times;</button>
-  <span class="spd-sep">|</span>
-  <button class="vid-filter-btn active" data-filter="all">All Videos</button>
-  <button class="vid-filter-btn" data-filter="exam">⭐ Exam Only</button>
-  <span class="video-total"><span class="vid-prog-text"><span class="vid-prog-watched">0</span> / <span class="vid-total-count">74</span> watched</span><span class="vid-prog-bar-wrap"><span class="vid-prog-bar-fill"></span></span></span>
+  <span class="spd-right">
+    <span class="speed-label">Speed:</span>
+    <select class="speed-select">
+      <option value="0.5">0.5×</option>
+      <option value="0.75">0.75×</option>
+      <option value="1">1×</option>
+      <option value="1.25">1.25×</option>
+      <option value="1.5" selected>1.5×</option>
+      <option value="1.75">1.75×</option>
+      <option value="2">2×</option>
+    </select>
+    <span class="spd-sep">|</span>
+    <button class="vid-filter-btn active" data-filter="all">All Videos</button>
+    <button class="vid-filter-btn" data-filter="exam">⭐ Exam Only</button>
+    <span class="video-total"><span class="vid-prog-text"><span class="vid-prog-watched">0</span> / <span class="vid-total-count">74</span> watched</span><span class="vid-prog-bar-wrap"><span class="vid-prog-bar-fill"></span></span></span>
+  </span>
 </div>
 <div class="video-layout">
 <nav class="video-toc" id="video-toc"></nav>
@@ -1954,13 +1953,8 @@ function applySpeed(rate) {
   currentSpeed = rate;
   jwPlayers.forEach(p => { try { p.setPlaybackRate(rate); } catch(e) {} });
 }
-document.querySelectorAll('.video-speed-bar .speed-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
-    document.querySelectorAll('.video-speed-bar .speed-btn').forEach(b => b.classList.remove('active'));
-    this.classList.add('active');
-    applySpeed(parseFloat(this.dataset.speed));
-  });
-});
+var speedSel = document.querySelector('.speed-select');
+if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseFloat(this.value)); });
 </script>
 </div>
 
