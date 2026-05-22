@@ -399,7 +399,7 @@
   }
 
   /* ── Exam Only filter bar ── */
-  .vid-filter-bar { display:flex; gap:8px; padding:10px 32px; background:var(--bg); border-bottom:1px solid var(--border); }
+  .spd-sep { color:var(--border); font-size:16px; margin:0 4px; user-select:none; }
   .vid-filter-btn { font-size:12px; font-weight:600; padding:4px 14px; border-radius:20px; border:1px solid var(--border); background:var(--bg2); color:var(--text2); cursor:pointer; transition:all 0.15s; }
   .vid-filter-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; }
   .vid-filter-btn:hover:not(.active) { border-color:var(--accent); color:var(--accent); }
@@ -733,11 +733,10 @@ This makes it a lot easier for you to understand what data your command should i
   <button class="speed-btn active" data-speed="1.5">1.5&times;</button>
   <button class="speed-btn" data-speed="1.75">1.75&times;</button>
   <button class="speed-btn" data-speed="2">2&times;</button>
-  <span class="video-total"><span class="vid-prog-text"><span class="vid-prog-watched">0</span> / 15 watched</span><span class="vid-prog-bar-wrap"><span class="vid-prog-bar-fill"></span></span></span>
-</div>
-<div class="vid-filter-bar">
+  <span class="spd-sep">|</span>
   <button class="vid-filter-btn active" data-filter="all">All Videos</button>
   <button class="vid-filter-btn" data-filter="exam">⭐ Exam Only</button>
+  <span class="video-total"><span class="vid-prog-text"><span class="vid-prog-watched">0</span> / <span class="vid-total-count">15</span> watched</span><span class="vid-prog-bar-wrap"><span class="vid-prog-bar-fill"></span></span></span>
 </div>
 <div class="video-layout">
 <nav class="video-toc" id="video-toc"></nav>
@@ -1253,24 +1252,34 @@ document.querySelectorAll('.video-speed-bar .speed-btn').forEach(btn => {
 </script>
 <script>
 /* ── Exam Only filter bar ── */
+/* ── Exam Only filter ── */
 (function() {
   var tab = document.getElementById('tab-videos');
   if (!tab) return;
-  var bar = tab.querySelector('.vid-filter-bar');
-  if (!bar) return;
-  var examCount = tab.querySelectorAll('.exam-essential').length;
-  var examBtn = bar.querySelector('[data-filter="exam"]');
-  if (examBtn) examBtn.textContent = '⭐ Exam Only (' + examCount + ')';
-  bar.addEventListener('click', function(e) {
+  var speedBar = document.querySelector('.video-speed-bar');
+  if (!speedBar) return;
+  var totalCards = tab.querySelectorAll('.video-card').length;
+  var examCards = tab.querySelectorAll('.exam-essential').length;
+  var examBtn = speedBar.querySelector('[data-filter="exam"]');
+  if (examBtn) examBtn.textContent = '⭐ Exam Only (' + examCards + ')';
+  function updateCount(isExam) {
+    var countEl = document.querySelector('.vid-total-count');
+    if (countEl) countEl.textContent = isExam ? examCards : totalCards;
+    var watchedEl = document.querySelector('.vid-prog-watched');
+    if (watchedEl) {
+      var selector = isExam ? '.exam-essential.watched' : '.video-card.watched';
+      watchedEl.textContent = tab.querySelectorAll(selector).length;
+    }
+  }
+  speedBar.addEventListener('click', function(e) {
     var btn = e.target.closest('.vid-filter-btn');
     if (!btn) return;
-    bar.querySelectorAll('.vid-filter-btn').forEach(function(b) { b.classList.remove('active'); });
+    speedBar.querySelectorAll('.vid-filter-btn').forEach(function(b) { b.classList.remove('active'); });
     btn.classList.add('active');
-    if (btn.dataset.filter === 'exam') {
-      tab.classList.add('exam-only');
-    } else {
-      tab.classList.remove('exam-only');
-    }
+    var isExam = btn.dataset.filter === 'exam';
+    if (isExam) tab.classList.add('exam-only');
+    else tab.classList.remove('exam-only');
+    updateCount(isExam);
   });
 })();
 </script>
