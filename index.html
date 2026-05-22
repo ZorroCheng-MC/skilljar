@@ -398,6 +398,14 @@
   .ft-row.done .ft-title { text-decoration: line-through; color: var(--text3); }
   .ft-row.done .ft-freq { opacity: 0.4; }
   .ft-row.done .ft-link, .ft-row.done .ft-hint { opacity: 0.45; }
+  .ft-course { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 8px; white-space: nowrap; vertical-align: middle; margin-right: 4px; }
+  .ft-course.api  { background: #dbeafe; color: #1e40af; }
+  .ft-course.cci  { background: #dcfce7; color: #166534; }
+  .ft-course.cc1  { background: #fef3c7; color: #92400e; }
+  .ft-concept { padding: 12px 14px; border-left: 3px solid var(--coral); background: rgba(194,65,12,0.06); border-radius: 0 6px 6px 0; margin-top: 8px; }
+  .ft-concept-head { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .ft-concept-body { font-size: 12px; color: var(--text3); }
+  .ft-concept-body li { margin-bottom: 3px; }
 
 </style>
 </head>
@@ -1461,52 +1469,84 @@
 <!-- ─── Fast Track ─── -->
 <section id="section-fast-track" class="section">
   <div class="page-title">⚡ Fast Track</div>
-  <div class="page-subtitle">17 targeted topics — everything that appears on the CCA-F exam, prioritised by question frequency</div>
+  <div class="page-subtitle">27 individual videos — mapped directly to exam questions. Watch only these. Skip everything else.</div>
 
   <div class="info-card highlight">
     <div class="info-card-title">📌 How to use</div>
-    <p style="margin:0;font-size:13.5px">Click each link, read the section, tick the checkbox. Progress is saved in your browser. Estimated total: <strong>~2 hours</strong>. Then take the <a href="full-exam/index.html">Full Practice Exam (60 Q)</a>.</p>
+    <p style="margin:0;font-size:13.5px">Each item links to the <strong>exact video</strong> that covers exam questions. Click → watch → tick. Progress is saved in your browser. Estimated total: <strong>~4 hours</strong>. Then take the <a href="full-exam/index.html">Full Practice Exam (60 Q)</a>.</p>
   </div>
 
   <div class="ft-progress-wrap">
     <div class="ft-progress-bar"><div class="ft-progress-fill" id="ft-fill"></div></div>
-    <div class="ft-progress-label" id="ft-label">0 / 17 complete</div>
+    <div class="ft-progress-label" id="ft-label">0 / 27 complete</div>
   </div>
 
   <!-- D1 -->
   <div class="ft-cluster">
-    <div class="ft-cluster-head">D1 · Agentic Architecture &amp; Orchestration <span class="ft-cluster-count">19 / 60 questions</span></div>
+    <div class="ft-cluster-head">D1 · Agentic Architecture &amp; Orchestration <span class="ft-cluster-count">27% · ~16 Q</span></div>
     <ul class="ft-list">
       <li class="ft-row">
         <input type="checkbox" class="ft-check" data-id="ft1" onchange="ftCheck(this)">
         <div class="ft-body">
-          <div class="ft-title">Multi-agent orchestration patterns <span class="ft-freq">6× on exam</span></div>
-          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Agents and workflows, Parallelization workflows</div>
-          <div class="ft-hint">Coordinator vs subagent roles; fan-out pattern; task decomposition scope</div>
+          <div class="ft-title"><span class="ft-course api">API</span>Agents and workflows <span class="ft-freq">6Q</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html#jwp-66" target="_blank">Building with the Claude API · #66</a></div>
+          <div class="ft-hint">Coordinator vs subagent roles; when to use multi-agent vs single-agent; orchestration scope</div>
         </div>
       </li>
       <li class="ft-row">
         <input type="checkbox" class="ft-check" data-id="ft2" onchange="ftCheck(this)">
         <div class="ft-body">
-          <div class="ft-title">Escalation criteria &amp; reliability calibration <span class="ft-freq">4× on exam</span></div>
-          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Being clear and direct, Providing examples</div>
-          <div class="ft-hint">Explicit escalation thresholds + few-shot examples beat self-reported confidence scores</div>
+          <div class="ft-title"><span class="ft-course api">API</span>Parallelization workflows <span class="ft-freq">6Q</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html#jwp-67" target="_blank">Building with the Claude API · #67</a></div>
+          <div class="ft-hint">Fan-out pattern; parallel subagents; when parallelization adds value vs overhead</div>
         </div>
       </li>
       <li class="ft-row">
         <input type="checkbox" class="ft-check" data-id="ft3" onchange="ftCheck(this)">
         <div class="ft-body">
-          <div class="ft-title">Agentic loop fundamentals &amp; stop conditions <span class="ft-freq">2× on exam</span></div>
-          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Agents and tools, Chaining workflows</div>
-          <div class="ft-hint">perception→reasoning→action loop; when to stop; parallel tool execution</div>
+          <div class="ft-title"><span class="ft-course api">API</span>Chaining workflows <span class="ft-freq">5Q</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html#jwp-68" target="_blank">Building with the Claude API · #68</a></div>
+          <div class="ft-hint">Sequential task decomposition; per-step context scoping; self-evaluation evaluator-optimizer pattern</div>
         </div>
       </li>
       <li class="ft-row">
         <input type="checkbox" class="ft-check" data-id="ft4" onchange="ftCheck(this)">
         <div class="ft-body">
-          <div class="ft-title">Agent SDK hook patterns <span class="ft-freq">1× on exam</span></div>
-          <div class="ft-link">→ <a href="claude-code-in-action/index.html" target="_blank">Claude Code in Action</a> — Introducing hooks, Defining hooks</div>
-          <div class="ft-hint">PreToolUse / PostToolUse / Stop / SubagentStop — deterministic control over agentic behaviour</div>
+          <div class="ft-title"><span class="ft-course api">API</span>Routing workflows <span class="ft-freq">2Q</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html#jwp-69" target="_blank">Building with the Claude API · #69</a></div>
+          <div class="ft-hint">Explicit escalation criteria; conditional branching; routing by classification</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft5" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title"><span class="ft-course api">API</span>Agents and tools <span class="ft-freq">5Q</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html#jwp-70" target="_blank">Building with the Claude API · #70</a></div>
+          <div class="ft-hint">Agentic loop stop conditions; ambiguous result handling; multi-step workflow enforcement</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft6" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title"><span class="ft-course api">API</span>Workflows vs agents <span class="ft-freq">concept</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html#jwp-72" target="_blank">Building with the Claude API · #72</a></div>
+          <div class="ft-hint">Workflows = predictable, deterministic; agents = dynamic, LLM-directed; know when each applies</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft7" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title"><span class="ft-course api">API</span>Implementing multiple turns <span class="ft-freq">1Q</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html#jwp-31" target="_blank">Building with the Claude API · #31</a></div>
+          <div class="ft-hint">Agentic loop mechanics; stop_reason = "tool_use" vs "end_turn"; programmatic loop control</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft8" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title"><span class="ft-course cc1">CC101</span>Subagents <span class="ft-freq">1Q</span></div>
+          <div class="ft-link">→ <a href="claude-code-101/index.html#ch-advanced-features" target="_blank">Claude Code 101 · Advanced Features → "Subagents"</a></div>
+          <div class="ft-hint">When Claude Code spawns subagents; scope inheritance; delegation vs orchestration</div>
         </div>
       </li>
     </ul>
@@ -1514,38 +1554,54 @@
 
   <!-- D2 -->
   <div class="ft-cluster">
-    <div class="ft-cluster-head">D2 · Tool Design &amp; MCP <span class="ft-cluster-count">14 / 60 questions</span></div>
+    <div class="ft-cluster-head">D2 · Tool Design &amp; MCP <span class="ft-cluster-count">18% · ~11 Q</span></div>
     <ul class="ft-list">
       <li class="ft-row">
-        <input type="checkbox" class="ft-check" data-id="ft5" onchange="ftCheck(this)">
+        <input type="checkbox" class="ft-check" data-id="ft9" onchange="ftCheck(this)">
         <div class="ft-body">
-          <div class="ft-title">Error propagation: structured context <span class="ft-freq">5× on exam</span></div>
-          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Sending tool results, Handling message blocks</div>
-          <div class="ft-hint">Return {failure_type, partial_results, suggested_alternatives} — not generic errors or silent success</div>
+          <div class="ft-title"><span class="ft-course api">API</span>Introducing tool use <span class="ft-freq">foundation</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html#jwp-24" target="_blank">Building with the Claude API · #24</a></div>
+          <div class="ft-hint">Tool use lifecycle; how Claude decides to call a tool; tool_choice parameter</div>
         </div>
       </li>
       <li class="ft-row">
-        <input type="checkbox" class="ft-check" data-id="ft6" onchange="ftCheck(this)">
+        <input type="checkbox" class="ft-check" data-id="ft10" onchange="ftCheck(this)">
         <div class="ft-body">
-          <div class="ft-title">Tool selection reliability via descriptions <span class="ft-freq">4× on exam</span></div>
-          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Tool schemas, Introducing tool use</div>
-          <div class="ft-hint">Tool descriptions are the primary routing mechanism — fix the description before adding infrastructure</div>
+          <div class="ft-title"><span class="ft-course api">API</span>Tool schemas <span class="ft-freq">4Q</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html#jwp-27" target="_blank">Building with the Claude API · #27</a></div>
+          <div class="ft-hint">Tool description = primary routing mechanism; fix descriptions before adding infrastructure; schema precision</div>
         </div>
       </li>
       <li class="ft-row">
-        <input type="checkbox" class="ft-check" data-id="ft7" onchange="ftCheck(this)">
+        <input type="checkbox" class="ft-check" data-id="ft11" onchange="ftCheck(this)">
         <div class="ft-body">
-          <div class="ft-title">Fine-grained tool control &amp; least-privilege <span class="ft-freq">4× on exam</span></div>
-          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Fine grained tool calling, The web search tool</div>
-          <div class="ft-hint">Give subagents only the tools they need; tool_choice: auto / any / forced</div>
+          <div class="ft-title"><span class="ft-course api">API</span>Handling message blocks <span class="ft-freq">5Q</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html#jwp-28" target="_blank">Building with the Claude API · #28</a></div>
+          <div class="ft-hint">Parse content blocks from response; identify tool_use blocks; error propagation through tool results</div>
         </div>
       </li>
       <li class="ft-row">
-        <input type="checkbox" class="ft-check" data-id="ft8" onchange="ftCheck(this)">
+        <input type="checkbox" class="ft-check" data-id="ft12" onchange="ftCheck(this)">
         <div class="ft-body">
-          <div class="ft-title">MCP server integration &amp; tool definitions <span class="ft-freq">1× on exam</span></div>
-          <div class="ft-link">→ <a href="intro-to-mcp/index.html" target="_blank">Introduction to MCP</a> — Defining tools with MCP &nbsp;·&nbsp; <a href="mcp-advanced/index.html" target="_blank">MCP Advanced</a> — Sampling</div>
-          <div class="ft-hint">stdio vs SSE transport; tool schema in MCP vs direct API</div>
+          <div class="ft-title"><span class="ft-course api">API</span>Sending tool results <span class="ft-freq">5Q</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html#jwp-29" target="_blank">Building with the Claude API · #29</a></div>
+          <div class="ft-hint">Return {failure_type, partial_results, suggested_alternatives} — structured errors, not silent success</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft13" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title"><span class="ft-course api">API</span>Fine grained tool calling <span class="ft-freq">3Q</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html#jwp-33" target="_blank">Building with the Claude API · #33</a></div>
+          <div class="ft-hint">Scoped tool sets per subagent; least-privilege principle; tool_choice: auto / any / forced name</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft14" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title"><span class="ft-course cci">CCI</span>MCP servers with Claude Code <span class="ft-freq">1Q</span></div>
+          <div class="ft-link">→ <a href="claude-code-in-action/index.html#jwp-7" target="_blank">Claude Code in Action · #7</a></div>
+          <div class="ft-hint">How Claude Code connects to MCP servers; tool discovery; stdio vs SSE transport</div>
         </div>
       </li>
     </ul>
@@ -1553,46 +1609,62 @@
 
   <!-- D3 -->
   <div class="ft-cluster">
-    <div class="ft-cluster-head">D3 · Claude Code Configuration <span class="ft-cluster-count">14 / 60 questions</span></div>
+    <div class="ft-cluster-head">D3 · Claude Code Configuration <span class="ft-cluster-count">20% · ~12 Q</span></div>
     <ul class="ft-list">
       <li class="ft-row">
-        <input type="checkbox" class="ft-check" data-id="ft9" onchange="ftCheck(this)">
+        <input type="checkbox" class="ft-check" data-id="ft15" onchange="ftCheck(this)">
         <div class="ft-body">
-          <div class="ft-title">Custom slash commands: project vs user scope <span class="ft-freq">6× on exam</span></div>
-          <div class="ft-link">→ <a href="claude-code-in-action/index.html" target="_blank">Claude Code in Action</a> — Custom commands &nbsp;·&nbsp; <a href="claude-code-101/index.html" target="_blank">Claude Code 101</a> — Skills</div>
-          <div class="ft-hint">.claude/commands/ (version-controlled, shared) vs ~/.claude/commands/ (personal only)</div>
+          <div class="ft-title"><span class="ft-course cci">CCI</span>Custom commands <span class="ft-freq">6Q</span></div>
+          <div class="ft-link">→ <a href="claude-code-in-action/index.html#jwp-6" target="_blank">Claude Code in Action · #6</a></div>
+          <div class="ft-hint"><code>.claude/commands/</code> = project-scoped, version-controlled, shared with team; markdown files with $ARGUMENTS</div>
         </div>
       </li>
       <li class="ft-row">
-        <input type="checkbox" class="ft-check" data-id="ft10" onchange="ftCheck(this)">
+        <input type="checkbox" class="ft-check" data-id="ft16" onchange="ftCheck(this)">
         <div class="ft-body">
-          <div class="ft-title">Claude Code in CI/CD: the <code>-p</code> flag <span class="ft-freq">2× on exam</span></div>
-          <div class="ft-link">→ <a href="claude-code-in-action/index.html" target="_blank">Claude Code in Action</a> — Github integration</div>
-          <div class="ft-hint"><code>claude -p "prompt"</code> runs non-interactively and exits — the only correct CI mode flag</div>
+          <div class="ft-title"><span class="ft-course cc1">CC101</span>Skills (slash commands scope) <span class="ft-freq">7Q</span></div>
+          <div class="ft-link">→ <a href="claude-code-101/index.html#ch-advanced-features" target="_blank">Claude Code 101 · Advanced Features → "Skills"</a></div>
+          <div class="ft-hint"><code>~/.claude/commands/</code> = user-scoped, personal only; Skills vs CLAUDE.md: commands vs persistent instructions</div>
         </div>
       </li>
       <li class="ft-row">
-        <input type="checkbox" class="ft-check" data-id="ft11" onchange="ftCheck(this)">
+        <input type="checkbox" class="ft-check" data-id="ft17" onchange="ftCheck(this)">
         <div class="ft-body">
-          <div class="ft-title">Plan mode for complex multi-file tasks <span class="ft-freq">2× on exam</span></div>
-          <div class="ft-link">→ <a href="claude-code-101/index.html" target="_blank">Claude Code 101</a> — The explore → plan → code → commit workflow</div>
-          <div class="ft-hint">Use plan mode before touching dozens of files; direct execution compounds mistakes at scale</div>
+          <div class="ft-title"><span class="ft-course cc1">CC101</span>The CLAUDE.md file <span class="ft-freq">3Q</span></div>
+          <div class="ft-link">→ <a href="claude-code-101/index.html#ch-working-effectively" target="_blank">Claude Code 101 · Working Effectively → "The CLAUDE.md file"</a></div>
+          <div class="ft-hint">Hierarchy: global → project root → subdirectory; <code>.claude/rules/</code> for modular org; glob patterns for path-specific rules</div>
         </div>
       </li>
       <li class="ft-row">
-        <input type="checkbox" class="ft-check" data-id="ft12" onchange="ftCheck(this)">
+        <input type="checkbox" class="ft-check" data-id="ft18" onchange="ftCheck(this)">
         <div class="ft-body">
-          <div class="ft-title">Path-specific rules with glob patterns <span class="ft-freq">1× on exam</span></div>
-          <div class="ft-link">→ <a href="claude-code-in-action/index.html" target="_blank">Claude Code in Action</a> — Adding context</div>
-          <div class="ft-hint">.claude/rules/ files with YAML frontmatter globs (e.g. **/*.test.tsx) apply per file type</div>
+          <div class="ft-title"><span class="ft-course cc1">CC101</span>The explore → plan → code → commit workflow <span class="ft-freq">2Q</span></div>
+          <div class="ft-link">→ <a href="claude-code-101/index.html#ch-getting-started" target="_blank">Claude Code 101 · Getting Started → "The explore → plan → code → commit workflow"</a></div>
+          <div class="ft-hint">Plan mode before touching many files; direct execution compounds mistakes; shift-tab to toggle plan mode</div>
         </div>
       </li>
       <li class="ft-row">
-        <input type="checkbox" class="ft-check" data-id="ft13" onchange="ftCheck(this)">
+        <input type="checkbox" class="ft-check" data-id="ft19" onchange="ftCheck(this)">
         <div class="ft-body">
-          <div class="ft-title">CLAUDE.md hierarchy &amp; modular organisation <span class="ft-freq">2× on exam</span></div>
-          <div class="ft-link">→ <a href="claude-code-101/index.html" target="_blank">Claude Code 101</a> — The CLAUDE.md file</div>
-          <div class="ft-hint">Global (~/.claude) → project root → subdirectory — each layer adds context</div>
+          <div class="ft-title"><span class="ft-course cci">CCI</span>Github integration (CI/CD) <span class="ft-freq">2Q</span></div>
+          <div class="ft-link">→ <a href="claude-code-in-action/index.html#jwp-8" target="_blank">Claude Code in Action · #8</a></div>
+          <div class="ft-hint"><code>claude -p "prompt"</code> = non-interactive, exits after completion — the only correct CI mode flag</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft20" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title"><span class="ft-course cc1">CC101</span>Context management <span class="ft-freq">1Q</span></div>
+          <div class="ft-link">→ <a href="claude-code-101/index.html#ch-working-effectively" target="_blank">Claude Code 101 · Working Effectively → "Context management"</a></div>
+          <div class="ft-hint">Methods to provide context: CLAUDE.md, @file references, /add, conversation history; when to clear context</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft21" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title"><span class="ft-course cci">CCI</span>Hooks series (3 videos) <span class="ft-freq">1Q</span></div>
+          <div class="ft-link">→ <a href="claude-code-in-action/index.html#jwp-9" target="_blank">Claude Code in Action · #9</a> · <a href="claude-code-in-action/index.html#jwp-10" target="_blank">#10</a> · <a href="claude-code-in-action/index.html#jwp-11" target="_blank">#11</a></div>
+          <div class="ft-hint">PreToolUse / PostToolUse / Stop / SubagentStop — shell commands triggered at lifecycle events; deterministic guardrails</div>
         </div>
       </li>
     </ul>
@@ -1600,41 +1672,71 @@
 
   <!-- D4 -->
   <div class="ft-cluster">
-    <div class="ft-cluster-head">D4 · Prompt Engineering &amp; Structured Output <span class="ft-cluster-count">12 / 60 questions</span></div>
+    <div class="ft-cluster-head">D4 · Prompt Engineering &amp; Structured Output <span class="ft-cluster-count">20% · ~12 Q</span></div>
     <ul class="ft-list">
       <li class="ft-row">
-        <input type="checkbox" class="ft-check" data-id="ft14" onchange="ftCheck(this)">
+        <input type="checkbox" class="ft-check" data-id="ft22" onchange="ftCheck(this)">
         <div class="ft-body">
-          <div class="ft-title">Message Batches API: when to use async <span class="ft-freq">4× on exam</span></div>
-          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Agents and workflows section</div>
-          <div class="ft-hint">Batches API = up to 24-hour processing — perfect for overnight reports, wrong for blocking CI checks</div>
+          <div class="ft-title"><span class="ft-course api">API</span>Prompt engineering <span class="ft-freq">foundation</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html#jwp-18" target="_blank">Building with the Claude API · #18</a></div>
+          <div class="ft-hint">Core prompting principles; why prompt quality is the primary lever before engineering solutions</div>
         </div>
       </li>
       <li class="ft-row">
-        <input type="checkbox" class="ft-check" data-id="ft15" onchange="ftCheck(this)">
+        <input type="checkbox" class="ft-check" data-id="ft23" onchange="ftCheck(this)">
         <div class="ft-body">
-          <div class="ft-title">Chaining &amp; parallelization workflows <span class="ft-freq">3× on exam</span></div>
-          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Chaining workflows, Parallelization workflows</div>
-          <div class="ft-hint">Focused per-file passes then a cross-file integration pass beats one large-context sweep</div>
+          <div class="ft-title"><span class="ft-course api">API</span>Being clear and direct <span class="ft-freq">2Q</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html#jwp-19" target="_blank">Building with the Claude API · #19</a></div>
+          <div class="ft-hint">Reduce false positives by eliminating ambiguity; explicit negative examples; do/don't patterns</div>
         </div>
       </li>
       <li class="ft-row">
-        <input type="checkbox" class="ft-check" data-id="ft16" onchange="ftCheck(this)">
+        <input type="checkbox" class="ft-check" data-id="ft24" onchange="ftCheck(this)">
         <div class="ft-body">
-          <div class="ft-title">Few-shot prompting &amp; prompt specificity <span class="ft-freq">2× on exam</span></div>
-          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Providing examples, Being specific</div>
-          <div class="ft-hint">Few-shot adds weight but doesn't fix missing specification — fix the root cause first</div>
+          <div class="ft-title"><span class="ft-course api">API</span>Being specific <span class="ft-freq">3Q</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html#jwp-20" target="_blank">Building with the Claude API · #20</a></div>
+          <div class="ft-hint">Classification consistency via precise criteria; false positive reduction; measurable output requirements</div>
         </div>
       </li>
       <li class="ft-row">
-        <input type="checkbox" class="ft-check" data-id="ft17" onchange="ftCheck(this)">
+        <input type="checkbox" class="ft-check" data-id="ft25" onchange="ftCheck(this)">
         <div class="ft-body">
-          <div class="ft-title">Structured output, self-evaluation &amp; long context <span class="ft-freq">3× on exam</span></div>
-          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Structured data, Response streaming</div>
-          <div class="ft-hint">Long context: critical info at start or end; structured output via tool_choice + JSON schema</div>
+          <div class="ft-title"><span class="ft-course api">API</span>Providing examples <span class="ft-freq">7Q</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html#jwp-22" target="_blank">Building with the Claude API · #22</a></div>
+          <div class="ft-hint">Few-shot fixes tool selection errors; escalation examples; iterative refinement pattern; examples add weight not spec</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft26" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title"><span class="ft-course api">API</span>Prompt caching <span class="ft-freq">1Q</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html#jwp-47" target="_blank">Building with the Claude API · #47</a></div>
+          <div class="ft-hint">Long context: place critical info at start or end of context window (primacy/recency); middle gets lost</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft27" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title"><span class="ft-course api">API</span>Structured data <span class="ft-freq">1Q</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html#jwp-9" target="_blank">Building with the Claude API · #9</a></div>
+          <div class="ft-hint">Structured output via tool_choice = "any" + JSON schema; more reliable than asking for JSON in prompt</div>
         </div>
       </li>
     </ul>
+
+    <!-- Concept card — no video available -->
+    <div class="ft-concept">
+      <div class="ft-concept-head"><span class="ft-freq">4Q</span> Message Batches API — Pure Concept (no video)</div>
+      <div class="ft-concept-body">
+        <ul style="margin:0;padding-left:18px">
+          <li>Async, fire-and-forget — up to <strong>24-hour</strong> processing window</li>
+          <li><strong>Cannot</strong> execute tools mid-request (no real-time tool calls in batch mode)</li>
+          <li>Use when: large overnight report runs, non-blocking jobs where results aren't needed immediately</li>
+          <li>Use Synchronous API when: real-time response needed, CI checks, interactive user flows</li>
+          <li>Key exam trap: batch ≠ faster — it's cheaper and async, not low-latency</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="info-card success">
@@ -1663,7 +1765,7 @@ function show(id, el) {
 }
 
 // Fast Track checkboxes
-var FT_TOTAL = 17;
+var FT_TOTAL = 27;
 function ftCheck(cb) {
   localStorage.setItem('ft:' + cb.dataset.id, cb.checked ? '1' : '0');
   cb.closest('.ft-row').classList.toggle('done', cb.checked);
