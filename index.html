@@ -48,19 +48,17 @@
     background: var(--bg); border-bottom: 1px solid var(--border);
     padding: 0 28px; display: flex; align-items: center; gap: 0;
   }
-  .site-logo {
-    font-family: 'Open Sans', sans-serif;
-    font-size: 14px; font-weight: 700; color: var(--ink);
-    letter-spacing: 0.12em; text-transform: uppercase;
-    display: flex; align-items: center; gap: 10px;
-    white-space: nowrap;
-  }
   .logo-mark {
     font-size: 18px; font-weight: 900; letter-spacing: -0.05em;
     color: var(--ink);
   }
   .header-sep { color: var(--border); margin: 0 16px; font-size: 20px; font-weight: 200; line-height: 1; }
-  .header-sub { font-size: 13px; color: var(--text3); font-weight: 400; }
+  .header-hub {
+    display: flex; align-items: center; gap: 0; text-decoration: none;
+    font-size: 13px; color: var(--text3); font-weight: 400; white-space: nowrap;
+  }
+  .header-hub:hover { text-decoration: none; color: var(--ink); }
+  .header-hub:hover .logo-mark { color: var(--accent); }
   .header-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
   .exam-badge {
     font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 2px;
@@ -412,11 +410,11 @@
 <body>
 
 <header class="site-header">
-  <div class="site-logo">
+  <a href="index.html" class="header-hub">
     <span class="logo-mark">ANTHROPIC</span>
-  </div>
-  <span class="header-sep">|</span>
-  <span class="header-sub">CCA-F Study Hub</span>
+    <span class="header-sep">|</span>
+    CCA-F Study Hub
+  </a>
   <div class="header-right">
     <span class="exam-badge">Claude Certified Architect – Foundations</span>
   </div>

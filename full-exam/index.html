@@ -43,6 +43,9 @@
   }
   .header-divider { width: 1px; height: 22px; background: var(--border); margin: 0 16px; }
   .header-title { font-size: 14px; color: var(--text2); }
+  .header-home-link { display: flex; align-items: center; text-decoration: none; }
+  .header-home-link:hover .logo-wordmark { opacity: 0.7; }
+  .header-home-link:hover .header-title { color: var(--ink); }
   .header-right { margin-left: auto; }
   .header-btn {
     display: inline-block; padding: 7px 16px; background: var(--ink); color: #fff;
@@ -211,9 +214,11 @@
 <body>
 
 <header class="site-header">
-  <div class="logo-wordmark">Anthropic</div>
-  <div class="header-divider"></div>
-  <div class="header-title">CCA-F Study Hub</div>
+  <a href="../index.html" class="header-home-link">
+    <div class="logo-wordmark">Anthropic</div>
+    <div class="header-divider"></div>
+    <div class="header-title">CCA-F Study Hub</div>
+  </a>
   <div class="header-right">
     <a class="header-btn" href="https://anthropic.skilljar.com/claude-certified-architect-foundations-access-request/437128" target="_blank">Take Official Exam ↗</a>
   </div>
