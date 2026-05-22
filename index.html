@@ -213,6 +213,10 @@
   .plan-table tr:nth-child(even) td { background: var(--bg2); }
   .plan-table a { color: var(--ink); font-weight: 500; }
   .plan-table a:hover { color: var(--coral); }
+  .wt-cell { white-space: nowrap; }
+  .wt-num { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .wt-bar-wrap { display: block; height: 4px; background: var(--bg3); border-radius: 2px; margin-top: 4px; width: 60px; }
+  .wt-bar-fill { display: block; height: 100%; border-radius: 2px; background: var(--coral); }
 
   /* ── Priority badges ── */
   .pri { display: inline-flex; align-items: center; gap: 3px; font-size: 11px;
@@ -462,11 +466,20 @@
   </div>
 
   <div class="nav-group">
+    <div class="nav-group-label">Course Guides</div>
+    <a class="nav-item" href="building-with-claude-api/index.html#tab-study">🔧 Building with the API</a>
+    <a class="nav-item" href="claude-code-in-action/index.html#tab-study">⚡ Claude Code in Action</a>
+    <a class="nav-item" href="claude-code-101/index.html#tab-study">💻 Claude Code 101</a>
+    <a class="nav-item" href="mcp-advanced/index.html#tab-study">🚀 MCP Advanced</a>
+    <a class="nav-item" href="intro-to-mcp/index.html#tab-study">🔌 Intro to MCP</a>
+  </div>
+
+  <div class="nav-group">
     <div class="nav-group-label">Resources</div>
+    <a class="nav-item" onclick="show('courses', this)">📚 Course Library</a>
     <a class="nav-item" onclick="show('sample-questions', this)">🧪 Sample Questions</a>
     <a class="nav-item" href="practice-exam/index.html">🎯 Practice Exam (12 Q)</a>
     <a class="nav-item" href="full-exam/index.html">📝 Full Practice Exam (60 Q)</a>
-    <a class="nav-item" onclick="show('courses', this)">📚 Course Library</a>
   </div>
 
 </nav>
@@ -561,11 +574,11 @@
 <!-- ─── Study Plan ─── -->
 <section id="section-study-plan" class="section">
   <div class="page-title">Study Plan</div>
-  <div class="page-subtitle">Allocate study time by exam domain weight — focus hardest on D1 (27%) and D3+D4 (20% each)</div>
+  <div class="page-subtitle">Courses sorted by combined exam domain weight — highest coverage first</div>
 
   <div class="info-card highlight">
     <div class="info-card-title">📌 Strategy</div>
-    <p style="margin:0;font-size:13.5px">Start with the <strong>🔴 Must</strong> courses in priority order. Each course covers 1–2 exam domains directly. Skip ⚪ courses entirely — they are below exam level or outside scope.</p>
+    <p style="margin:0;font-size:13.5px">Start with the <strong>🔴 Must</strong> courses in priority order. The <em>Weight %</em> column shows the combined exam domain weight each course directly covers. Courses with overlapping domains (e.g. D3) are worth studying for both.</p>
   </div>
 
   <div class="section-heading">Course Priority & Domain Coverage</div>
@@ -575,6 +588,7 @@
         <th>Priority</th>
         <th>Course</th>
         <th>Domains</th>
+        <th>Weight %</th>
         <th>Est. Time</th>
         <th>Focus Note</th>
       </tr>
@@ -582,43 +596,53 @@
     <tbody>
       <tr>
         <td><span class="pri pri-must">🔴 Must</span></td>
+        <td><a href="building-with-claude-api/index.html">🔧 Building with the Claude API</a></td>
+        <td>D2 · D4 · D5</td>
+        <td class="wt-cell"><span class="wt-num">53%</span><span class="wt-bar-wrap"><span class="wt-bar-fill" style="width:66%"></span></span></td>
+        <td>~5 hrs</td>
+        <td>Tool use (D2), prompt eng &amp; structured output (D4), context windows &amp; batches (D5)</td>
+      </tr>
+      <tr>
+        <td><span class="pri pri-must">🔴 Must</span></td>
         <td><a href="claude-code-in-action/index.html">⚡ Claude Code in Action</a></td>
         <td>D1 · D3</td>
+        <td class="wt-cell"><span class="wt-num">47%</span><span class="wt-bar-wrap"><span class="wt-bar-fill" style="width:59%"></span></span></td>
         <td>~4 hrs</td>
-        <td>Hooks, Agent SDK, custom commands — highest exam weight</td>
-      </tr>
-      <tr>
-        <td><span class="pri pri-must">🔴 Must</span></td>
-        <td><a href="building-with-claude-api/index.html">🔧 Building with the Claude API</a></td>
-        <td>D4 · D5</td>
-        <td>~5 hrs</td>
-        <td>Prompt eng, tool use, structured output, context windows</td>
-      </tr>
-      <tr>
-        <td><span class="pri pri-must">🔴 Must</span></td>
-        <td><a href="mcp-advanced/index.html">🚀 MCP Advanced Topics</a></td>
-        <td>D2</td>
-        <td>~2 hrs</td>
-        <td>Tool descriptions, error patterns, tool_choice — entire D2</td>
-      </tr>
-      <tr>
-        <td><span class="pri pri-imp">🟡 Important</span></td>
-        <td><a href="intro-to-mcp/index.html">🔌 Introduction to MCP</a></td>
-        <td>D2</td>
-        <td>~1.5 hrs</td>
-        <td>Foundation before MCP Advanced; MCP server config</td>
+        <td>Agentic control flow &amp; hooks (D1), Claude Code config &amp; Agent SDK (D3)</td>
       </tr>
       <tr>
         <td><span class="pri pri-imp">🟡 Important</span></td>
         <td><a href="claude-code-101/index.html">💻 Claude Code 101</a></td>
         <td>D3</td>
+        <td class="wt-cell"><span class="wt-num">20%</span><span class="wt-bar-wrap"><span class="wt-bar-fill" style="width:25%"></span></span></td>
         <td>~1.5 hrs</td>
-        <td>Foundation before Claude Code in Action; CLAUDE.md basics</td>
+        <td>Foundation before Claude Code in Action; CLAUDE.md, memory, slash commands</td>
+      </tr>
+      <tr>
+        <td><span class="pri pri-must">🔴 Must</span></td>
+        <td><a href="mcp-advanced/index.html">🚀 MCP Advanced Topics</a></td>
+        <td>D2</td>
+        <td class="wt-cell"><span class="wt-num">18%</span><span class="wt-bar-wrap"><span class="wt-bar-fill" style="width:23%"></span></span></td>
+        <td>~2 hrs</td>
+        <td>Tool descriptions, error patterns, tool_choice — deep dive on D2</td>
+      </tr>
+      <tr>
+        <td><span class="pri pri-imp">🟡 Important</span></td>
+        <td><a href="intro-to-mcp/index.html">🔌 Introduction to MCP</a></td>
+        <td>D2</td>
+        <td class="wt-cell"><span class="wt-num">18%</span><span class="wt-bar-wrap"><span class="wt-bar-fill" style="width:23%"></span></span></td>
+        <td>~1.5 hrs</td>
+        <td>Foundation before MCP Advanced; MCP server config &amp; protocol basics</td>
       </tr>
     </tbody>
   </table>
 
-  <div class="info-card success">
+  <div class="info-card" style="background:var(--bg4);border:1px solid var(--border)">
+    <div class="info-card-title">ℹ️ Domain Weight Reference</div>
+    <p style="margin:0;font-size:13px;color:var(--text2)">D1 Agentic Architecture <strong style="color:var(--d1)">27%</strong> · D2 Tool Design &amp; MCP <strong style="color:var(--d2)">18%</strong> · D3 Claude Code Config <strong style="color:var(--d3)">20%</strong> · D4 Prompt Engineering <strong style="color:var(--d4)">20%</strong> · D5 Context Management <strong style="color:var(--d5)">15%</strong> &nbsp;|&nbsp; Note: D3 is covered by both CC101 (foundation) and Claude Code in Action (applied).</p>
+  </div>
+
+  <div class="info-card success" style="margin-top:14px">
     <div class="info-card-title">✅ Known Gap: Agent SDK Multi-Agent Patterns (D1)</div>
     <p style="margin:0;font-size:13.5px">The Claude Code in Action SDK chapter videos were still processing at scrape time. Watch the SDK lessons directly on Skilljar to fill the Agent SDK multi-agent patterns gap in D1. This is a high-weight domain (27%) so don't skip this.</p>
   </div>
