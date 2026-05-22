@@ -398,6 +398,11 @@
     white-space: nowrap; flex-shrink: 0;
   }
 
+  /* ── Exam Only filter tab ── */
+  .tab-content.exam-only .video-card:not(.exam-essential) { display: none; }
+  .tab-content.exam-only .chapter-section:not(:has(.exam-essential)) { display: none; }
+  .tab-content.exam-only .toc-progress { display: none; }
+
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -418,7 +423,8 @@
   <button class="tab-btn active" data-tab="study">📚 Study Guide</button>
   <button class="tab-btn" data-tab="quiz">📝 Quiz</button>
   <button class="tab-btn" data-tab="videos">🎬 Videos</button>
-  
+  <button class="tab-btn" data-tab="exam">⭐ Exam Only</button>
+
 </div>
 
 <div id="tab-study" class="tab-content active">
@@ -775,11 +781,23 @@ document.querySelectorAll('.video-speed-bar .speed-btn').forEach(btn => {
   var TAB_KEY = 'sj:tab:' + location.pathname;
 
   function activateTab(tab) {
+    var vidsEl = document.getElementById('tab-videos');
+    if (vidsEl) vidsEl.classList.remove('exam-only');
+
+    if (tab === 'exam') {
+      document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+      document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+      var examBtn = document.querySelector('.tab-btn[data-tab="exam"]');
+      if (examBtn) examBtn.classList.add('active');
+      if (vidsEl) { vidsEl.classList.add('active'); vidsEl.classList.add('exam-only'); }
+      return;
+    }
+
     var btn = document.querySelector('.tab-btn[data-tab="' + tab + '"]');
     var content = document.getElementById('tab-' + tab);
     if (!btn || !content) return;
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
     btn.classList.add('active');
     content.classList.add('active');
   }
@@ -1237,6 +1255,14 @@ document.querySelectorAll('.video-speed-bar .speed-btn').forEach(btn => {
     var toggle = titleEl.querySelector('.watch-toggle');
     if (toggle) titleEl.insertBefore(tag, toggle); else titleEl.appendChild(tag);
   });
+})();
+</script>
+<script>
+/* ── Exam Only tab count ── */
+(function() {
+  var total = document.querySelectorAll('#tab-videos .exam-essential').length;
+  var btn = document.querySelector('.tab-btn[data-tab="exam"]');
+  if (btn && total > 0) btn.textContent = '⭐ Exam Only (' + total + ')';
 })();
 </script>
 </body>
