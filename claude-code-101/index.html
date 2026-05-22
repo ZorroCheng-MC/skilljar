@@ -158,6 +158,7 @@
   /* ── Tab bar right-side widgets ── */
   .spd-right, .sg-filter-right { margin-left: auto; display: none; align-items: center; gap: 10px; padding-right: 4px; }
   .sg-filter-select { font-size:12px; padding:3px 8px; border-radius:6px; border:1px solid var(--border); background:var(--bg2); color:var(--text2); cursor:pointer; }
+  .sg-exam-badge { font-size:10px; font-weight:700; background:#c2410c; color:#fff; padding:2px 7px; border-radius:3px; margin-left:10px; vertical-align:middle; letter-spacing:0.04em; }
   .speed-label { font-size: 13px; color: var(--text2); }
   .speed-select { font-size: 12px; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg2); color: var(--text2); cursor: pointer; }
   .video-total { display: flex; align-items: center; gap: 8px; }
@@ -1403,17 +1404,35 @@ if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseF
   var sel = document.querySelector('.sg-filter-select');
   if (!sel) return;
   var examIds = ['working-effectively','advanced-features'];
+  examIds.forEach(function(id) {
+    var h2 = document.getElementById(id);
+    if (!h2 || h2.querySelector('.sg-exam-badge')) return;
+    var b = document.createElement('span'); b.className = 'sg-exam-badge'; b.textContent = '★ Exam';
+    h2.appendChild(b);
+  });
   function applyFilter(examOnly) {
     var body = document.querySelector('#tab-study .md-body');
     if (!body) return;
     var passedFirstH2 = false, visible = true;
     Array.from(body.children).forEach(function(el) {
-      if (el.tagName === 'H2') {
-        passedFirstH2 = true;
-        visible = !examOnly || examIds.indexOf(el.id) !== -1;
-      }
+      if (el.tagName === 'H2') { passedFirstH2 = true; visible = !examOnly || examIds.indexOf(el.id) !== -1; }
       el.style.display = (!passedFirstH2 || visible) ? '' : 'none';
     });
+    var toc = document.getElementById('study-toc');
+    if (toc) {
+      var curVisible = true;
+      var visibleH2s = {};
+      examIds.forEach(function(id) { visibleH2s[id] = true; });
+      toc.querySelectorAll('.toc-link').forEach(function(a) {
+        if (a.classList.contains('h2')) {
+          var id = (a.getAttribute('href') || '').replace('#','');
+          curVisible = !examOnly || !!visibleH2s[id];
+          a.style.display = curVisible ? '' : 'none';
+        } else {
+          a.style.display = curVisible ? '' : 'none';
+        }
+      });
+    }
   }
   sel.addEventListener('change', function() { applyFilter(this.value === 'exam'); });
 })();
