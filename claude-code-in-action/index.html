@@ -398,10 +398,13 @@
     white-space: nowrap; flex-shrink: 0;
   }
 
-  /* ── Exam Only filter tab ── */
-  .tab-content.exam-only .video-card:not(.exam-essential) { display: none; }
-  .tab-content.exam-only .chapter-section:not(:has(.exam-essential)) { display: none; }
-  .tab-content.exam-only .toc-progress { display: none; }
+  /* ── Exam Only filter bar ── */
+  .vid-filter-bar { display:flex; gap:8px; padding:10px 32px; background:var(--bg); border-bottom:1px solid var(--border); }
+  .vid-filter-btn { font-size:12px; font-weight:600; padding:4px 14px; border-radius:20px; border:1px solid var(--border); background:var(--bg2); color:var(--text2); cursor:pointer; transition:all 0.15s; }
+  .vid-filter-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .vid-filter-btn:hover:not(.active) { border-color:var(--accent); color:var(--accent); }
+  #tab-videos.exam-only .video-card:not(.exam-essential) { display:none; }
+  #tab-videos.exam-only .chapter-section:not(:has(.exam-essential)) { display:none; }
 
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -423,7 +426,6 @@
   <button class="tab-btn active" data-tab="study">📚 Study Guide</button>
   <button class="tab-btn" data-tab="quiz">📝 Quiz</button>
   <button class="tab-btn" data-tab="videos">🎬 Videos</button>
-  <button class="tab-btn" data-tab="exam">⭐ Exam Only</button>
 
 </div>
 
@@ -733,6 +735,10 @@ This makes it a lot easier for you to understand what data your command should i
   <button class="speed-btn" data-speed="2">2&times;</button>
   <span class="video-total"><span class="vid-prog-text"><span class="vid-prog-watched">0</span> / 15 watched</span><span class="vid-prog-bar-wrap"><span class="vid-prog-bar-fill"></span></span></span>
 </div>
+<div class="vid-filter-bar">
+  <button class="vid-filter-btn active" data-filter="all">All Videos</button>
+  <button class="vid-filter-btn" data-filter="exam">⭐ Exam Only</button>
+</div>
 <div class="video-layout">
 <nav class="video-toc" id="video-toc"></nav>
 <div class="video-content">
@@ -781,18 +787,6 @@ document.querySelectorAll('.video-speed-bar .speed-btn').forEach(btn => {
   var TAB_KEY = 'sj:tab:' + location.pathname;
 
   function activateTab(tab) {
-    var vidsEl = document.getElementById('tab-videos');
-    if (vidsEl) vidsEl.classList.remove('exam-only');
-
-    if (tab === 'exam') {
-      document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
-      document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
-      var examBtn = document.querySelector('.tab-btn[data-tab="exam"]');
-      if (examBtn) examBtn.classList.add('active');
-      if (vidsEl) { vidsEl.classList.add('active'); vidsEl.classList.add('exam-only'); }
-      return;
-    }
-
     var btn = document.querySelector('.tab-btn[data-tab="' + tab + '"]');
     var content = document.getElementById('tab-' + tab);
     if (!btn || !content) return;
@@ -1258,11 +1252,26 @@ document.querySelectorAll('.video-speed-bar .speed-btn').forEach(btn => {
 })();
 </script>
 <script>
-/* ── Exam Only tab count ── */
+/* ── Exam Only filter bar ── */
 (function() {
-  var total = document.querySelectorAll('#tab-videos .exam-essential').length;
-  var btn = document.querySelector('.tab-btn[data-tab="exam"]');
-  if (btn && total > 0) btn.textContent = '⭐ Exam Only (' + total + ')';
+  var tab = document.getElementById('tab-videos');
+  if (!tab) return;
+  var bar = tab.querySelector('.vid-filter-bar');
+  if (!bar) return;
+  var examCount = tab.querySelectorAll('.exam-essential').length;
+  var examBtn = bar.querySelector('[data-filter="exam"]');
+  if (examBtn) examBtn.textContent = '⭐ Exam Only (' + examCount + ')';
+  bar.addEventListener('click', function(e) {
+    var btn = e.target.closest('.vid-filter-btn');
+    if (!btn) return;
+    bar.querySelectorAll('.vid-filter-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    if (btn.dataset.filter === 'exam') {
+      tab.classList.add('exam-only');
+    } else {
+      tab.classList.remove('exam-only');
+    }
+  });
 })();
 </script>
 </body>
