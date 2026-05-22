@@ -155,8 +155,9 @@
   .md-body li.incorrect { color: var(--text2); }
   .md-body li.correct::before { content: ''; }
 
-  /* ── Videos tab ── */
-  .spd-right { margin-left: auto; display: none; align-items: center; gap: 10px; }
+  /* ── Tab bar right-side widgets ── */
+  .spd-right, .sg-filter-right { margin-left: auto; display: none; align-items: center; gap: 10px; padding-right: 4px; }
+  .sg-filter-select { font-size:12px; padding:3px 8px; border-radius:6px; border:1px solid var(--border); background:var(--bg2); color:var(--text2); cursor:pointer; }
   .speed-label { font-size: 13px; color: var(--text2); }
   .speed-select { font-size: 12px; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg2); color: var(--text2); cursor: pointer; }
   .video-total { display: flex; align-items: center; gap: 8px; }
@@ -430,6 +431,12 @@
       <option value="exam">⭐ Exam Only</option>
     </select>
     <span class="video-total"><span class="vid-prog-text"><span class="vid-prog-watched">0</span> / <span class="vid-total-count">74</span> watched</span><span class="vid-prog-bar-wrap"><span class="vid-prog-bar-fill"></span></span></span>
+  </span>
+  <span class="sg-filter-right">
+    <select class="sg-filter-select">
+      <option value="all">All Chapters</option>
+      <option value="exam">⭐ Exam Only</option>
+    </select>
   </span>
 </div>
 
@@ -1966,6 +1973,8 @@ if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseF
     content.classList.add('active');
     var spdRight = document.querySelector('.spd-right');
     if (spdRight) spdRight.style.display = tab === 'videos' ? 'flex' : 'none';
+    var sgRight = document.querySelector('.sg-filter-right');
+    if (sgRight) sgRight.style.display = tab === 'study' ? 'flex' : 'none';
   }
 
   document.getElementById('tabBar').addEventListener('click', function(e) {
@@ -2449,6 +2458,27 @@ if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseF
     else tab.classList.remove('exam-only');
     updateCount(isExam);
   });
+})();
+</script>
+<script>
+/* ── Study guide exam filter ── */
+(function() {
+  var sel = document.querySelector('.sg-filter-select');
+  if (!sel) return;
+  var examIds = ['accessing-claude-with-the-api','prompt-engineering-techniques','tool-use-with-claude','features-of-claude','agents-and-workflows'];
+  function applyFilter(examOnly) {
+    var body = document.querySelector('#tab-study .md-body');
+    if (!body) return;
+    var passedFirstH2 = false, visible = true;
+    Array.from(body.children).forEach(function(el) {
+      if (el.tagName === 'H2') {
+        passedFirstH2 = true;
+        visible = !examOnly || examIds.indexOf(el.id) !== -1;
+      }
+      el.style.display = (!passedFirstH2 || visible) ? '' : 'none';
+    });
+  }
+  sel.addEventListener('change', function() { applyFilter(this.value === 'exam'); });
 })();
 </script>
 </body>
