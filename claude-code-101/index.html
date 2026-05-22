@@ -383,6 +383,16 @@
   }
   .toc-prog-fill.complete { background: #047857; }
 
+
+  /* ── Exam essential tags ── */
+  .video-card.exam-essential { border-color: #c2410c !important; background: rgba(194,65,12,0.04) !important; }
+  .exam-tag {
+    display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.02em;
+    background: #c2410c; color: #fff;
+    padding: 1px 7px; border-radius: 8px; margin-left: 6px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -973,7 +983,10 @@ document.querySelectorAll('.video-speed-bar .speed-btn').forEach(btn => {
     if (_ht) {
       var _tc = _ht.closest('.tab-content');
       if (_tc) activateTab(_tc.id.replace('tab-', ''));
-      setTimeout(function() { _ht.scrollIntoView({block: 'start'}); }, 80);
+      setTimeout(function() {
+        var top = _ht.getBoundingClientRect().top + window.scrollY - 170;
+        window.scrollTo(0, Math.max(0, top));
+      }, 300);
     }
   }
 })();
@@ -1333,5 +1346,19 @@ document.querySelectorAll('.video-speed-bar .speed-btn').forEach(btn => {
 })();
 </script>
 
+<script>
+/* ── Exam essential tags ── */
+(function() {
+  var YT = ['xJQuF02NAK8','eW3oTyfeWZ0','O0FGCxkHM-U','jKErNxuxPXg','bjdBVZa66oU'];
+  YT.forEach(function(ytId) {
+    var iframe = document.querySelector('iframe[src*="' + ytId + '"]'); if (!iframe) return;
+    var card = iframe.closest('.video-card'); if (!card) return;
+    card.classList.add('exam-essential');
+    var titleEl = card.querySelector('.video-title'); if (!titleEl) return;
+    var tag = document.createElement('span'); tag.className = 'exam-tag'; tag.textContent = '★ Exam';
+    titleEl.appendChild(tag);
+  });
+})();
+</script>
 </body>
 </html>
