@@ -1968,6 +1968,14 @@ document.querySelectorAll('.video-speed-bar .speed-btn').forEach(btn => {
   if (saved && document.querySelector('.tab-btn[data-tab="' + saved + '"]')) {
     activateTab(saved);
   }
+  if (location.hash) {
+    var _ht = document.querySelector(location.hash);
+    if (_ht) {
+      var _tc = _ht.closest('.tab-content');
+      if (_tc) activateTab(_tc.id.replace('tab-', ''));
+      setTimeout(function() { _ht.scrollIntoView({block: 'start'}); }, 80);
+    }
+  }
 })();
 </script>
 <script>
