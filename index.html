@@ -718,8 +718,8 @@
       <h2>D1: Agentic Architecture & Orchestration</h2>
       <p>The highest-weighted domain — understand how agents perceive, reason, and act; multi-agent coordination patterns; and hooks for deterministic control.</p>
       <div class="domain-tags">
-        <span class="domain-tag">⚡ Claude Code in Action</span>
         <span class="domain-tag">🔧 Building with Claude API</span>
+        <span class="domain-tag">💻 Claude Code 101</span>
       </div>
     </div>
   </div>
@@ -762,22 +762,20 @@
   </div>
 
   <div class="topic-card">
-    <div class="topic-title"><span class="topic-num">3</span>Hooks for Deterministic Enforcement</div>
+    <div class="topic-title"><span class="topic-num">3</span>Workflows vs Agents — When to Use Each</div>
     <ul>
-      <li><strong>PreToolUse:</strong> runs before any tool call; can block the call or modify parameters; return <code>{"decision":"block","reason":"..."}</code> to deny</li>
-      <li><strong>PostToolUse:</strong> runs after a tool returns; can inspect results; inject additional context into the next turn</li>
-      <li><strong>Stop:</strong> fires when the model signals it wants to stop; use to persist state or trigger cleanup</li>
-      <li><strong>SubagentStop:</strong> fires when a subagent finishes; allows coordinator to collect and process results</li>
-      <li>Hooks receive structured JSON via <strong>stdin</strong>; must return JSON on <strong>stdout</strong></li>
-      <li>Hook scripts run as shell processes — keep them fast (&lt;200ms) to avoid latency</li>
-      <li>Use hooks for: audit logging, cost guardrails, safety filters, enforcing code review gates</li>
+      <li><strong>Workflows</strong> = predictable, deterministic pipelines; steps and decision branches are pre-defined by the developer</li>
+      <li><strong>Agents</strong> = dynamic, LLM-directed; the model decides which tools to call and in what order at runtime</li>
+      <li>Use workflows when: steps are known in advance, consistency is critical, auditability is required</li>
+      <li>Use agents when: the task is open-ended, requires adaptive decision-making, or has too many branches to pre-define</li>
+      <li><strong>Evaluator-optimizer pattern:</strong> one agent generates output, a second evaluates it against criteria; repeat until quality threshold met</li>
+      <li>Most production systems combine both: a workflow outer shell with agentic sub-tasks inside</li>
     </ul>
     <div class="key-terms">
-      <span class="key-term">PreToolUse</span>
-      <span class="key-term">PostToolUse</span>
-      <span class="key-term">Stop</span>
-      <span class="key-term">SubagentStop</span>
-      <span class="key-term">stdin/stdout JSON</span>
+      <span class="key-term">workflow</span>
+      <span class="key-term">agent</span>
+      <span class="key-term">evaluator-optimizer</span>
+      <span class="key-term">deterministic</span>
     </div>
   </div>
 
@@ -800,8 +798,8 @@
   </div>
 
   <div class="info-card warn">
-    <div class="info-card-title">⚠ Study Gap — Agent SDK Lessons</div>
-    The SDK & Wrap Up chapter in <em>Claude Code in Action</em> covers multi-agent patterns directly testable in D1. Those videos were still processing at scrape time — watch them directly on Skilljar to fill this gap.
+    <div class="info-card-title">⚠ Study Gap — Agent SDK Multi-Agent Patterns</div>
+    The Fast Track covers D1 through the <em>Building with the Claude API</em> agentic section (ft1–ft7) plus Claude Code 101 subagents (ft8). If the CCA-F exam tests Claude Code's Agent SDK multi-agent patterns specifically, supplement with the SDK &amp; Wrap Up chapter in <em>Claude Code in Action</em> on Skilljar — those videos were not available at scrape time.
   </div>
 </section>
 
@@ -813,8 +811,8 @@
       <h2>D2: Tool Design & MCP Integration</h2>
       <p>Writing effective tool definitions, structured error handling, tool_choice control, and configuring MCP servers in Claude Code.</p>
       <div class="domain-tags">
-        <span class="domain-tag">🚀 MCP Advanced Topics</span>
-        <span class="domain-tag">🔌 Introduction to MCP</span>
+        <span class="domain-tag">🔧 Building with Claude API</span>
+        <span class="domain-tag">⚡ Claude Code in Action</span>
       </div>
     </div>
   </div>
@@ -997,17 +995,55 @@
   <div class="topic-card">
     <div class="topic-title"><span class="topic-num">5</span>Claude Code in CI/CD Pipelines</div>
     <ul>
-      <li>Use <strong>non-interactive mode:</strong> <code>claude --print "task description"</code> — outputs result to stdout and exits</li>
+      <li>Use <strong>non-interactive mode:</strong> <code>claude -p "task description"</code> (or <code>--print</code>) — outputs result to stdout and exits</li>
       <li>Set <code>ANTHROPIC_API_KEY</code> environment variable; never hardcode credentials</li>
       <li>Use <code>--allowedTools</code> to restrict which tools CI can invoke — principle of least privilege</li>
       <li>Use <code>--dangerously-skip-permissions</code> in fully automated CI pipelines where no human can approve prompts</li>
-      <li>Pipe task descriptions from files: <code>claude --print "$(cat task.txt)"</code></li>
+      <li>Pipe task descriptions from files: <code>claude -p "$(cat task.txt)"</code></li>
       <li>Exit codes: 0 = success, non-zero = error; parse stdout for structured results</li>
     </ul>
     <div class="key-terms">
-      <span class="key-term">--print</span>
+      <span class="key-term">-p / --print</span>
       <span class="key-term">ANTHROPIC_API_KEY</span>
       <span class="key-term">--allowedTools</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">6</span>Providing Context in Claude Code</div>
+    <ul>
+      <li><strong>CLAUDE.md</strong> — injected automatically at session start; use for persistent project rules and preferences</li>
+      <li><strong>@file references</strong> — type <code>@path/to/file</code> in a prompt to include that file's content in context</li>
+      <li><strong>/add command</strong> — adds files to context interactively; useful when Claude needs to read a file before acting</li>
+      <li><strong>Conversation history</strong> — prior turns stay in context; Claude can refer back to earlier instructions</li>
+      <li><strong>/clear</strong> — clears conversation history and loaded files; use when starting a new task to avoid context bleed</li>
+      <li>Order of preference: CLAUDE.md &gt; system prompt &gt; @file reference &gt; inline paste</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">@file</span>
+      <span class="key-term">/add</span>
+      <span class="key-term">/clear</span>
+      <span class="key-term">CLAUDE.md</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">7</span>Hooks for Deterministic Control</div>
+    <ul>
+      <li><strong>PreToolUse:</strong> runs before any tool call; can block the call; return <code>{"decision":"block","reason":"..."}</code> to deny</li>
+      <li><strong>PostToolUse:</strong> runs after a tool returns; can inspect and transform results before the next turn</li>
+      <li><strong>Stop:</strong> fires when the model signals end-of-turn; use to persist state or trigger cleanup</li>
+      <li><strong>SubagentStop:</strong> fires when a subagent finishes; allows the coordinator to collect and process results</li>
+      <li>Hook scripts are shell commands — receive JSON on <strong>stdin</strong>, must return JSON on <strong>stdout</strong></li>
+      <li>Keep hooks fast (&lt;200ms); use for: audit logging, cost guardrails, safety filters, enforcing code review gates</li>
+      <li>Hooks are configured in <code>.claude/settings.json</code> under the <code>"hooks"</code> key</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">PreToolUse</span>
+      <span class="key-term">PostToolUse</span>
+      <span class="key-term">Stop</span>
+      <span class="key-term">SubagentStop</span>
+      <span class="key-term">stdin/stdout JSON</span>
     </div>
   </div>
 </section>
@@ -1021,7 +1057,6 @@
       <p>Forcing structured output via tools, few-shot examples, validation-retry loops, and the Message Batches API.</p>
       <div class="domain-tags">
         <span class="domain-tag">🔧 Building with the Claude API</span>
-        <span class="domain-tag">☁️ Bedrock (prompt eng sections)</span>
       </div>
     </div>
   </div>
@@ -1029,7 +1064,42 @@
   <div class="section-heading">Core Topics</div>
 
   <div class="topic-card">
-    <div class="topic-title"><span class="topic-num">1</span>Structured Output via tool_use</div>
+    <div class="topic-title"><span class="topic-num">1</span>Clarity, Specificity & Prompting Principles</div>
+    <ul>
+      <li><strong>Be clear and direct:</strong> state exactly what you want; avoid hedging phrases like "try to" or "maybe" — they introduce ambiguity</li>
+      <li>Use <strong>explicit negative examples</strong> alongside positive ones — "do X; do NOT do Y" reduces false positives</li>
+      <li><strong>Be specific:</strong> define precise classification criteria, measurable output requirements, and exact formats</li>
+      <li>Prompt quality is the <strong>primary lever</strong> — fix the prompt before adding infrastructure (routing layers, retries, etc.)</li>
+      <li>For repeated tasks: write a <strong>rubric</strong> in the prompt; the model self-checks against it before responding</li>
+      <li>Chain-of-thought reasoning: ask the model to explain its reasoning when traceability matters</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">clarity</span>
+      <span class="key-term">negative examples</span>
+      <span class="key-term">rubric</span>
+      <span class="key-term">chain-of-thought</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">2</span>Long-Context Placement (Primacy / Recency)</div>
+    <ul>
+      <li>Claude's attention is strongest at the <strong>beginning</strong> (primacy) and <strong>end</strong> (recency) of the context window</li>
+      <li>Information placed in the <strong>middle</strong> of a very long context is more likely to be under-weighted or missed</li>
+      <li>Place the most critical instructions and facts at the <strong>start of the system prompt</strong> or at the <strong>end of the last user message</strong></li>
+      <li>For prompt caching: cache the system prompt (stable, long content) and keep user turns uncached (dynamic)</li>
+      <li>When injecting retrieved context (RAG), place it just before the question, not buried in the middle of the conversation</li>
+    </ul>
+    <div class="key-terms">
+      <span class="key-term">primacy effect</span>
+      <span class="key-term">recency effect</span>
+      <span class="key-term">prompt caching</span>
+      <span class="key-term">context placement</span>
+    </div>
+  </div>
+
+  <div class="topic-card">
+    <div class="topic-title"><span class="topic-num">3</span>Structured Output via tool_use</div>
     <ul>
       <li>Force structured JSON output by defining a <strong>tool with a JSON schema</strong> and setting <code>tool_choice</code> to that tool</li>
       <li>The model must respond with a valid <code>tool_use</code> block matching the schema — not a free-text response</li>
@@ -1047,7 +1117,7 @@
   </div>
 
   <div class="topic-card">
-    <div class="topic-title"><span class="topic-num">2</span>Few-Shot Prompting</div>
+    <div class="topic-title"><span class="topic-num">4</span>Few-Shot Prompting</div>
     <ul>
       <li>Provide <strong>input/output example pairs</strong> in the prompt to demonstrate desired format and style</li>
       <li>Include <strong>diverse examples</strong> covering edge cases — don't just show the happy path</li>
@@ -1064,7 +1134,7 @@
   </div>
 
   <div class="topic-card">
-    <div class="topic-title"><span class="topic-num">3</span>Explicit Criteria & Rubrics</div>
+    <div class="topic-title"><span class="topic-num">5</span>Explicit Criteria & Rubrics</div>
     <ul>
       <li>Define <strong>clear acceptance criteria</strong> in the system prompt — what makes a good output vs. a bad one</li>
       <li>Use <strong>checklists and rubrics</strong> so the model can self-evaluate before responding</li>
@@ -1080,7 +1150,7 @@
   </div>
 
   <div class="topic-card">
-    <div class="topic-title"><span class="topic-num">4</span>Validation-Retry Loops</div>
+    <div class="topic-title"><span class="topic-num">6</span>Validation-Retry Loops</div>
     <ul>
       <li>Check model output against <strong>programmatic criteria</strong> (schema validation, regex, business rules)</li>
       <li>If validation fails, send a new message with <strong>specific feedback</strong>: what was wrong and what to fix</li>
@@ -1097,7 +1167,7 @@
   </div>
 
   <div class="topic-card">
-    <div class="topic-title"><span class="topic-num">5</span>Message Batches API</div>
+    <div class="topic-title"><span class="topic-num">7</span>Message Batches API</div>
     <ul>
       <li>Process up to <strong>10,000 requests asynchronously</strong> in a single batch — ideal for bulk operations</li>
       <li>Batches are <strong>50% cheaper</strong> than real-time API calls — use for non-time-sensitive workloads</li>
