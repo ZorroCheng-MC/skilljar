@@ -155,27 +155,21 @@
   .md-body li.incorrect { color: var(--text2); }
   .md-body li.correct::before { content: ''; }
 
-  /* ── Videos tab ── */
-  .video-speed-bar {
-    display: flex; align-items: center; gap: 10px;
-    background: var(--bg2); border-bottom: 1px solid var(--border);
-    padding: 10px 32px;
-    margin-bottom: 0; flex-wrap: wrap;
-    position: sticky; top: 120px; z-index: 90;
-  }
+  /* ── Tab bar right widgets ── */
+  .spd-right, .sg-filter-right { margin-left: auto; display: none; align-items: center; gap: 10px; padding-right: 4px; }
   .speed-label { font-size: 13px; color: var(--text2); }
-  .speed-btn {
-    background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
-    padding: 4px 12px; border-radius: 20px; cursor: pointer;
-    font-size: 12px; transition: all 0.15s;
-  }
-  .speed-btn:hover { background: var(--bg3); color: var(--text); }
-  .speed-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .speed-select { font-size: 12px; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg2); color: var(--text2); cursor: pointer; }
+  .spd-sep { color:var(--border); font-size:16px; margin:0 4px; user-select:none; }
+  .vid-filter-select { font-size:12px; padding:3px 8px; border-radius:6px; border:1px solid var(--border); background:var(--bg2); color:var(--text2); cursor:pointer; }
+  .sg-filter-select { font-size:12px; padding:3px 8px; border-radius:6px; border:1px solid var(--border); background:var(--bg2); color:var(--text2); cursor:pointer; }
+  .sg-exam-badge { font-size:10px; font-weight:700; background:#c2410c; color:#fff; padding:2px 7px; border-radius:3px; margin-left:10px; vertical-align:middle; letter-spacing:0.04em; }
   .video-total { margin-left: auto; display: flex; align-items: center; gap: 8px; }
   .vid-prog-text { font-size: 12px; font-weight: 600; color: var(--ink); }
   .vid-prog-bar-wrap { width: 64px; height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
   .vid-prog-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; width: 0%; }
   .vid-prog-bar-fill.complete { background: #047857; }
+  #tab-videos.exam-only .video-card:not(.exam-essential) { display:none; }
+  #tab-videos.exam-only .chapter-section:not(:has(.exam-essential)) { display:none; }
   .chapter-section { margin-bottom: 36px; }
   .chapter-title {
     font-size: 17px; font-weight: 700; color: var(--ink);
@@ -408,7 +402,30 @@
   <button class="tab-btn active" data-tab="study">📚 Study Guide</button>
   <button class="tab-btn" data-tab="quiz">📝 Quiz</button>
   <button class="tab-btn" data-tab="videos">🎬 Videos</button>
-  
+  <span class="spd-right">
+    <span class="speed-label">Speed:</span>
+    <select class="speed-select">
+      <option value="0.5">0.5×</option>
+      <option value="0.75">0.75×</option>
+      <option value="1">1×</option>
+      <option value="1.25">1.25×</option>
+      <option value="1.5" selected>1.5×</option>
+      <option value="1.75">1.75×</option>
+      <option value="2">2×</option>
+    </select>
+    <span class="spd-sep">|</span>
+    <select class="vid-filter-select">
+      <option value="all">All Videos</option>
+      <option value="exam">⭐ Exam Only</option>
+    </select>
+    <span class="video-total"><span class="vid-prog-text"><span class="vid-prog-watched">0</span> / <span class="vid-total-count">11</span> watched</span><span class="vid-prog-bar-wrap"><span class="vid-prog-bar-fill"></span></span></span>
+  </span>
+  <span class="sg-filter-right">
+    <select class="sg-filter-select">
+      <option value="all">All Chapters</option>
+      <option value="exam">⭐ Exam Only</option>
+    </select>
+  </span>
 </div>
 
 <div id="tab-study" class="tab-content active">
@@ -622,21 +639,10 @@ Get prompt = await self.session.get_prompt(prompt_name, arguments), return resul
 <div id="tab-videos" class="tab-content">
   <script src="https://cdn.jwplayer.com/libraries/Akyo8gQO.js">
 </script>
-<div class="video-speed-bar">
-  <span class="speed-label">Speed:</span>
-  <button class="speed-btn" data-speed="0.5">0.5&times;</button>
-  <button class="speed-btn" data-speed="0.75">0.75&times;</button>
-  <button class="speed-btn" data-speed="1">1&times;</button>
-  <button class="speed-btn" data-speed="1.25">1.25&times;</button>
-  <button class="speed-btn active" data-speed="1.5">1.5&times;</button>
-  <button class="speed-btn" data-speed="1.75">1.75&times;</button>
-  <button class="speed-btn" data-speed="2">2&times;</button>
-  <span class="video-total"><span class="vid-prog-text"><span class="vid-prog-watched">0</span> / 11 watched</span><span class="vid-prog-bar-wrap"><span class="vid-prog-bar-fill"></span></span></span>
-</div>
 <div class="video-layout">
 <nav class="video-toc" id="video-toc"></nav>
 <div class="video-content">
-<div class="chapter-section" id="ch-mcp-fundamentals"><div class="chapter-title">MCP Fundamentals</div><div class="video-grid"><div class="video-card"><div class="video-title">Introducing MCP</div><div id="jwp-0"></div></div><div class="video-card"><div class="video-title">MCP clients</div><div id="jwp-1"></div></div><div class="video-card"><div class="video-title">Project setup</div><div id="jwp-2"></div></div><div class="video-card"><div class="video-title">Defining tools with MCP</div><div id="jwp-3"></div></div><div class="video-card"><div class="video-title">The server inspector</div><div id="jwp-4"></div></div></div></div><div class="chapter-section" id="ch-mcp-primitives"><div class="chapter-title">MCP Primitives</div><div class="video-grid"><div class="video-card"><div class="video-title">Implementing a client</div><div id="jwp-5"></div></div><div class="video-card"><div class="video-title">Defining resources</div><div id="jwp-6"></div></div><div class="video-card"><div class="video-title">Accessing resources</div><div id="jwp-7"></div></div><div class="video-card"><div class="video-title">Defining prompts</div><div id="jwp-8"></div></div><div class="video-card"><div class="video-title">Prompts in the client</div><div id="jwp-9"></div></div><div class="video-card"><div class="video-title">MCP review</div><div id="jwp-10"></div></div></div></div>
+<div class="chapter-section" id="ch-mcp-fundamentals"><div class="chapter-title">MCP Fundamentals</div><div class="video-grid"><div class="video-card exam-essential"><div class="video-title">Introducing MCP</div><div id="jwp-0"></div></div><div class="video-card exam-essential"><div class="video-title">MCP clients</div><div id="jwp-1"></div></div><div class="video-card exam-essential"><div class="video-title">Project setup</div><div id="jwp-2"></div></div><div class="video-card exam-essential"><div class="video-title">Defining tools with MCP</div><div id="jwp-3"></div></div><div class="video-card exam-essential"><div class="video-title">The server inspector</div><div id="jwp-4"></div></div></div></div><div class="chapter-section" id="ch-mcp-primitives"><div class="chapter-title">MCP Primitives</div><div class="video-grid"><div class="video-card exam-essential"><div class="video-title">Implementing a client</div><div id="jwp-5"></div></div><div class="video-card exam-essential"><div class="video-title">Defining resources</div><div id="jwp-6"></div></div><div class="video-card exam-essential"><div class="video-title">Accessing resources</div><div id="jwp-7"></div></div><div class="video-card exam-essential"><div class="video-title">Defining prompts</div><div id="jwp-8"></div></div><div class="video-card exam-essential"><div class="video-title">Prompts in the client</div><div id="jwp-9"></div></div><div class="video-card exam-essential"><div class="video-title">MCP review</div><div id="jwp-10"></div></div></div></div>
 </div>
 </div>
 <script>
@@ -660,13 +666,6 @@ function applySpeed(rate) {
   currentSpeed = rate;
   jwPlayers.forEach(p => { try { p.setPlaybackRate(rate); } catch(e) {} });
 }
-document.querySelectorAll('.video-speed-bar .speed-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
-    document.querySelectorAll('.video-speed-bar .speed-btn').forEach(b => b.classList.remove('active'));
-    this.classList.add('active');
-    applySpeed(parseFloat(this.dataset.speed));
-  });
-});
 </script>
 </div>
 
@@ -684,6 +683,10 @@ document.querySelectorAll('.video-speed-bar .speed-btn').forEach(btn => {
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     btn.classList.add('active');
     content.classList.add('active');
+    var spdRight = document.querySelector('.spd-right');
+    if (spdRight) spdRight.style.display = tab === 'videos' ? 'flex' : 'none';
+    var sgRight = document.querySelector('.sg-filter-right');
+    if (sgRight) sgRight.style.display = tab === 'study' ? 'flex' : 'none';
   }
 
   document.getElementById('tabBar').addEventListener('click', function(e) {
@@ -1115,5 +1118,69 @@ document.querySelectorAll('.video-speed-bar .speed-btn').forEach(btn => {
 })();
 </script>
 
+<script>
+/* ── Speed select ── */
+(function() {
+  var speedSel = document.querySelector('.speed-select');
+  if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseFloat(this.value)); });
+})();
+/* ── Exam Only filter (videos) ── */
+(function() {
+  var tab = document.getElementById('tab-videos');
+  if (!tab) return;
+  var spdRight = document.querySelector('.spd-right');
+  if (!spdRight) return;
+  var totalCards = tab.querySelectorAll('.video-card').length;
+  var examCards = tab.querySelectorAll('.exam-essential').length;
+  var filterSel = spdRight.querySelector('.vid-filter-select');
+  if (filterSel) { var examOpt = filterSel.querySelector('option[value="exam"]'); if (examOpt) examOpt.textContent = '⭐ Exam Only (' + examCards + ')'; }
+  function updateCount(isExam) {
+    var countEl = document.querySelector('.vid-total-count');
+    if (countEl) countEl.textContent = isExam ? examCards : totalCards;
+    var watchedEl = document.querySelector('.vid-prog-watched');
+    if (watchedEl) {
+      var selector = isExam ? '.exam-essential.watched' : '.video-card.watched';
+      watchedEl.textContent = tab.querySelectorAll(selector).length;
+    }
+  }
+  if (filterSel) filterSel.addEventListener('change', function() {
+    var isExam = this.value === 'exam';
+    if (isExam) tab.classList.add('exam-only');
+    else tab.classList.remove('exam-only');
+    updateCount(isExam);
+  });
+})();
+/* ── Study guide exam filter ── */
+(function() {
+  var sel = document.querySelector('.sg-filter-select');
+  if (!sel) return;
+  var examIds = ['mcp-fundamentals','mcp-primitives'];
+  examIds.forEach(function(id) {
+    var h2 = document.getElementById(id);
+    if (!h2 || h2.querySelector('.sg-exam-badge')) return;
+    var b = document.createElement('span'); b.className = 'sg-exam-badge'; b.textContent = '★ Exam';
+    h2.appendChild(b);
+  });
+  function applyFilter(examOnly) {
+    var body = document.querySelector('#tab-study .md-body');
+    if (!body) return;
+    var passedFirstH2 = false, visible = true;
+    Array.from(body.children).forEach(function(el) {
+      if (el.tagName === 'H2') { passedFirstH2 = true; visible = !examOnly || examIds.indexOf(el.id) !== -1; }
+      el.style.display = (!passedFirstH2 || visible) ? '' : 'none';
+    });
+    var toc = document.getElementById('study-toc');
+    if (toc) {
+      var visibleH2s = {}; examIds.forEach(function(id) { visibleH2s[id] = true; });
+      var curVisible = true;
+      toc.querySelectorAll('.toc-link').forEach(function(a) {
+        if (a.classList.contains('h2')) { var id = (a.getAttribute('href') || '').replace('#',''); curVisible = !examOnly || !!visibleH2s[id]; a.style.display = curVisible ? '' : 'none'; }
+        else a.style.display = curVisible ? '' : 'none';
+      });
+    }
+  }
+  sel.addEventListener('change', function() { applyFilter(this.value === 'exam'); });
+})();
+</script>
 </body>
 </html>
