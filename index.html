@@ -1783,9 +1783,22 @@ function show(id, el) {
   var section = document.getElementById('section-' + id);
   if (section) section.classList.add('active');
   if (el) el.classList.add('active');
+  else {
+    var navEl = document.querySelector('.nav-item[onclick*="show(\'' + id + '\'"]');
+    if (navEl) navEl.classList.add('active');
+  }
   window.scrollTo(0, 0);
+  localStorage.setItem('hub:section', id);
   if (id === 'fast-track') ftRefresh();
 }
+
+/* Restore last section on page load */
+(function() {
+  var saved = localStorage.getItem('hub:section');
+  if (saved && document.getElementById('section-' + saved)) {
+    show(saved);
+  }
+})();
 
 // Fast Track checkboxes
 var FT_TOTAL = 27;
