@@ -376,6 +376,29 @@
     .section { padding: 28px 20px 64px; }
     .page-title { font-size: 28px; }
   }
+
+  /* ── Fast Track ── */
+  .ft-progress-wrap { margin-bottom: 20px; }
+  .ft-progress-bar { height: 8px; background: var(--bg2); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 6px; }
+  .ft-progress-fill { height: 100%; background: var(--coral); border-radius: 3px; transition: width 0.3s; width: 0%; }
+  .ft-progress-label { font-size: 12px; color: var(--text3); }
+  .ft-cluster { margin-bottom: 32px; }
+  .ft-cluster-head { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); padding-bottom: 10px; border-bottom: 2px solid var(--border); margin-bottom: 0; display: flex; align-items: center; gap: 8px; }
+  .ft-cluster-count { font-size: 10px; background: var(--bg3); color: var(--text3); padding: 1px 7px; border-radius: 8px; font-weight: 600; }
+  .ft-list { list-style: none; padding: 0; margin: 0; }
+  .ft-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .ft-row:last-child { border-bottom: none; }
+  .ft-check { width: 17px; height: 17px; flex-shrink: 0; margin-top: 3px; accent-color: var(--coral); cursor: pointer; }
+  .ft-body { flex: 1; min-width: 0; }
+  .ft-title { font-size: 14px; font-weight: 600; color: var(--ink); display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+  .ft-freq { font-size: 11px; font-weight: 700; color: var(--coral); background: rgba(194,65,12,0.1); padding: 1px 7px; border-radius: 8px; white-space: nowrap; }
+  .ft-link { font-size: 13px; margin-bottom: 3px; }
+  .ft-link a { color: var(--d3); font-weight: 500; }
+  .ft-hint { font-size: 11px; color: var(--text3); font-style: italic; }
+  .ft-row.done .ft-title { text-decoration: line-through; color: var(--text3); }
+  .ft-row.done .ft-freq { opacity: 0.4; }
+  .ft-row.done .ft-link, .ft-row.done .ft-hint { opacity: 0.45; }
+
 </style>
 </head>
 <body>
@@ -400,6 +423,7 @@
     <div class="nav-group-label">Exam</div>
     <a class="nav-item active" onclick="show('overview', this)">📋 Overview</a>
     <a class="nav-item" onclick="show('study-plan', this)">📅 Study Plan</a>
+    <a class="nav-item" onclick="show('fast-track', this)">⚡ Fast Track</a>
   </div>
 
   <div class="nav-group">
@@ -434,7 +458,8 @@
   <div class="nav-group">
     <div class="nav-group-label">Resources</div>
     <a class="nav-item" onclick="show('sample-questions', this)">🧪 Sample Questions</a>
-    <a class="nav-item" href="practice-exam/index.html">🎯 Practice Exam</a>
+    <a class="nav-item" href="practice-exam/index.html">🎯 Practice Exam (12 Q)</a>
+    <a class="nav-item" href="full-exam/index.html">📝 Full Practice Exam (60 Q)</a>
     <a class="nav-item" onclick="show('courses', this)">📚 Course Library</a>
   </div>
 
@@ -1433,6 +1458,196 @@
   </div>
 </section>
 
+<!-- ─── Fast Track ─── -->
+<section id="section-fast-track" class="section">
+  <div class="page-title">⚡ Fast Track</div>
+  <div class="page-subtitle">17 targeted topics — everything that appears on the CCA-F exam, prioritised by question frequency</div>
+
+  <div class="info-card highlight">
+    <div class="info-card-title">📌 How to use</div>
+    <p style="margin:0;font-size:13.5px">Click each link, read the section, tick the checkbox. Progress is saved in your browser. Estimated total: <strong>~2 hours</strong>. Then take the <a href="full-exam/index.html">Full Practice Exam (60 Q)</a>.</p>
+  </div>
+
+  <div class="ft-progress-wrap">
+    <div class="ft-progress-bar"><div class="ft-progress-fill" id="ft-fill"></div></div>
+    <div class="ft-progress-label" id="ft-label">0 / 17 complete</div>
+  </div>
+
+  <!-- D1 -->
+  <div class="ft-cluster">
+    <div class="ft-cluster-head">D1 · Agentic Architecture &amp; Orchestration <span class="ft-cluster-count">19 / 60 questions</span></div>
+    <ul class="ft-list">
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft1" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title">Multi-agent orchestration patterns <span class="ft-freq">6× on exam</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Agents and workflows, Parallelization workflows</div>
+          <div class="ft-hint">Coordinator vs subagent roles; fan-out pattern; task decomposition scope</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft2" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title">Escalation criteria &amp; reliability calibration <span class="ft-freq">4× on exam</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Being clear and direct, Providing examples</div>
+          <div class="ft-hint">Explicit escalation thresholds + few-shot examples beat self-reported confidence scores</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft3" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title">Agentic loop fundamentals &amp; stop conditions <span class="ft-freq">2× on exam</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Agents and tools, Chaining workflows</div>
+          <div class="ft-hint">perception→reasoning→action loop; when to stop; parallel tool execution</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft4" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title">Agent SDK hook patterns <span class="ft-freq">1× on exam</span></div>
+          <div class="ft-link">→ <a href="claude-code-in-action/index.html" target="_blank">Claude Code in Action</a> — Introducing hooks, Defining hooks</div>
+          <div class="ft-hint">PreToolUse / PostToolUse / Stop / SubagentStop — deterministic control over agentic behaviour</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- D2 -->
+  <div class="ft-cluster">
+    <div class="ft-cluster-head">D2 · Tool Design &amp; MCP <span class="ft-cluster-count">14 / 60 questions</span></div>
+    <ul class="ft-list">
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft5" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title">Error propagation: structured context <span class="ft-freq">5× on exam</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Sending tool results, Handling message blocks</div>
+          <div class="ft-hint">Return {failure_type, partial_results, suggested_alternatives} — not generic errors or silent success</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft6" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title">Tool selection reliability via descriptions <span class="ft-freq">4× on exam</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Tool schemas, Introducing tool use</div>
+          <div class="ft-hint">Tool descriptions are the primary routing mechanism — fix the description before adding infrastructure</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft7" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title">Fine-grained tool control &amp; least-privilege <span class="ft-freq">4× on exam</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Fine grained tool calling, The web search tool</div>
+          <div class="ft-hint">Give subagents only the tools they need; tool_choice: auto / any / forced</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft8" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title">MCP server integration &amp; tool definitions <span class="ft-freq">1× on exam</span></div>
+          <div class="ft-link">→ <a href="intro-to-mcp/index.html" target="_blank">Introduction to MCP</a> — Defining tools with MCP &nbsp;·&nbsp; <a href="mcp-advanced/index.html" target="_blank">MCP Advanced</a> — Sampling</div>
+          <div class="ft-hint">stdio vs SSE transport; tool schema in MCP vs direct API</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- D3 -->
+  <div class="ft-cluster">
+    <div class="ft-cluster-head">D3 · Claude Code Configuration <span class="ft-cluster-count">14 / 60 questions</span></div>
+    <ul class="ft-list">
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft9" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title">Custom slash commands: project vs user scope <span class="ft-freq">6× on exam</span></div>
+          <div class="ft-link">→ <a href="claude-code-in-action/index.html" target="_blank">Claude Code in Action</a> — Custom commands &nbsp;·&nbsp; <a href="claude-code-101/index.html" target="_blank">Claude Code 101</a> — Skills</div>
+          <div class="ft-hint">.claude/commands/ (version-controlled, shared) vs ~/.claude/commands/ (personal only)</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft10" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title">Claude Code in CI/CD: the <code>-p</code> flag <span class="ft-freq">2× on exam</span></div>
+          <div class="ft-link">→ <a href="claude-code-in-action/index.html" target="_blank">Claude Code in Action</a> — Github integration</div>
+          <div class="ft-hint"><code>claude -p "prompt"</code> runs non-interactively and exits — the only correct CI mode flag</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft11" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title">Plan mode for complex multi-file tasks <span class="ft-freq">2× on exam</span></div>
+          <div class="ft-link">→ <a href="claude-code-101/index.html" target="_blank">Claude Code 101</a> — The explore → plan → code → commit workflow</div>
+          <div class="ft-hint">Use plan mode before touching dozens of files; direct execution compounds mistakes at scale</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft12" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title">Path-specific rules with glob patterns <span class="ft-freq">1× on exam</span></div>
+          <div class="ft-link">→ <a href="claude-code-in-action/index.html" target="_blank">Claude Code in Action</a> — Adding context</div>
+          <div class="ft-hint">.claude/rules/ files with YAML frontmatter globs (e.g. **/*.test.tsx) apply per file type</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft13" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title">CLAUDE.md hierarchy &amp; modular organisation <span class="ft-freq">2× on exam</span></div>
+          <div class="ft-link">→ <a href="claude-code-101/index.html" target="_blank">Claude Code 101</a> — The CLAUDE.md file</div>
+          <div class="ft-hint">Global (~/.claude) → project root → subdirectory — each layer adds context</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- D4 -->
+  <div class="ft-cluster">
+    <div class="ft-cluster-head">D4 · Prompt Engineering &amp; Structured Output <span class="ft-cluster-count">12 / 60 questions</span></div>
+    <ul class="ft-list">
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft14" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title">Message Batches API: when to use async <span class="ft-freq">4× on exam</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Agents and workflows section</div>
+          <div class="ft-hint">Batches API = up to 24-hour processing — perfect for overnight reports, wrong for blocking CI checks</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft15" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title">Chaining &amp; parallelization workflows <span class="ft-freq">3× on exam</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Chaining workflows, Parallelization workflows</div>
+          <div class="ft-hint">Focused per-file passes then a cross-file integration pass beats one large-context sweep</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft16" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title">Few-shot prompting &amp; prompt specificity <span class="ft-freq">2× on exam</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Providing examples, Being specific</div>
+          <div class="ft-hint">Few-shot adds weight but doesn't fix missing specification — fix the root cause first</div>
+        </div>
+      </li>
+      <li class="ft-row">
+        <input type="checkbox" class="ft-check" data-id="ft17" onchange="ftCheck(this)">
+        <div class="ft-body">
+          <div class="ft-title">Structured output, self-evaluation &amp; long context <span class="ft-freq">3× on exam</span></div>
+          <div class="ft-link">→ <a href="building-with-claude-api/index.html" target="_blank">Building with the Claude API</a> — Structured data, Response streaming</div>
+          <div class="ft-hint">Long context: critical info at start or end; structured output via tool_choice + JSON schema</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="info-card success">
+    <div class="info-card-title">✅ Done? Take the exam</div>
+    <p style="margin:0 0 10px;font-size:13.5px">Target <strong>900+ / 1000</strong> before booking the real certification.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <a href="full-exam/index.html" style="padding:8px 18px;background:var(--coral);color:#fff;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none">📝 Full Practice Exam (60 Q)</a>
+      <a href="practice-exam/index.html" style="padding:8px 18px;background:var(--bg3);color:var(--ink);border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;border:1px solid var(--border)">🎯 Sample Exam (12 Q)</a>
+    </div>
+  </div>
+</section>
+
+
 </main>
 </div>
 
@@ -1444,7 +1659,30 @@ function show(id, el) {
   if (section) section.classList.add('active');
   if (el) el.classList.add('active');
   window.scrollTo(0, 0);
+  if (id === 'fast-track') ftRefresh();
 }
+
+// Fast Track checkboxes
+var FT_TOTAL = 17;
+function ftCheck(cb) {
+  localStorage.setItem('ft:' + cb.dataset.id, cb.checked ? '1' : '0');
+  cb.closest('.ft-row').classList.toggle('done', cb.checked);
+  ftRefresh();
+}
+function ftRefresh() {
+  var done = 0;
+  document.querySelectorAll('.ft-check').forEach(function(cb) {
+    var v = localStorage.getItem('ft:' + cb.dataset.id) === '1';
+    cb.checked = v;
+    cb.closest('.ft-row').classList.toggle('done', v);
+    if (v) done++;
+  });
+  var fill = document.getElementById('ft-fill');
+  if (fill) fill.style.width = Math.round(done / FT_TOTAL * 100) + '%';
+  var lbl = document.getElementById('ft-label');
+  if (lbl) lbl.textContent = done + ' / ' + FT_TOTAL + ' complete';
+}
+
 
 function answer(btn, cardId, chosen, correct) {
   var card = document.getElementById(cardId);
