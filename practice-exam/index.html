@@ -195,6 +195,20 @@
     .main { padding: 28px 16px 64px; }
     .page-title { font-size: 28px; }
   }
+
+  /* Scenario action bar */
+  .scenario-actions {
+    display: flex; gap: 8px; margin: 4px 0 18px;
+  }
+  .sc-btn {
+    padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: 1px solid var(--border); font-family: 'Open Sans', sans-serif;
+    transition: background 0.15s;
+  }
+  .sc-btn-reset { background: var(--bg3); color: var(--text2); }
+  .sc-btn-reset:hover { background: var(--border); }
+  .sc-btn-show { background: rgba(4,120,87,0.08); color: var(--d4); border-color: rgba(4,120,87,0.3); }
+  .sc-btn-show:hover { background: rgba(4,120,87,0.18); }
 </style>
 </head>
 <body>
@@ -244,8 +258,12 @@
 
   <!-- ── Scenario 1 ── -->
   <div class="scenario-header">Scenario 1 — Customer Support Resolution Agent</div>
+  <div class="scenario-actions">
+    <button class="sc-btn sc-btn-reset" onclick="resetSection(1)">↺ Reset section</button>
+    <button class="sc-btn sc-btn-show" onclick="showAnswers(1)">👁 Show answers</button>
+  </div>
 
-  <div class="q-card" id="q1">
+  <div class="q-card" id="q1" data-sc="1">
     <div class="q-meta">
       <span class="q-num">Q1</span>
       <span class="q-tag d1">D1</span>
@@ -269,7 +287,7 @@
     </div>
   </div>
 
-  <div class="q-card" id="q2">
+  <div class="q-card" id="q2" data-sc="1">
     <div class="q-meta">
       <span class="q-num">Q2</span>
       <span class="q-tag d2">D2</span>
@@ -292,7 +310,7 @@
     </div>
   </div>
 
-  <div class="q-card" id="q3">
+  <div class="q-card" id="q3" data-sc="1">
     <div class="q-meta">
       <span class="q-num">Q3</span>
       <span class="q-tag d5">D5</span>
@@ -317,8 +335,12 @@
 
   <!-- ── Scenario 2 ── -->
   <div class="scenario-header">Scenario 2 — Code Generation with Claude Code</div>
+  <div class="scenario-actions">
+    <button class="sc-btn sc-btn-reset" onclick="resetSection(2)">↺ Reset section</button>
+    <button class="sc-btn sc-btn-show" onclick="showAnswers(2)">👁 Show answers</button>
+  </div>
 
-  <div class="q-card" id="q4">
+  <div class="q-card" id="q4" data-sc="2">
     <div class="q-meta">
       <span class="q-num">Q4</span>
       <span class="q-tag d3">D3</span>
@@ -341,7 +363,7 @@
     </div>
   </div>
 
-  <div class="q-card" id="q5">
+  <div class="q-card" id="q5" data-sc="2">
     <div class="q-meta">
       <span class="q-num">Q5</span>
       <span class="q-tag d3">D3</span>
@@ -364,7 +386,7 @@
     </div>
   </div>
 
-  <div class="q-card" id="q6">
+  <div class="q-card" id="q6" data-sc="2">
     <div class="q-meta">
       <span class="q-num">Q6</span>
       <span class="q-tag d3">D3</span>
@@ -389,8 +411,12 @@
 
   <!-- ── Scenario 3 ── -->
   <div class="scenario-header">Scenario 3 — Multi-Agent Research System</div>
+  <div class="scenario-actions">
+    <button class="sc-btn sc-btn-reset" onclick="resetSection(3)">↺ Reset section</button>
+    <button class="sc-btn sc-btn-show" onclick="showAnswers(3)">👁 Show answers</button>
+  </div>
 
-  <div class="q-card" id="q7">
+  <div class="q-card" id="q7" data-sc="3">
     <div class="q-meta">
       <span class="q-num">Q7</span>
       <span class="q-tag d1">D1</span>
@@ -413,7 +439,7 @@
     </div>
   </div>
 
-  <div class="q-card" id="q8">
+  <div class="q-card" id="q8" data-sc="3">
     <div class="q-meta">
       <span class="q-num">Q8</span>
       <span class="q-tag d5">D5</span>
@@ -436,7 +462,7 @@
     </div>
   </div>
 
-  <div class="q-card" id="q9">
+  <div class="q-card" id="q9" data-sc="3">
     <div class="q-meta">
       <span class="q-num">Q9</span>
       <span class="q-tag d2">D2</span>
@@ -461,8 +487,12 @@
 
   <!-- ── Scenario 5 ── -->
   <div class="scenario-header">Scenario 5 — Claude Code for Continuous Integration</div>
+  <div class="scenario-actions">
+    <button class="sc-btn sc-btn-reset" onclick="resetSection(4)">↺ Reset section</button>
+    <button class="sc-btn sc-btn-show" onclick="showAnswers(4)">👁 Show answers</button>
+  </div>
 
-  <div class="q-card" id="q10">
+  <div class="q-card" id="q10" data-sc="4">
     <div class="q-meta">
       <span class="q-num">Q10</span>
       <span class="q-tag d3">D3</span>
@@ -485,7 +515,7 @@
     </div>
   </div>
 
-  <div class="q-card" id="q11">
+  <div class="q-card" id="q11" data-sc="4">
     <div class="q-meta">
       <span class="q-num">Q11</span>
       <span class="q-tag d4">D4</span>
@@ -508,7 +538,7 @@
     </div>
   </div>
 
-  <div class="q-card" id="q12">
+  <div class="q-card" id="q12" data-sc="4">
     <div class="q-meta">
       <span class="q-num">Q12</span>
       <span class="q-tag d4">D4</span>
@@ -536,22 +566,35 @@
 <script>
 var answered = 0;
 var correct = 0;
+var TOTAL = 12;
+
+function recalcScore() {
+  var ans = 0, cor = 0;
+  document.querySelectorAll('.q-card').forEach(function(card) {
+    var btns = card.querySelectorAll('.choice');
+    if (!btns[0] || !btns[0].disabled) return;
+    ans++;
+    var hasWrong = Array.from(btns).some(function(b) { return b.classList.contains('wrong'); });
+    if (!hasWrong) cor++;
+  });
+  answered = ans; correct = cor;
+  document.getElementById('score-correct').textContent = cor;
+  document.getElementById('score-total').textContent = ans;
+  document.getElementById('progress-fill').style.width = Math.round(ans / TOTAL * 100) + '%';
+}
 
 function answer(cardId, chosen, correctLetter) {
   var card = document.getElementById(cardId);
   var buttons = card.querySelectorAll('.choice');
-  var alreadyAnswered = buttons[0].disabled;
-  if (alreadyAnswered) return;
+  if (buttons[0].disabled) return;
 
   buttons.forEach(function(b) { b.disabled = true; });
 
   var isCorrect = chosen === correctLetter;
   if (isCorrect) {
-    // find clicked button by its letter text
     buttons.forEach(function(b) {
       if (b.querySelector('.ltr').textContent.trim() === chosen) b.classList.add('correct');
     });
-    correct++;
   } else {
     buttons.forEach(function(b) {
       var ltr = b.querySelector('.ltr').textContent.trim();
@@ -560,22 +603,12 @@ function answer(cardId, chosen, correctLetter) {
     });
   }
 
-  answered++;
-  document.getElementById('score-correct').textContent = correct;
-  document.getElementById('score-total').textContent = answered;
-  var pct = Math.round((answered / 12) * 100);
-  document.getElementById('progress-fill').style.width = pct + '%';
-
   document.getElementById(cardId + '-exp').style.display = 'block';
   document.getElementById(cardId + '-ref').style.display = 'block';
+  recalcScore();
 }
 
 function resetAll() {
-  answered = 0; correct = 0;
-  document.getElementById('score-correct').textContent = '0';
-  document.getElementById('score-total').textContent = '0';
-  document.getElementById('progress-fill').style.width = '0%';
-
   document.querySelectorAll('.choice').forEach(function(b) {
     b.disabled = false;
     b.classList.remove('correct', 'wrong');
@@ -583,6 +616,40 @@ function resetAll() {
   document.querySelectorAll('.explanation, .ref-box').forEach(function(el) {
     el.style.display = 'none';
   });
+  recalcScore();
+}
+
+function resetSection(sc) {
+  document.querySelectorAll('.q-card[data-sc="' + sc + '"]').forEach(function(card) {
+    card.querySelectorAll('.choice').forEach(function(b) {
+      b.disabled = false;
+      b.classList.remove('correct', 'wrong');
+    });
+    var exp = document.getElementById(card.id + '-exp');
+    if (exp) exp.style.display = 'none';
+    var ref = document.getElementById(card.id + '-ref');
+    if (ref) ref.style.display = 'none';
+  });
+  recalcScore();
+}
+
+function showAnswers(sc) {
+  document.querySelectorAll('.q-card[data-sc="' + sc + '"]').forEach(function(card) {
+    var btns = card.querySelectorAll('.choice');
+    if (btns[0].disabled) return;
+    var m = btns[0].getAttribute('onclick').match(/answer\('[^']+','[^']+','([A-Z])'\)/);
+    if (!m) return;
+    var correctLetter = m[1];
+    btns.forEach(function(b) {
+      b.disabled = true;
+      if (b.querySelector('.ltr').textContent.trim() === correctLetter) b.classList.add('correct');
+    });
+    var exp = document.getElementById(card.id + '-exp');
+    if (exp) exp.style.display = 'block';
+    var ref = document.getElementById(card.id + '-ref');
+    if (ref) ref.style.display = 'block';
+  });
+  recalcScore();
 }
 </script>
 </body>

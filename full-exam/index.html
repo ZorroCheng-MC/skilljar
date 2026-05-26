@@ -209,6 +209,20 @@
   .choice-explanation.correct-exp { border-left-color: #047857; }
   .choice-explanation.wrong-exp { border-left-color: #dc2626; }
 
+  /* Scenario action bar */
+  .scenario-actions {
+    display: flex; gap: 8px; margin: 4px 0 18px;
+  }
+  .sc-btn {
+    padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: 1px solid var(--border); font-family: 'Open Sans', sans-serif;
+    transition: background 0.15s;
+  }
+  .sc-btn-reset { background: var(--bg3); color: var(--text2); }
+  .sc-btn-reset:hover { background: var(--border); }
+  .sc-btn-show { background: rgba(4,120,87,0.08); color: var(--d4); border-color: rgba(4,120,87,0.3); }
+  .sc-btn-show:hover { background: rgba(4,120,87,0.18); }
+
 </style>
 </head>
 <body>
@@ -247,8 +261,12 @@
   </div>
 
   <div class="scenario-header">Scenario 1 — Customer Support Resolution Agent</div>
+  <div class="scenario-actions">
+    <button class="sc-btn sc-btn-reset" onclick="resetSection(1)">↺ Reset section</button>
+    <button class="sc-btn sc-btn-show" onclick="showAnswers(1)">👁 Show answers</button>
+  </div>
 
-  <div class="q-card" id="q1">
+  <div class="q-card" id="q1" data-sc="1">
     <div class="q-meta">
       <span class="q-num">Q1</span>
       <span class="q-tag d1">D1</span>
@@ -273,7 +291,7 @@
     <div class="explanation" id="q1-exp"><strong>Why A:</strong> When a specific tool sequence is required for critical business logic (like verifying customer identity before processing refunds), programmatic enforcement provides deterministic guarantees that prompt-based approaches cannot. Options B and C rely on probabilistic LLM compliance, which is insufficient when errors have financial consequences. Option D addresses tool availability rather than tool ordering, which is not the actual problem.</div>
   </div>
 
-  <div class="q-card" id="q2">
+  <div class="q-card" id="q2" data-sc="1">
     <div class="q-meta">
       <span class="q-num">Q2</span>
       <span class="q-tag d1">D1</span>
@@ -298,7 +316,7 @@
     <div class="explanation" id="q2-exp"><strong>Why B:</strong> Tool descriptions are the primary mechanism LLMs use for tool selection. When descriptions are minimal, models lack the context to differentiate between similar tools. Option B directly addresses this root cause with a low-effort, high-leverage fix. Few-shot examples (A) add token overhead without fixing the underlying issue. A routing layer (C) is over-engineered and bypasses the LLM&#x27;s natural language understanding. Consolidating tools (D) is a valid architectural choice but requires more effort than a &quot;first step&quot; warrants when the immediate problem is inadequate descriptions.</div>
   </div>
 
-  <div class="q-card" id="q3">
+  <div class="q-card" id="q3" data-sc="1">
     <div class="q-meta">
       <span class="q-num">Q3</span>
       <span class="q-tag d1">D1</span>
@@ -323,7 +341,7 @@
     <div class="explanation" id="q3-exp"><strong>Why A:</strong> Adding explicit escalation criteria with few-shot examples directly addresses the root cause: unclear decision boundaries. This is the proportionate first response before adding infrastructure. Option B fails because LLM self-reported confidence is poorly calibrated—the agent is already incorrectly confident on hard cases. Option C is over-engineered, requiring labeled data and ML infrastructure when prompt optimization hasn&#x27;t been tried. Option D solves a different problem entirely; sentiment doesn&#x27;t correlate with case complexity, which is the actual issue.</div>
   </div>
 
-  <div class="q-card" id="q4">
+  <div class="q-card" id="q4" data-sc="1">
     <div class="q-meta">
       <span class="q-num">Q4</span>
       <span class="q-tag d1">D1</span>
@@ -348,7 +366,7 @@
     <div class="explanation" id="q4-exp"><strong>Why B:</strong> Few-shot examples are the most effective first approach because the agent already handles single-concern requests well (94% accuracy), indicating it understands the tools—it just needs guidance on the multi-concern pattern. This is a low-cost, proven technique that directly addresses the root cause. Option A over-engineers the solution with added latency and complexity. Option C misdiagnoses the problem—tool selection isn&#x27;t the issue since single-concern accuracy is high. Option D is reactive rather than preventive and doesn&#x27;t address the parameter mixing issue.</div>
   </div>
 
-  <div class="q-card" id="q5">
+  <div class="q-card" id="q5" data-sc="1">
     <div class="q-meta">
       <span class="q-num">Q5</span>
       <span class="q-tag d1">D1</span>
@@ -373,7 +391,7 @@
     <div class="explanation" id="q5-exp"><strong>Why B:</strong> Option B is correct because it identifies a genuine policy gap—the policy explicitly covers own-site price drops but is silent on competitor price matching. The agent cannot invent policy, so human judgment is required. Option A is wrong because multi-issue requests can be handled sequentially without escalation. Option C is wrong because escalating based on speculation about future customer intent is not a valid criterion. Option D is wrong because the stated reason (avoiding relationship damage) reflects emotional avoidance rather than operational necessity—the agent should present factual tracking evidence according to policy.</div>
   </div>
 
-  <div class="q-card" id="q6">
+  <div class="q-card" id="q6" data-sc="1">
     <div class="q-meta">
       <span class="q-num">Q6</span>
       <span class="q-tag d1">D1</span>
@@ -398,7 +416,7 @@
     <div class="explanation" id="q6-exp"><strong>Why A:</strong> The `stop_reason` field is Claude&#x27;s explicit signal for loop control: &quot;tool_use&quot; means Claude wants to execute a tool and receive results, while &quot;end_turn&quot; means Claude has finished its response. Option B describes a safety guardrail, not the primary control mechanism. Option C relies on unreliable natural language parsing instead of structured API signals. Option D is incorrect because Claude often generates both text and tool calls in the same response—text presence doesn&#x27;t indicate completion.</div>
   </div>
 
-  <div class="q-card" id="q7">
+  <div class="q-card" id="q7" data-sc="1">
     <div class="q-meta">
       <span class="q-num">Q7</span>
       <span class="q-tag d1">D1</span>
@@ -423,7 +441,7 @@
     <div class="explanation" id="q7-exp"><strong>Why A:</strong> Tool descriptions are the primary input the model uses to decide which tool to call. When an agent consistently selects the wrong tool, the first diagnostic step is always to examine whether tool descriptions clearly distinguish their purposes and specify when each should be used. Option B&#x27;s &quot;every possible pattern&quot; approach is impractical and addresses symptoms rather than root cause. Option C over-engineers the solution by building a separate classifier instead of fixing the underlying tool definitions. Option D sacrifices necessary functionality rather than addressing why the confusion exists.</div>
   </div>
 
-  <div class="q-card" id="q8">
+  <div class="q-card" id="q8" data-sc="1">
     <div class="q-meta">
       <span class="q-num">Q8</span>
       <span class="q-tag d1">D1</span>
@@ -448,7 +466,7 @@
     <div class="explanation" id="q8-exp"><strong>Why B:</strong> Option B (decompose-parallelize-synthesize) directly addresses both problems: sequential investigation causing excessive tool calls, and redundant customer data gathering. By decomposing the request into distinct concerns first and reusing the same customer context across parallel investigations, the agent eliminates redundancy and reduces total calls. Option A would make the sequential problem worse by adding more gates. Option C doesn&#x27;t systematically address context reuse or parallel investigation. Option D hides useful tool structure and doesn&#x27;t address the workflow pattern issue.</div>
   </div>
 
-  <div class="q-card" id="q9">
+  <div class="q-card" id="q9" data-sc="1">
     <div class="q-meta">
       <span class="q-num">Q9</span>
       <span class="q-tag d1">D1</span>
@@ -473,7 +491,7 @@
     <div class="explanation" id="q9-exp"><strong>Why A:</strong> Claude can request multiple tools in a single response, and executors should return all results together before the next API call. Prompting Claude to batch related information-gathering calls leverages this native capability with minimal architecture changes. Speculative execution (B) wastes resources on unneeded calls and introduces complexity. Composite tools (C) reduce flexibility and create maintenance burden without addressing the root cause. Increasing max_tokens (D) doesn&#x27;t affect tool batching behavior—it only limits output length.</div>
   </div>
 
-  <div class="q-card" id="q10">
+  <div class="q-card" id="q10" data-sc="1">
     <div class="q-meta">
       <span class="q-num">Q10</span>
       <span class="q-tag d1">D1</span>
@@ -498,7 +516,7 @@
     <div class="explanation" id="q10-exp"><strong>Why A:</strong> The systematic pattern (78% vs 93%) triggered by a specific keyword indicates explicit routing logic in the system prompt rather than tool description issues or model limitations. Option B contradicts the stated premise that descriptions are unambiguous. Option C proposes impractical fine-tuning when simpler prompt fixes would address the issue. Option D is unlikely because the model correctly selects tools 93% of the time when the keyword is absent, demonstrating it can make correct selections without the triggering term.</div>
   </div>
 
-  <div class="q-card" id="q11">
+  <div class="q-card" id="q11" data-sc="1">
     <div class="q-meta">
       <span class="q-num">Q11</span>
       <span class="q-tag d1">D1</span>
@@ -523,7 +541,7 @@
     <div class="explanation" id="q11-exp"><strong>Why A:</strong> PostToolUse hooks provide a single, centralized point for data normalization that works uniformly across all tools (including third-party ones you cannot modify). This approach is deterministic—code transforms data reliably, unlike option B which relies on probabilistic LLM interpretation. Option C creates inconsistent dual approaches (modify some tools, wrap others), violating maintainability principles. Option D requires the agent to remember to call a tool after every retrieval, doubling API calls and relying on unreliable agent behavior for deterministic transformations.</div>
   </div>
 
-  <div class="q-card" id="q12">
+  <div class="q-card" id="q12" data-sc="1">
     <div class="q-meta">
       <span class="q-num">Q12</span>
       <span class="q-tag d1">D1</span>
@@ -548,7 +566,7 @@
     <div class="explanation" id="q12-exp"><strong>Why B:</strong> Option B is most effective because few-shot examples that target the specific failure mode (ambiguous requests) and include explicit reasoning help the model understand the decision-making process for edge cases. Worked examples demonstrating comparative tool selection are more effective than declarative rules alone for nuanced decisions. Option A focuses on unambiguous cases where there&#x27;s no problem. Option C organizes examples in a way that doesn&#x27;t help with comparative tool selection decisions. Option D provides helpful guidelines, but static tool descriptions are less effective than worked examples for teaching nuanced edge-case reasoning—the model needs to see the actual decision process, not just rules about when to use each tool.</div>
   </div>
 
-  <div class="q-card" id="q13">
+  <div class="q-card" id="q13" data-sc="1">
     <div class="q-meta">
       <span class="q-num">Q13</span>
       <span class="q-tag d1">D1</span>
@@ -573,7 +591,7 @@
     <div class="explanation" id="q13-exp"><strong>Why A:</strong> Self-critique (evaluator-optimizer pattern) directly addresses the root cause: inconsistent inclusion of explanation elements. By having the agent evaluate its own response against specific criteria before presenting it, you catch case-specific gaps that vary with each situation. Few-shot examples (B) help with consistent patterns but cannot cover highly variable gaps. Model tier upgrades (C) don&#x27;t address the structural issue—the resolutions are already accurate, just incompletely explained. Confirmation steps (D) shift the burden to customers rather than improving the agent&#x27;s output quality.</div>
   </div>
 
-  <div class="q-card" id="q14">
+  <div class="q-card" id="q14" data-sc="1">
     <div class="q-meta">
       <span class="q-num">Q14</span>
       <span class="q-tag d1">D1</span>
@@ -598,7 +616,7 @@
     <div class="explanation" id="q14-exp"><strong>Why A:</strong> Option A is correct because structured extraction addresses the root cause: summarization is inherently lossy for precise details. By extracting transactional facts (amounts, dates, order numbers) into a persistent block before summarization, critical information is preserved reliably and available in every prompt. Option B fails because LLMs don&#x27;t reliably follow preservation instructions under context pressure—you can&#x27;t &quot;prompt your way out&quot; of summarization being lossy. Option C only delays the problem without solving it; longer conversations will still lose early details. Option D is over-engineered and fragile—reference phrase detection is unreliable, and it doesn&#x27;t help when the agent proactively uses wrong values without the customer explicitly referencing them.</div>
   </div>
 
-  <div class="q-card" id="q15">
+  <div class="q-card" id="q15" data-sc="1">
     <div class="q-meta">
       <span class="q-num">Q15</span>
       <span class="q-tag d1">D1</span>
@@ -624,8 +642,12 @@
   </div>
 
   <div class="scenario-header">Scenario 2 — Code Generation with Claude Code</div>
+  <div class="scenario-actions">
+    <button class="sc-btn sc-btn-reset" onclick="resetSection(2)">↺ Reset section</button>
+    <button class="sc-btn sc-btn-show" onclick="showAnswers(2)">👁 Show answers</button>
+  </div>
 
-  <div class="q-card" id="q16">
+  <div class="q-card" id="q16" data-sc="2">
     <div class="q-meta">
       <span class="q-num">Q16</span>
       <span class="q-tag d2">D2</span>
@@ -650,7 +672,7 @@
     <div class="explanation" id="q16-exp"><strong>Why A:</strong> Project-scoped custom slash commands should be stored in the `.claude/commands/` directory within the repository. These commands are version-controlled and automatically available to all developers when they clone or pull the repo. Option B (`~/.claude/commands/`) is for personal commands that aren&#x27;t shared via version control. Option C (CLAUDE.md) is for project instructions and context, not command definitions. Option D describes a configuration mechanism that doesn&#x27;t exist in Claude Code.</div>
   </div>
 
-  <div class="q-card" id="q17">
+  <div class="q-card" id="q17" data-sc="2">
     <div class="q-meta">
       <span class="q-num">Q17</span>
       <span class="q-tag d2">D2</span>
@@ -675,7 +697,7 @@
     <div class="explanation" id="q17-exp"><strong>Why A:</strong> Plan mode is designed for complex tasks involving large-scale changes, multiple valid approaches, and architectural decisions—exactly what monolith-to-microservices restructuring requires. It enables safe codebase exploration and design before committing to changes. Option B risks costly rework when dependencies are discovered late. Option C assumes you already know the right structure without exploring the code. Option D ignores that the complexity is already stated in the requirements, not something that might emerge later.</div>
   </div>
 
-  <div class="q-card" id="q18">
+  <div class="q-card" id="q18" data-sc="2">
     <div class="q-meta">
       <span class="q-num">Q18</span>
       <span class="q-tag d2">D2</span>
@@ -700,7 +722,7 @@
     <div class="explanation" id="q18-exp"><strong>Why A:</strong> Option A is correct because `.claude/rules/` with glob patterns (e.g., `**/*.test.tsx`) allows conventions to be automatically applied based on file paths regardless of directory location—essential for test files spread throughout the codebase. Option B relies on inference rather than explicit matching, making it unreliable. Option C requires manual skill invocation or relies on Claude choosing to load them, contradicting the need for deterministic &quot;automatic&quot; application based on file paths. Option D can&#x27;t easily handle files spread across many directories since CLAUDE.md files are directory-bound.</div>
   </div>
 
-  <div class="q-card" id="q19">
+  <div class="q-card" id="q19" data-sc="2">
     <div class="q-meta">
       <span class="q-num">Q19</span>
       <span class="q-tag d2">D2</span>
@@ -727,7 +749,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q19-exp"><strong>Why A:</strong> The Explore subagent is designed for tasks producing verbose output you don&#x27;t need retained, returning concise summaries. Keeping Phases 2 and 3 in the main conversation preserves context for iterative refinement and multi-phase work. Option B&#x27;s /compact is lossy and may discard needed pattern details. Option C loses session context about edge case decisions across files. Option D adds manual overhead that subagents handle automatically and is designed for automation, not interactive work.</div>
   </div>
 
-  <div class="q-card" id="q20">
+  <div class="q-card" id="q20" data-sc="2">
     <div class="q-meta">
       <span class="q-num">Q20</span>
       <span class="q-tag d2">D2</span>
@@ -752,7 +774,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q20-exp"><strong>Why A:</strong> The `context: fork` frontmatter option runs skills in an isolated sub-agent context, preventing verbose output from polluting the main conversation and causing responsiveness issues. Option B violates the requirement to preserve full analysis capability by compressing outputs. Option C doesn&#x27;t solve the problem—running three skills sequentially still pollutes context with the same total output. Option D misunderstands the issue; model tier affects speed and cost but doesn&#x27;t address context window pollution from analysis output. Note: Custom slash commands have been merged into skills in Claude Code. Files at `.claude/commands/` still work, but `.claude/skills/` is now the recommended location with additional features like supporting files and automatic loading.</div>
   </div>
 
-  <div class="q-card" id="q21">
+  <div class="q-card" id="q21" data-sc="2">
     <div class="q-meta">
       <span class="q-num">Q21</span>
       <span class="q-tag d2">D2</span>
@@ -777,7 +799,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q21-exp"><strong>Why B:</strong> Skills provide on-demand context loading via slash commands (e.g., a skill at .claude/skills/api-patterns/SKILL.md creates /api-patterns), adding overhead only when explicitly invoked for endpoint generation. Option A loads the exemplar code for every session regardless of task type, wasting context on unrelated work. Option C uses location-based activation (path rules), which would still load the context for bug fixes and reviews in the API directory—exactly what the scenario says is unnecessary. Option D works but is manual and tedious, not leveraging Claude Code&#x27;s configuration capabilities.</div>
   </div>
 
-  <div class="q-card" id="q22">
+  <div class="q-card" id="q22" data-sc="2">
     <div class="q-meta">
       <span class="q-num">Q22</span>
       <span class="q-tag d2">D2</span>
@@ -802,7 +824,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q22-exp"><strong>Why B:</strong> B is correct because if team guidelines were added to individual developers&#x27; user-level ~/.claude/CLAUDE.md files instead of the project&#x27;s .claude/CLAUDE.md, only those developers would receive the instructions. Moving guidelines to the project-level file ensures all team members (including new joiners) receive them. A is unlikely since new developers rarely have pre-existing conflicting configurations. C is incorrect because Claude Code doesn&#x27;t build persistent per-user preference models through repeated interactions. D is incorrect because Claude Code reads CLAUDE.md files fresh at session start rather than caching them across sessions.</div>
   </div>
 
-  <div class="q-card" id="q23">
+  <div class="q-card" id="q23" data-sc="2">
     <div class="q-meta">
       <span class="q-num">Q23</span>
       <span class="q-tag d2">D2</span>
@@ -827,7 +849,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q23-exp"><strong>Why A:</strong> The `context: fork` frontmatter option runs the skill in an isolated sub-agent context, preventing exploration discussion from affecting subsequent conversation. Option B fails because there&#x27;s no mechanism to discard context mid-conversation—history is additive. Option C is wrong because skill directory location affects discoverability and precedence, not execution context. Option D misunderstands the `!` prefix—bash output still flows into conversation context, and exploration requires LLM reasoning.</div>
   </div>
 
-  <div class="q-card" id="q24">
+  <div class="q-card" id="q24" data-sc="2">
     <div class="q-meta">
       <span class="q-num">Q24</span>
       <span class="q-tag d2">D2</span>
@@ -852,7 +874,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q24-exp"><strong>Why A:</strong> Option A is correct because project-scoped `.mcp.json` with environment variable expansion is the idiomatic pattern for sharing MCP configurations—it provides a single source of truth for the team while allowing each developer to supply their own credentials via environment variables. Option B fails the consistency requirement since user-scoped configurations across six developers will inevitably diverge. Option C is an anti-pattern that commits placeholder values and relies on a fragile override mechanism. Option D is over-engineered, building a custom wrapper when native environment variable expansion already solves the problem.</div>
   </div>
 
-  <div class="q-card" id="q25">
+  <div class="q-card" id="q25" data-sc="2">
     <div class="q-meta">
       <span class="q-num">Q25</span>
       <span class="q-tag d2">D2</span>
@@ -877,7 +899,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q25-exp"><strong>Why A:</strong> When facing multiple valid implementation approaches with different architectural implications AND ambiguous requirements, plan mode is appropriate. The Slack integration method choice (webhooks vs bot tokens vs Apps) affects authentication flows, error handling, and future capabilities—this architectural decision warrants exploration and team alignment before implementation. Options B and C both make assumptions about which approach is correct without evaluating trade-offs. Option D incorrectly assumes scaffolding can proceed meaningfully before the integration method is chosen, when the authentication pattern and response handling differ significantly between approaches.</div>
   </div>
 
-  <div class="q-card" id="q26">
+  <div class="q-card" id="q26" data-sc="2">
     <div class="q-meta">
       <span class="q-num">Q26</span>
       <span class="q-tag d2">D2</span>
@@ -902,7 +924,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q26-exp"><strong>Why A:</strong> Concrete input-output examples are the most effective approach because they directly address the core problem: prose descriptions being interpreted ambiguously. Examples bypass linguistic ambiguity by showing exactly what transformation is expected. Option B continues using prose, which has already failed twice. Option C validates output structure but doesn&#x27;t help Claude understand the transformation logic. Option D is diagnostic but doesn&#x27;t provide a concrete target for iteration—after identifying divergence, you&#x27;d still need to use examples or other methods to fix it.</div>
   </div>
 
-  <div class="q-card" id="q27">
+  <div class="q-card" id="q27" data-sc="2">
     <div class="q-meta">
       <span class="q-num">Q27</span>
       <span class="q-tag d2">D2</span>
@@ -927,7 +949,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q27-exp"><strong>Why A:</strong> Claude Code supports a `.claude/rules/` directory where you can create separate markdown files for topic-specific guidelines (e.g., `testing.md`, `api-conventions.md`). This allows teams to organize large instruction sets into maintainable modules. Option B describes the directory hierarchy feature, which provides context for different parts of the codebase but doesn&#x27;t solve the problem of organizing a single project&#x27;s many guidelines. Option C doesn&#x27;t exist as a Claude Code feature. Option D confuses README files (human documentation) with CLAUDE.md files (instructions for Claude).</div>
   </div>
 
-  <div class="q-card" id="q28">
+  <div class="q-card" id="q28" data-sc="2">
     <div class="q-meta">
       <span class="q-num">Q28</span>
       <span class="q-tag d2">D2</span>
@@ -952,7 +974,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q28-exp"><strong>Why A:</strong> Option A correctly uses three distinct skill configuration features to address each specific issue: `argument-hint` frontmatter shows expected parameters during autocomplete (addressing missing arguments), `context: fork` isolates execution in a subagent context separate from conversation history (preventing context bleeding), and `allowed-tools` restricts tool access (preventing unauthorized operations). Option B attempts three fixes but splitting skills doesn&#x27;t inherently solve context isolation, and relying on SKILL.md instructions to request arguments is less effective than `argument-hint` which provides autocomplete hints. Option C relies entirely on prompt-based instructions which are unreliable—skills are markdown templates that become part of the prompt, not programs with enforcement mechanisms; telling Claude to &quot;ignore prior context&quot; or &quot;avoid forbidden operations&quot; doesn&#x27;t actually restrict access. Option D&#x27;s positional parameters don&#x27;t enforce argument presence (they&#x27;re just empty if not provided), `@` file references control what&#x27;s explicitly included but don&#x27;t prevent context from prior conversation, and `description` frontmatter only appears in help text—it doesn&#x27;t restrict tool access.</div>
   </div>
 
-  <div class="q-card" id="q29">
+  <div class="q-card" id="q29" data-sc="2">
     <div class="q-meta">
       <span class="q-num">Q29</span>
       <span class="q-tag d2">D2</span>
@@ -977,7 +999,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q29-exp"><strong>Why B:</strong> CLAUDE.md content is loaded for every conversation, making it ideal for universal standards you always want applied. Skills are model-invoked and loaded on-demand when Claude detects a relevant task, making them perfect for specialized workflows. Option A fails because moving everything to Skills means coding standards won&#x27;t be automatically applied. Option C misapplies path-specific rules (designed for file-type conventions) to workflow-based distinctions. Option D improves maintainability through @import but still loads all content every conversation, not solving the conditional loading requirement.</div>
   </div>
 
-  <div class="q-card" id="q30">
+  <div class="q-card" id="q30" data-sc="2">
     <div class="q-meta">
       <span class="q-num">Q30</span>
       <span class="q-tag d2">D2</span>
@@ -1003,8 +1025,12 @@ What&#x27;s the most effective approach to complete this while maintaining imple
   </div>
 
   <div class="scenario-header">Scenario 3 — Multi-Agent Research System</div>
+  <div class="scenario-actions">
+    <button class="sc-btn sc-btn-reset" onclick="resetSection(3)">↺ Reset section</button>
+    <button class="sc-btn sc-btn-show" onclick="showAnswers(3)">👁 Show answers</button>
+  </div>
 
-  <div class="q-card" id="q31">
+  <div class="q-card" id="q31" data-sc="3">
     <div class="q-meta">
       <span class="q-num">Q31</span>
       <span class="q-tag d3">D3</span>
@@ -1029,7 +1055,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q31-exp"><strong>Why B:</strong> The coordinator&#x27;s logs reveal the root cause directly: it decomposed &quot;creative industries&quot; into only visual arts subtasks (digital art, graphic design, photography), completely omitting music, writing, and film. The subagents executed their assigned tasks correctly—the problem is what they were assigned. This makes Option B clearly correct: the coordinator&#x27;s task decomposition was too narrow. Options A, C, and D incorrectly blame downstream agents that are working correctly within their assigned scope. The synthesis agent can only combine findings it receives; the web search agent searched exactly what it was assigned; and there&#x27;s no evidence of document filtering—the missing industries were never researched in the first place.</div>
   </div>
 
-  <div class="q-card" id="q32">
+  <div class="q-card" id="q32" data-sc="3">
     <div class="q-meta">
       <span class="q-num">Q32</span>
       <span class="q-tag d3">D3</span>
@@ -1054,7 +1080,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q32-exp"><strong>Why A:</strong> Structured error context gives the coordinator the information it needs to make intelligent recovery decisions—whether to retry with a modified query, try an alternative approach, or proceed with partial results. Option B&#x27;s generic status hides valuable context from the coordinator, preventing informed decisions. Option C suppresses the error by marking failure as success, which prevents any recovery and risks incomplete research outputs. Option D terminates the entire workflow unnecessarily when recovery strategies could succeed.</div>
   </div>
 
-  <div class="q-card" id="q33">
+  <div class="q-card" id="q33" data-sc="3">
     <div class="q-meta">
       <span class="q-num">Q33</span>
       <span class="q-tag d3">D3</span>
@@ -1079,7 +1105,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q33-exp"><strong>Why A:</strong> Option A applies the principle of least privilege by giving the synthesis agent only what it needs for the 85% common case (simple fact verification) while preserving the existing coordination pattern for complex cases. Option B&#x27;s batching approach creates blocking dependencies since synthesis steps may depend on earlier verified facts, making all-at-once batching impractical. Option C over-provisions the synthesis agent, violating separation of concerns and potentially degrading its accuracy on its primary synthesis task. Option D relies on speculative caching that cannot reliably predict what the synthesis agent will need to verify.</div>
   </div>
 
-  <div class="q-card" id="q34">
+  <div class="q-card" id="q34" data-sc="3">
     <div class="q-meta">
       <span class="q-num">Q34</span>
       <span class="q-tag d3">D3</span>
@@ -1104,7 +1130,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q34-exp"><strong>Why A:</strong> Option A addresses the root cause by having upstream agents output only what downstream agents need—structured facts, citations, and relevance scores rather than verbose content and reasoning traces. This reduces tokens at the source while preserving essential information. Option B adds latency, cost, and potential information loss through another agent that itself must process 155K tokens. Option C degrades synthesis quality since sequential batching prevents seeing all findings together to identify patterns and contradictions. Option D is over-engineered for this use case—RAG retrieval works for large knowledge bases, but synthesis requires comprehensive coverage of known inputs, not selective retrieval based on queries.</div>
   </div>
 
-  <div class="q-card" id="q35">
+  <div class="q-card" id="q35" data-sc="3">
     <div class="q-meta">
       <span class="q-num">Q35</span>
       <span class="q-tag d3">D3</span>
@@ -1129,7 +1155,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q35-exp"><strong>Why A:</strong> The coordinator pattern provides centralized visibility, consistent error handling, and control over information flow between subagents. Option B is wrong because serialization isn&#x27;t unique to coordinators—any component can pass data. Option C is incorrect because routing through a coordinator adds overhead rather than reducing it. Option D creates a false dichotomy—retry logic can be implemented anywhere, not just in coordinators.</div>
   </div>
 
-  <div class="q-card" id="q36">
+  <div class="q-card" id="q36" data-sc="3">
     <div class="q-meta">
       <span class="q-num">Q36</span>
       <span class="q-tag d3">D3</span>
@@ -1154,7 +1180,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q36-exp"><strong>Why C:</strong> Option C correctly applies separation of concerns: the document analysis agent completes its core task (analyzing documents) without blocking, preserves all information with explicit conflict annotation, and defers the reconciliation decision to the coordinator which has broader context. Option A creates unnecessary workflow blocking. Option B has the wrong agent making credibility judgments that affect which data gets used. Option D risks the conflict being missed due to lack of annotation and inappropriately delegates the decision to the synthesis agent.</div>
   </div>
 
-  <div class="q-card" id="q37">
+  <div class="q-card" id="q37" data-sc="3">
     <div class="q-meta">
       <span class="q-num">Q37</span>
       <span class="q-tag d3">D3</span>
@@ -1179,7 +1205,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q37-exp"><strong>Why A:</strong> Returning errors with context to the coordinator is the correct approach because it allows the coordinator agent to make informed decisions about how to proceed—whether to skip the document, try an alternative, or inform the user. Silent failures (B) hide critical information and undermine report completeness. Terminating the entire workflow (C) is disproportionate for a single file issue. Retrying (D) is pointless for corrupted files since corruption is a permanent failure, not a transient one that might resolve.</div>
   </div>
 
-  <div class="q-card" id="q38">
+  <div class="q-card" id="q38" data-sc="3">
     <div class="q-meta">
       <span class="q-num">Q38</span>
       <span class="q-tag d3">D3</span>
@@ -1204,7 +1230,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q38-exp"><strong>Why B:</strong> The orchestrator-workers pattern requires the coordinator to maintain control of the workflow by collecting results from subagents and passing them to the appropriate specialized component. Option B correctly uses the synthesis agent for its intended purpose—integrating findings into a coherent output. Option A fails because concatenation is not integration and produces incoherent results. Options C and D violate the coordination pattern by having agents bypass the coordinator or communicate peer-to-peer, which breaks centralized control and creates architectural problems.</div>
   </div>
 
-  <div class="q-card" id="q39">
+  <div class="q-card" id="q39" data-sc="3">
     <div class="q-meta">
       <span class="q-num">Q39</span>
       <span class="q-tag d3">D3</span>
@@ -1229,7 +1255,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q39-exp"><strong>Why A:</strong> Option A is correct because it embodies graceful degradation with transparency—continuing with available data while propagating uncertainty information downstream. This allows the report generator and end users to make informed decisions about confidence levels. Option B violates separation of concerns (subagents shouldn&#x27;t direct coordinator retry logic) and assumes retries will succeed. Option C hides critical information, producing potentially misleading research reports. Option D treats partial success as total failure, wasting completed work and providing no value when partial results would be useful.</div>
   </div>
 
-  <div class="q-card" id="q40">
+  <div class="q-card" id="q40" data-sc="3">
     <div class="q-meta">
       <span class="q-num">Q40</span>
       <span class="q-tag d3">D3</span>
@@ -1254,7 +1280,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q40-exp"><strong>Why A:</strong> Option A is correct because coordinator-level task partitioning addresses the root cause (unclear boundaries) before work begins, preserves parallelism, and prevents wasted tokens. Option B adds unnecessary complexity with shared state and race conditions. Option C fails to address the stated concern—tokens are still wasted even if results are deduplicated afterward. Option D unnecessarily sacrifices parallelism when simple partitioning achieves the same deduplication benefit.</div>
   </div>
 
-  <div class="q-card" id="q41">
+  <div class="q-card" id="q41" data-sc="3">
     <div class="q-meta">
       <span class="q-num">Q41</span>
       <span class="q-tag d3">D3</span>
@@ -1279,7 +1305,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q41-exp"><strong>Why C:</strong> Option C correctly identifies that a timeout (query didn&#x27;t complete) is semantically different from &quot;0 results&quot; (query succeeded but found nothing). In research contexts, knowing a source has no relevant data is informative, while a timeout means the data is unknown. This distinction enables appropriate decisions: retry access failures but accept empty results as valid findings. Option A incorrectly treats valid empty results as failures, causing wasteful retries. Option B hides retry context from the coordinator, limiting resource budget management. Option D destroys actionable information through aggregation.</div>
   </div>
 
-  <div class="q-card" id="q42">
+  <div class="q-card" id="q42" data-sc="3">
     <div class="q-meta">
       <span class="q-num">Q42</span>
       <span class="q-tag d3">D3</span>
@@ -1304,7 +1330,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q42-exp"><strong>Why A:</strong> Option A directly addresses the root cause: the semantic overlap between tool names and descriptions. Renaming `analyze_content` to `extract_web_results` and using &quot;processes and returns information retrieved from web searches&quot; completely eliminates the ambiguous &quot;analyze&quot; terminology that was confusing the coordinator. Option B over-engineers with an unnecessary classifier when the fix is simply clearer descriptions. Option C only fixes one side of the overlap, leaving the web search tool ambiguous. Option D treats the symptom through prompt workarounds rather than fixing the underlying tool definition problem.</div>
   </div>
 
-  <div class="q-card" id="q43">
+  <div class="q-card" id="q43" data-sc="3">
     <div class="q-meta">
       <span class="q-num">Q43</span>
       <span class="q-tag d3">D3</span>
@@ -1329,7 +1355,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q43-exp"><strong>Why A:</strong> Option A is correct because it follows the principle of handling errors at the lowest level capable of resolving them. The subagent handles transient failures locally (reducing coordinator burden) while escalating only unresolvable issues with context for informed decisions. Option B masks errors as success, hiding problems rather than solving them. Option C increases coordinator burden by adding validation responsibilities. Option D adds unnecessary architectural complexity and coordination overhead.</div>
   </div>
 
-  <div class="q-card" id="q44">
+  <div class="q-card" id="q44" data-sc="3">
     <div class="q-meta">
       <span class="q-num">Q44</span>
       <span class="q-tag d3">D3</span>
@@ -1354,7 +1380,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q44-exp"><strong>Why A:</strong> Option A is correct because it addresses the root cause by constraining the tool&#x27;s capability at the interface level. A `load_document` tool with format validation makes the undesired search behavior impossible rather than merely discouraged—following the principle of least privilege. Option B removes useful capability and adds latency for legitimate document loading. Option C relies on prompt instructions, which provide unreliable enforcement since LLMs can ignore instructions when the tool technically permits the behavior. Option D uses a blocklist approach that requires ongoing maintenance and can never be complete, addressing symptoms rather than the underlying design flaw.</div>
   </div>
 
-  <div class="q-card" id="q45">
+  <div class="q-card" id="q45" data-sc="3">
     <div class="q-meta">
       <span class="q-num">Q45</span>
       <span class="q-tag d3">D3</span>
@@ -1380,8 +1406,12 @@ What&#x27;s the most effective approach to complete this while maintaining imple
   </div>
 
   <div class="scenario-header">Scenario 4 — Claude Code for Continuous Integration</div>
+  <div class="scenario-actions">
+    <button class="sc-btn sc-btn-reset" onclick="resetSection(4)">↺ Reset section</button>
+    <button class="sc-btn sc-btn-show" onclick="showAnswers(4)">👁 Show answers</button>
+  </div>
 
-  <div class="q-card" id="q46">
+  <div class="q-card" id="q46" data-sc="4">
     <div class="q-meta">
       <span class="q-num">Q46</span>
       <span class="q-tag d4">D4</span>
@@ -1406,7 +1436,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q46-exp"><strong>Why A:</strong> The `-p` (or `--print`) flag is the documented way to run Claude Code in non-interactive mode. It processes the prompt, outputs the result to stdout, and exits without waiting for user input—exactly what CI/CD pipelines require. The other options reference non-existent features (CLAUDE_HEADLESS environment variable, --batch flag) or use Unix workarounds that don&#x27;t properly address Claude Code&#x27;s command syntax.</div>
   </div>
 
-  <div class="q-card" id="q47">
+  <div class="q-card" id="q47" data-sc="4">
     <div class="q-meta">
       <span class="q-num">Q47</span>
       <span class="q-tag d4">D4</span>
@@ -1431,7 +1461,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q47-exp"><strong>Why A:</strong> The Message Batches API offers 50% cost savings but has processing times up to 24 hours with no guaranteed latency SLA. This makes it unsuitable for blocking pre-merge checks where developers wait for results, but ideal for overnight batch jobs like technical debt reports. Option B is wrong because relying on &quot;often faster&quot; completion isn&#x27;t acceptable for blocking workflows. Option C reflects a misconception—batch results can be correlated using custom_id fields. Option D adds unnecessary complexity when the simpler solution is matching each API to its appropriate use case.</div>
   </div>
 
-  <div class="q-card" id="q48">
+  <div class="q-card" id="q48" data-sc="4">
     <div class="q-meta">
       <span class="q-num">Q48</span>
       <span class="q-tag d4">D4</span>
@@ -1456,7 +1486,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q48-exp"><strong>Why A:</strong> Splitting reviews into focused passes directly addresses the root cause: attention dilution when processing many files at once. File-by-file analysis ensures consistent depth, while a separate integration pass catches cross-file issues. Option B shifts burden to developers without improving the system. Option C misunderstands that larger context windows don&#x27;t solve attention quality issues—the &quot;lost in the middle&quot; problem persists. Option D would actually suppress detection of real bugs by requiring consensus on issues that may only be caught intermittently.</div>
   </div>
 
-  <div class="q-card" id="q49">
+  <div class="q-card" id="q49" data-sc="4">
     <div class="q-meta">
       <span class="q-num">Q49</span>
       <span class="q-tag d4">D4</span>
@@ -1481,7 +1511,7 @@ What&#x27;s the most effective approach to complete this while maintaining imple
     <div class="explanation" id="q49-exp"><strong>Why A:</strong> The correct answer matches API approaches to latency requirements: PR style checks block developers and need immediate responses (synchronous), while weekly audits and nightly test generation are scheduled tasks that can tolerate up to 24 hours of processing time (batch). Option B would create unacceptable delays for blocking PR checks. Option C misses cost savings on nightly jobs that don&#x27;t need immediate results. Option D foregoes significant batch savings when prompt caching isn&#x27;t an equivalent cost reduction.</div>
   </div>
 
-  <div class="q-card" id="q50">
+  <div class="q-card" id="q50" data-sc="4">
     <div class="q-meta">
       <span class="q-num">Q50</span>
       <span class="q-tag d4">D4</span>
@@ -1508,7 +1538,7 @@ What is the primary technical constraint when considering batch processing for t
     <div class="explanation" id="q50-exp"><strong>Why B:</strong> Batch processing supports tool definitions and can generate tool calls, but its asynchronous fire-and-forget model means you cannot execute tools and return results mid-request. This breaks iterative workflows where Claude needs tool results to continue analysis. Option A is incorrect (batch fully supports tools), C is incorrect (custom_id provides request correlation), and D identifies a real but secondary concern—the phrase &quot;though the workflow could otherwise function&quot; is false because the architectural limitation in B would prevent this workflow even if batch completed instantly.</div>
   </div>
 
-  <div class="q-card" id="q51">
+  <div class="q-card" id="q51" data-sc="4">
     <div class="q-meta">
       <span class="q-num">Q51</span>
       <span class="q-tag d4">D4</span>
@@ -1533,7 +1563,7 @@ What is the primary technical constraint when considering batch processing for t
     <div class="explanation" id="q51-exp"><strong>Why A:</strong> The correct answer is A because LLMs can only reason about information in their context. Without knowing what tests already exist, Claude cannot avoid suggesting duplicates. Providing the existing test file directly addresses this root cause. Option B doesn&#x27;t solve duplication since edge cases might also be covered. Option C uses brittle keyword matching that misses semantically equivalent tests with different names. Option D incorrectly assumes reducing quantity improves relevance—Claude has no basis to prioritize non-duplicates without context about what exists.</div>
   </div>
 
-  <div class="q-card" id="q52">
+  <div class="q-card" id="q52" data-sc="4">
     <div class="q-meta">
       <span class="q-num">Q52</span>
       <span class="q-tag d4">D4</span>
@@ -1558,7 +1588,7 @@ What is the primary technical constraint when considering batch processing for t
     <div class="explanation" id="q52-exp"><strong>Why A:</strong> Option A is correct because it provides Claude with the context needed to make intelligent decisions about what&#x27;s genuinely new versus already addressed. By including previous findings, Claude can reason about whether issues have been fixed rather than blindly re-flagging them. Option B sacrifices thoroughness by limiting scope—changes in one file might affect issues in another. Option C uses brittle pattern matching that can&#x27;t semantically determine if issues are truly resolved, and LLM outputs vary in wording across runs. Option D avoids the problem by reducing feedback frequency, losing the continuous feedback value that makes CI/CD reviews useful.</div>
   </div>
 
-  <div class="q-card" id="q53">
+  <div class="q-card" id="q53" data-sc="4">
     <div class="q-meta">
       <span class="q-num">Q53</span>
       <span class="q-tag d4">D4</span>
@@ -1583,7 +1613,7 @@ What is the primary technical constraint when considering batch processing for t
     <div class="explanation" id="q53-exp"><strong>Why A:</strong> Running a second, independent Claude instance without the generator&#x27;s reasoning addresses the root cause of self-review blind spots. LLMs exhibit confirmation bias when reviewing their own work within the same context. By giving the reviewer only the code and proposed changes (not the reasoning behind them), it evaluates changes from a fresh perspective. Option B fails because self-review within the same context carries the same biases. Options C and D improve generation quality but don&#x27;t address the fundamental self-review limitation—the question explicitly states Claude considered these cases during generation and concluded its approach was correct, so more thinking time (C) or more context (D) won&#x27;t help catch issues Claude has already rationalized.</div>
   </div>
 
-  <div class="q-card" id="q54">
+  <div class="q-card" id="q54" data-sc="4">
     <div class="q-meta">
       <span class="q-num">Q54</span>
       <span class="q-tag d4">D4</span>
@@ -1608,7 +1638,7 @@ What is the primary technical constraint when considering batch processing for t
     <div class="explanation" id="q54-exp"><strong>Why A:</strong> Explicit severity criteria with concrete code examples directly address the root cause of inconsistency: ambiguous interpretation of what each severity level means. This is a proven prompt engineering technique for improving classification reliability. Option B&#x27;s issue-type-to-severity mapping loses important context (the same issue type may warrant different severities based on code path). Option C shifts the burden to manual review, defeating automation. Option D&#x27;s relative ratings would make a single minor issue &quot;critical&quot; if it&#x27;s the only finding, introducing more inconsistency rather than less.</div>
   </div>
 
-  <div class="q-card" id="q55">
+  <div class="q-card" id="q55" data-sc="4">
     <div class="q-meta">
       <span class="q-num">Q55</span>
       <span class="q-tag d4">D4</span>
@@ -1633,7 +1663,7 @@ What is the primary technical constraint when considering batch processing for t
     <div class="explanation" id="q55-exp"><strong>Why B:</strong> The Claude Code CLI supports `--output-format json` with `--json-schema` to guarantee well-formed structured output that can be reliably parsed for automation. Options A and C rely on prompt-based formatting which LLMs follow inconsistently—fine for human consumption but unreliable for automated pipelines requiring specific fields. Option D adds unnecessary complexity and cost with a second LLM call when the problem is solved natively with structured output enforcement via CLI flags.</div>
   </div>
 
-  <div class="q-card" id="q56">
+  <div class="q-card" id="q56" data-sc="4">
     <div class="q-meta">
       <span class="q-num">Q56</span>
       <span class="q-tag d4">D4</span>
@@ -1658,7 +1688,7 @@ What is the primary technical constraint when considering batch processing for t
     <div class="explanation" id="q56-exp"><strong>Why A:</strong> The root cause is that &quot;accurate and up-to-date&quot; lacks a definition of what constitutes a problem. Explicit criteria (A) directly address this by defining the target: semantic contradiction between a comment&#x27;s claim and actual code behavior. Few-shot examples (B) help the model recognize similar patterns to those shown, but pattern-matching won&#x27;t generalize to novel misleading comments—the model needs the underlying criterion to identify any contradiction. Filtering (C) addresses one symptom (false positives on TODOs) but ignores the false negative problem entirely. Git blame data (D) provides temporal context but doesn&#x27;t define what should actually be flagged—old comments can be accurate, and new comments can be wrong.</div>
   </div>
 
-  <div class="q-card" id="q57">
+  <div class="q-card" id="q57" data-sc="4">
     <div class="q-meta">
       <span class="q-num">Q57</span>
       <span class="q-tag d4">D4</span>
@@ -1683,7 +1713,7 @@ What is the primary technical constraint when considering batch processing for t
     <div class="explanation" id="q57-exp"><strong>Why B:</strong> Deep analysis is the correct choice because it runs overnight and doesn&#x27;t require immediate results, making it ideal for batch processing&#x27;s up-to-24-hour latency in exchange for 50% cost savings. The Message Batches API works asynchronously: you submit requests, poll for completion status, then retrieve results from a JSONL file—there&#x27;s no callback mechanism. This polling model fits perfectly with overnight jobs that can check periodically and post PR comments once complete. Pre-merge-commit hooks block PR merging and require timely completion, making them incompatible with batch processing&#x27;s latency—even though most batches complete in under an hour, the system makes no timing guarantees. Using batch for both modes would break the pre-merge-commit workflow, and avoiding batch entirely wastes cost savings on the latency-tolerant deep analysis workload.</div>
   </div>
 
-  <div class="q-card" id="q58">
+  <div class="q-card" id="q58" data-sc="4">
     <div class="q-meta">
       <span class="q-num">Q58</span>
       <span class="q-tag d4">D4</span>
@@ -1710,7 +1740,7 @@ Developer surveys indicate growing distrust—many have started dismissing findi
     <div class="explanation" id="q58-exp"><strong>Why A:</strong> Option A is correct because it immediately stops trust erosion by removing high-FP categories while preserving the value of accurate ones (security, correctness, performance). A tool giving 50% wrong advice is worse than no tool—developers who&#x27;ve lost trust won&#x27;t regain it while noisy findings continue. Option B damages working categories to compensate for broken ones. Option C shifts burden to developers without reducing noise, and those who already distrust the system won&#x27;t trust confidence scores. Option D addresses the right problem but ignores urgency—trust will continue eroding during iteration.</div>
   </div>
 
-  <div class="q-card" id="q59">
+  <div class="q-card" id="q59" data-sc="4">
     <div class="q-meta">
       <span class="q-num">Q59</span>
       <span class="q-tag d4">D4</span>
@@ -1735,7 +1765,7 @@ Developer surveys indicate growing distrust—many have started dismissing findi
     <div class="explanation" id="q59-exp"><strong>Why B:</strong> Few-shot examples are the most effective technique for achieving consistent output format when instructions alone produce variable results. The scenario explicitly shows that instruction refinement failed, making Option A a repetition of a failing approach. Option B works because examples demonstrate the exact pattern expected, which models follow more reliably than abstract instructions. Option C overcomplicates the system without addressing format consistency, and Option D misdiagnoses the problem—the model sometimes succeeds with current context, so more context won&#x27;t fix format variability.</div>
   </div>
 
-  <div class="q-card" id="q60">
+  <div class="q-card" id="q60" data-sc="4">
     <div class="q-meta">
       <span class="q-num">Q60</span>
       <span class="q-tag d4">D4</span>
@@ -1764,15 +1794,29 @@ Developer surveys indicate growing distrust—many have started dismissing findi
 </div><!-- /main -->
 
 <script>
-
 var answered = 0;
 var correct = 0;
+var TOTAL = 60;
+
+function recalcScore() {
+  var ans = 0, cor = 0;
+  document.querySelectorAll('.q-card').forEach(function(card) {
+    var btns = card.querySelectorAll('.choice');
+    if (!btns[0] || !btns[0].disabled) return;
+    ans++;
+    var hasWrong = Array.from(btns).some(function(b) { return b.classList.contains('wrong'); });
+    if (!hasWrong) cor++;
+  });
+  answered = ans; correct = cor;
+  document.getElementById('score-correct').textContent = cor;
+  document.getElementById('score-total').textContent = ans;
+  document.getElementById('progress-fill').style.width = Math.round(ans / TOTAL * 100) + '%';
+}
 
 function answer(cardId, chosen, correctLetter) {
   var card = document.getElementById(cardId);
   var buttons = card.querySelectorAll('.choice');
-  var alreadyAnswered = buttons[0].disabled;
-  if (alreadyAnswered) return;
+  if (buttons[0].disabled) return;
 
   buttons.forEach(function(b) { b.disabled = true; });
 
@@ -1781,7 +1825,6 @@ function answer(cardId, chosen, correctLetter) {
     buttons.forEach(function(b) {
       if (b.querySelector('.ltr').textContent.trim() === chosen) b.classList.add('correct');
     });
-    correct++;
   } else {
     buttons.forEach(function(b) {
       var ltr = b.querySelector('.ltr').textContent.trim();
@@ -1790,7 +1833,7 @@ function answer(cardId, chosen, correctLetter) {
     });
   }
 
-  // Show per-choice explanations
+  // Show per-choice explanations (full-exam feature)
   buttons.forEach(function(b) {
     var ltr = b.querySelector('.ltr').textContent.trim();
     var expText = b.getAttribute('data-exp');
@@ -1802,21 +1845,11 @@ function answer(cardId, chosen, correctLetter) {
     b.insertAdjacentElement('afterend', expDiv);
   });
 
-  answered++;
-  document.getElementById('score-correct').textContent = correct;
-  document.getElementById('score-total').textContent = answered;
-  var pct = Math.round((answered / 60) * 100);
-  document.getElementById('progress-fill').style.width = pct + '%';
-
   document.getElementById(cardId + '-exp').style.display = 'block';
+  recalcScore();
 }
 
 function resetAll() {
-  answered = 0; correct = 0;
-  document.getElementById('score-correct').textContent = '0';
-  document.getElementById('score-total').textContent = '0';
-  document.getElementById('progress-fill').style.width = '0%';
-
   document.querySelectorAll('.choice').forEach(function(b) {
     b.disabled = false;
     b.classList.remove('correct', 'wrong');
@@ -1824,12 +1857,39 @@ function resetAll() {
   document.querySelectorAll('.explanation').forEach(function(el) {
     el.style.display = 'none';
   });
-  // Remove injected choice-explanation divs
-  document.querySelectorAll('.choice-explanation').forEach(function(el) {
-    el.remove();
-  });
+  document.querySelectorAll('.choice-explanation').forEach(function(el) { el.remove(); });
+  recalcScore();
 }
 
+function resetSection(sc) {
+  document.querySelectorAll('.q-card[data-sc="' + sc + '"]').forEach(function(card) {
+    card.querySelectorAll('.choice').forEach(function(b) {
+      b.disabled = false;
+      b.classList.remove('correct', 'wrong');
+    });
+    card.querySelectorAll('.choice-explanation').forEach(function(el) { el.remove(); });
+    var exp = document.getElementById(card.id + '-exp');
+    if (exp) exp.style.display = 'none';
+  });
+  recalcScore();
+}
+
+function showAnswers(sc) {
+  document.querySelectorAll('.q-card[data-sc="' + sc + '"]').forEach(function(card) {
+    var btns = card.querySelectorAll('.choice');
+    if (btns[0].disabled) return;
+    var m = btns[0].getAttribute('onclick').match(/answer\('[^']+','[^']+','([A-Z])'\)/);
+    if (!m) return;
+    var correctLetter = m[1];
+    btns.forEach(function(b) {
+      b.disabled = true;
+      if (b.querySelector('.ltr').textContent.trim() === correctLetter) b.classList.add('correct');
+    });
+    var exp = document.getElementById(card.id + '-exp');
+    if (exp) exp.style.display = 'block';
+  });
+  recalcScore();
+}
 </script>
 </body>
 </html>
