@@ -269,6 +269,9 @@
     border-radius: 8px; font-size: 13px; color: #b91c1c;
   }
   .retry-banner.active { display: block; }
+  .retry-banner.complete {
+    background: rgba(4,120,87,0.07); border-color: rgba(4,120,87,0.2); color: #047857;
+  }
 
   /* Test History */
   .history-panel {
@@ -1904,6 +1907,8 @@ var _answers = {};
 var _retryMode = false;
 var _retrySnapshot = null;
 var _retryTotal = 0;
+var _retryAnswers = {};
+var _retryComplete = false;
 
 function setCardStatus(card, isCorrect) {
   card.classList.remove('answered-correct', 'answered-wrong');
@@ -1928,7 +1933,7 @@ function updateRetryBtn() {
   if (!btn) return;
   if (_retryMode) {
     btn.style.display = 'inline-block';
-    btn.textContent = '✕ Exit Retry';
+    btn.textContent = _retryComplete ? '✓ Save & Exit' : '✕ Exit Retry';
     btn.classList.add('exit-mode');
   } else {
     var wrongs = getWrongCards().length;
@@ -1951,6 +1956,8 @@ function enterRetry() {
   if (!wrongCards.length) return;
   _retrySnapshot = JSON.parse(JSON.stringify(_answers));
   _retryTotal = wrongCards.length;
+  _retryAnswers = {};
+  _retryComplete = false;
   _retryMode = true;
 
   document.getElementById('show-all-btn').style.display = 'none';
@@ -1991,23 +1998,38 @@ function enterRetry() {
 }
 
 function exitRetry() {
-  _retryMode = false;
+  // Capture retry stats before clearing state
+  var retryAnswersCopy = JSON.parse(JSON.stringify(_retryAnswers));
+  var retryTotalCopy = _retryTotal;
+  var hadAnswers = Object.keys(retryAnswersCopy).length > 0;
 
+  // Merge: start from snapshot, overlay retry answers on top
+  _answers = JSON.parse(JSON.stringify(_retrySnapshot));
+  Object.keys(retryAnswersCopy).forEach(function(cardId) {
+    _answers[cardId] = retryAnswersCopy[cardId];
+  });
+
+  // Clear retry state
+  _retryMode = false;
+  _retrySnapshot = null;
+  _retryTotal = 0;
+  _retryAnswers = {};
+  _retryComplete = false;
+
+  // Show all UI
   document.querySelectorAll('.q-card').forEach(function(card) { card.style.display = ''; });
   document.querySelectorAll('.scenario-header').forEach(function(el) { el.style.display = ''; });
   document.querySelectorAll('.scenario-actions').forEach(function(el) { el.style.display = ''; });
 
+  // Clear visual state on all cards
   document.querySelectorAll('.choice').forEach(function(b) {
-    b.disabled = false;
-    b.classList.remove('correct', 'wrong');
+    b.disabled = false; b.classList.remove('correct', 'wrong');
   });
   document.querySelectorAll('.explanation').forEach(function(el) { el.style.display = 'none'; });
   document.querySelectorAll('.choice-explanation').forEach(function(el) { el.remove(); });
+  document.querySelectorAll('.q-card').forEach(function(card) { setCardStatus(card, null); });
 
-  _answers = _retrySnapshot;
-  _retrySnapshot = null;
-  _retryTotal = 0;
-
+  // Re-render merged state
   Object.keys(_answers).forEach(function(cardId) {
     var chosen = _answers[cardId];
     var card = document.getElementById(cardId);
@@ -2036,9 +2058,12 @@ function exitRetry() {
     if (exp) exp.style.display = 'block';
   });
 
+  // Persist merged state to localStorage
+  saveState();
+
+  // Restore UI chrome
   document.getElementById('retry-banner').classList.remove('active');
   document.getElementById('score-max').textContent = TOTAL;
-
   var showBtn = document.getElementById('show-all-btn');
   if (showBtn) {
     showBtn.style.display = '';
@@ -2048,6 +2073,9 @@ function exitRetry() {
   }
 
   recalcScore();
+
+  // Auto-record retry session to history
+  if (hadAnswers) autoRecordRetry(retryAnswersCopy, retryTotalCopy);
 }
 
 function recalcScore() {
@@ -2064,6 +2092,13 @@ function recalcScore() {
   document.getElementById('score-correct').textContent = cor;
   document.getElementById('score-total').textContent = ans;
   document.getElementById('progress-fill').style.width = Math.round(ans / total * 100) + '%';
+  if (_retryMode && ans === _retryTotal && !_retryComplete) {
+    _retryComplete = true;
+    var banner = document.getElementById('retry-banner');
+    banner.className = 'retry-banner active' + (cor === _retryTotal ? ' complete' : '');
+    banner.textContent = (cor === _retryTotal ? '🎉 Perfect retry! ' : '↺ Retry complete — ') +
+      cor + '/' + _retryTotal + ' correct this round. Click Save & Exit to record your results.';
+  }
   updateRetryBtn();
 }
 
@@ -2145,6 +2180,7 @@ function answer(cardId, chosen, correctLetter) {
   addChoiceExplanations(card, correctLetter);
   document.getElementById(cardId + '-exp').style.display = 'block';
   _answers[cardId] = chosen;
+  if (_retryMode) _retryAnswers[cardId] = chosen;
   setCardStatus(card, isCorrect);
   recalcScore();
   saveState();
@@ -2155,6 +2191,8 @@ function resetAll() {
     _retryMode = false;
     _retrySnapshot = null;
     _retryTotal = 0;
+    _retryAnswers = {};
+    _retryComplete = false;
     document.getElementById('retry-banner').classList.remove('active');
     document.getElementById('score-max').textContent = TOTAL;
     document.querySelectorAll('.q-card').forEach(function(card) { card.style.display = ''; });
@@ -2231,7 +2269,8 @@ function saveHistoryData() {
   localStorage.setItem('sj:fe:history', JSON.stringify(_history));
 }
 
-function recordAttempt() {
+function recordAttempt(opts) {
+  opts = opts || {};
   var results = {};
   for (var i = 1; i <= TOTAL; i++) {
     var card = document.getElementById('q' + i);
@@ -2245,9 +2284,29 @@ function recordAttempt() {
   var answered = Object.keys(results).filter(function(k) { return results[k] !== null; }).length;
   var now = new Date();
   var dateStr = now.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-  _history.push({ date: dateStr, score: correct, answered: answered, total: TOTAL, results: results });
+  _history.push({
+    date: dateStr, score: correct, answered: answered, total: TOTAL, results: results,
+    type: opts.type || 'exam',
+    retryTotal: opts.retryTotal || null,
+    retryCorrect: opts.retryCorrect || null,
+    retryAnswered: opts.retryAnswered || null
+  });
   saveHistoryData();
   renderHistory();
+}
+
+function autoRecordRetry(retryAnswersCopy, retryTotal) {
+  var retryAnswered = Object.keys(retryAnswersCopy).length;
+  var retryCorrect = 0;
+  Object.keys(retryAnswersCopy).forEach(function(cardId) {
+    var card = document.getElementById(cardId);
+    if (!card) return;
+    var btns = card.querySelectorAll('.choice');
+    if (!btns[0]) return;
+    var m = btns[0].getAttribute('onclick').match(/answer\('[^']+','[^']+','([A-Z])'\)/);
+    if (m && retryAnswersCopy[cardId] === m[1]) retryCorrect++;
+  });
+  recordAttempt({ type: 'retry', retryTotal: retryTotal, retryCorrect: retryCorrect, retryAnswered: retryAnswered });
 }
 
 function deleteAttempt(idx) {
@@ -2261,21 +2320,29 @@ function renderHistory() {
   var empty = document.getElementById('history-empty');
   if (!_history.length) { empty.style.display = ''; list.innerHTML = ''; return; }
   empty.style.display = 'none';
+  var examCount = 0, retryCount = 0;
   list.innerHTML = _history.map(function(a, idx) {
+    var isRetry = a.type === 'retry';
+    if (isRetry) retryCount++; else examCount++;
+    var label = isRetry ? 'Retry ' + retryCount : 'Attempt ' + examCount;
+    var pct = Math.round(a.score / a.total * 100);
+    var scoreHtml = isRetry
+      ? '<span class="attempt-score-val">' + a.retryCorrect + '/' + a.retryAnswered + '</span>' +
+        ' this retry <span style="color:var(--text3)">→ ' + a.score + '/60 (' + pct + '%)</span>'
+      : '<span class="attempt-score-val">' + a.score + '/' + a.total + '</span>' +
+        ' <span class="attempt-pct">(' + pct + '%)</span>';
     var dots = '';
     for (var i = 1; i <= TOTAL; i++) {
       var v = a.results['q'+i];
       var cls = v === true ? 'correct' : v === false ? 'wrong' : 'skipped';
       dots += '<span class="q-dot ' + cls + '" title="Q' + i + (v === true ? ' ✓' : v === false ? ' ✗' : ' —') + '"></span>';
     }
-    var pct = Math.round(a.score / a.total * 100);
     return '<div class="attempt-row">' +
       '<div class="attempt-meta">' +
-        '<span class="attempt-label">Attempt ' + (idx+1) + '</span>' +
+        '<span class="attempt-label">' + label + '</span>' +
         '<span>' + a.date + '</span>' +
-        '<span><span class="attempt-score-val">' + a.score + '/' + a.total + '</span>' +
-        ' <span class="attempt-pct">(' + pct + '%)</span></span>' +
-        (a.answered < a.total ? '<span style="color:var(--text3)">' + (a.total - a.answered) + ' unanswered</span>' : '') +
+        '<span>' + scoreHtml + '</span>' +
+        (a.answered < a.total && !isRetry ? '<span style="color:var(--text3)">' + (a.total - a.answered) + ' unanswered</span>' : '') +
         '<button class="attempt-delete" onclick="deleteAttempt(' + idx + ')">✕ remove</button>' +
       '</div>' +
       '<div class="attempt-dots">' + dots + '</div>' +
