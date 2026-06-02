@@ -159,9 +159,7 @@
   .spd-right, .sg-filter-right { margin-left: auto; display: none; align-items: center; gap: 10px; padding-right: 4px; }
   .sg-filter-select { font-size:12px; padding:3px 8px; border-radius:6px; border:1px solid var(--border); background:var(--bg2); color:var(--text2); cursor:pointer; }
   .sg-exam-badge { font-size:10px; font-weight:700; background:#c2410c; color:#fff; padding:2px 7px; border-radius:3px; margin-left:10px; vertical-align:middle; letter-spacing:0.04em; }
-  .speed-label { font-size: 13px; color: var(--text2); }
-  .speed-select { font-size: 12px; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg2); color: var(--text2); cursor: pointer; }
-  .video-total { display: flex; align-items: center; gap: 8px; }
+.video-total { display: flex; align-items: center; gap: 8px; }
   .vid-prog-text { font-size: 12px; font-weight: 600; color: var(--ink); }
   .vid-prog-bar-wrap { width: 64px; height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
   .vid-prog-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; width: 0%; }
@@ -172,7 +170,7 @@
     border-left: 3px solid var(--accent); padding-left: 12px;
     margin-bottom: 14px;
   }
-  .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
+  .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
   .video-card {
     background: var(--bg2); border: 1px solid var(--border);
     border-radius: 10px; overflow: hidden;
@@ -385,6 +383,13 @@
 
   /* ── Exam Only filter bar ── */
   .spd-sep { color:var(--border); font-size:16px; margin:0 4px; user-select:none; }
+  .yt-spd-wrap { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--text2); }
+  .yt-spd-label { white-space:nowrap; }
+  .yt-spd-val { font-weight:700; color:var(--ink); min-width:2.2em; text-align:center; }
+  .yt-spd-hint { display:flex; align-items:center; gap:2px; }
+  .yt-spd-hint kbd { font-size:10px; padding:1px 5px; border-radius:3px; background:var(--bg3); border:1px solid var(--border); font-family:monospace; color:var(--text); line-height:1.6; cursor:default; }
+  .yt-speed-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:rgba(0,0,0,0.78); color:#fff; font-size:14px; font-weight:600; padding:7px 20px; border-radius:20px; pointer-events:none; opacity:0; transition:opacity 0.18s, transform 0.18s; z-index:9999; }
+  .yt-speed-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
   .vid-filter-select { font-size:12px; padding:3px 8px; border-radius:6px; border:1px solid var(--border); background:var(--bg2); color:var(--text2); cursor:pointer; }
   #tab-videos.exam-only .video-card:not(.exam-essential) { display:none; }
   #tab-videos.exam-only .chapter-section:not(:has(.exam-essential)) { display:none; }
@@ -402,7 +407,7 @@
   </a>
   <span class="header-chevron">›</span>
   <span class="header-course">💻 Claude Code 101</span>
-  <div class="header-meta">12 videos · 7 quiz questions</div>
+  <div class="header-meta">12 videos · 4 quiz questions</div>
 </header>
 
 <div class="tab-bar" id="tabBar">
@@ -410,16 +415,10 @@
   <button class="tab-btn" data-tab="quiz">📝 Quiz</button>
   <button class="tab-btn" data-tab="videos">🎬 Videos</button>
   <span class="spd-right">
-    <span class="speed-label">Speed:</span>
-    <select class="speed-select">
-      <option value="0.5">0.5×</option>
-      <option value="0.75">0.75×</option>
-      <option value="1">1×</option>
-      <option value="1.25">1.25×</option>
-      <option value="1.5" selected>1.5×</option>
-      <option value="1.75">1.75×</option>
-      <option value="2">2×</option>
-    </select>
+    <span class="yt-spd-wrap">
+      <span class="yt-spd-label">YouTube speed — press <kbd>&lt;</kbd> <kbd>&gt;</kbd> :</span>
+      <span class="yt-spd-val" id="yt-speed-val">1×</span>
+    </span>
     <span class="spd-sep">|</span>
     <select class="vid-filter-select">
       <option value="all">All Videos</option>
@@ -867,21 +866,7 @@ If something needs to happen every time without fail, don't put it in a prompt. 
 <li class="correct">C) It reads it automatically at the start of every session ✓</li>
 <li class="incorrect">D) It only reads it when you explicitly ask it to</li>
 </ul>
-<p><strong>5. How satisfied are you with the content provided in this course?</strong></p>
-<ul>
-<li class="incorrect">A) Not at all satisfied</li>
-<li class="incorrect">B) Not very satisfied</li>
-<li class="incorrect">C) Unsure</li>
-<li class="incorrect">D) Satisfied</li>
-</ul>
-<p><strong>6. How likely are you to recommend this course to a friend or coworker?</strong></p>
-<ul>
-<li class="incorrect">A) Very unlikely</li>
-<li class="incorrect">B) Unlikely</li>
-<li class="incorrect">C) Not sure</li>
-<li class="incorrect">D) Likely</li>
-</ul>
-<p><strong>7. Is there any feedback you'd like to provide based upon your experience with this course so far?</strong></p></div>
+<p><strong>5. Is there any feedback you'd like to provide based upon your experience with this course so far?</strong></p></div>
 </div>
 </div>
 </div>
@@ -891,22 +876,10 @@ If something needs to happen every time without fail, don't put it in a prompt. 
 <div class="video-layout">
 <nav class="video-toc" id="video-toc"></nav>
 <div class="video-content">
-<div class="chapter-section" id="ch-getting-started"><div class="chapter-title">Getting Started</div><div class="video-grid"><div class="video-card"><div class="video-title">What is Claude Code?</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/fl1DSmwQKKY?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">How Claude Code works</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/6bs5b4FltCU?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Installing Claude Code</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/0kILa02vKuI?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Your first prompt</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/gbetp6D7J_Q?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">The explore → plan → code → commit workflow</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/xJQuF02NAK8?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div><div class="chapter-section" id="ch-working-effectively"><div class="chapter-title">Working Effectively</div><div class="video-grid"><div class="video-card"><div class="video-title">Context management</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/eW3oTyfeWZ0?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Code review</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/RKsADl0ZC3Y?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">The CLAUDE.md file</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/O0FGCxkHM-U?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div><div class="chapter-section" id="ch-advanced-features"><div class="chapter-title">Advanced Features</div><div class="video-grid"><div class="video-card"><div class="video-title">Subagents</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/jKErNxuxPXg?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Skills</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/bjdBVZa66oU?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">MCP</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/kkBFmwkDzdo?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Hooks</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/IkaPHiMDazM?playsinline=1&rel=0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div>
+<div class="chapter-section" id="ch-getting-started"><div class="chapter-title">Getting Started</div><div class="video-grid"><div class="video-card"><div class="video-title">What is Claude Code?</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/fl1DSmwQKKY?playsinline=1&rel=0&enablejsapi=1" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">How Claude Code works</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/6bs5b4FltCU?playsinline=1&rel=0&enablejsapi=1" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Installing Claude Code</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/0kILa02vKuI?playsinline=1&rel=0&enablejsapi=1" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Your first prompt</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/gbetp6D7J_Q?playsinline=1&rel=0&enablejsapi=1" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">The explore → plan → code → commit workflow</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/xJQuF02NAK8?playsinline=1&rel=0&enablejsapi=1" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div><div class="chapter-section" id="ch-working-effectively"><div class="chapter-title">Working Effectively</div><div class="video-grid"><div class="video-card"><div class="video-title">Context management</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/eW3oTyfeWZ0?playsinline=1&rel=0&enablejsapi=1" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Code review</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/RKsADl0ZC3Y?playsinline=1&rel=0&enablejsapi=1" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">The CLAUDE.md file</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/O0FGCxkHM-U?playsinline=1&rel=0&enablejsapi=1" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div><div class="chapter-section" id="ch-advanced-features"><div class="chapter-title">Advanced Features</div><div class="video-grid"><div class="video-card"><div class="video-title">Subagents</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/jKErNxuxPXg?playsinline=1&rel=0&enablejsapi=1" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Skills</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/bjdBVZa66oU?playsinline=1&rel=0&enablejsapi=1" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">MCP</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/kkBFmwkDzdo?playsinline=1&rel=0&enablejsapi=1" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div><div class="video-card"><div class="video-title">Hooks</div><div class="yt-wrap"><iframe src="https://www.youtube.com/embed/IkaPHiMDazM?playsinline=1&rel=0&enablejsapi=1" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe></div></div></div></div>
 </div>
 </div>
 <script>
-const jwPlayers = [];
-let currentSpeed = 1.5;
-
-jwPlayers.forEach(p => {
-  p.on('play', function() { try { this.setPlaybackRate(currentSpeed); } catch(e) {} });
-});
-function applySpeed(rate) {
-  currentSpeed = rate;
-  jwPlayers.forEach(p => { try { p.setPlaybackRate(rate); } catch(e) {} });
-}
-var speedSel = document.querySelector('.speed-select');
-if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseFloat(this.value)); });
 
 /* Study Guide TOC */
 (function() {
@@ -991,7 +964,12 @@ if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseF
     var _ht = document.querySelector(location.hash);
     if (_ht) {
       var _tc = _ht.closest('.tab-content');
-      if (_tc) activateTab(_tc.id.replace('tab-', ''));
+      if (_tc) {
+        var _tabName = _tc.id.replace('tab-', '');
+        activateTab(_tabName);
+        localStorage.setItem(TAB_KEY, _tabName);
+        history.replaceState(null, '', location.pathname + location.search);
+      }
       setTimeout(function() {
         var top = _ht.getBoundingClientRect().top + window.scrollY - 115;
         window.scrollTo(0, Math.max(0, top));
@@ -1171,6 +1149,7 @@ if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseF
     }
     btn.classList.add('hidden');
     block.querySelector('.qs-retry').classList.remove('hidden');
+    saveQuizProgress();
   };
 
   window.qzRetry = function(btn) {
@@ -1195,6 +1174,7 @@ if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseF
       });
     });
     btn.textContent = 'Answers Shown'; btn.disabled = true;
+    saveQuizProgress();
   };
 
   window.qzResetAll = function() {
@@ -1214,7 +1194,23 @@ if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseF
     });
     var showBtn = document.querySelector('#tab-quiz .quiz-show-btn');
     if (showBtn) { showBtn.textContent = 'Show All Answers'; showBtn.disabled = false; }
+    saveQuizProgress();
   };
+
+  function saveQuizProgress() {
+    var c = 0, t = 0, any = false;
+    document.querySelectorAll('#tab-quiz .qs-card[data-correct]').forEach(function(card) {
+      if (!card.dataset.correct) return;
+      var isDone = card.classList.contains('done');
+      var isShown = !isDone && card.querySelector('.qs-choice.show-ans');
+      if (!isDone && !isShown) return;
+      any = true; t++;
+      if (isDone && card.querySelector('.qs-choice.correct')) c++;
+      else if (isShown) c++;
+    });
+    if (any) localStorage.setItem('sj:qz:' + location.pathname, JSON.stringify({c:c, t:t}));
+    else localStorage.removeItem('sj:qz:' + location.pathname);
+  }
 })();
 </script>
 
@@ -1324,8 +1320,17 @@ if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseF
 
     tab.querySelectorAll('.video-card').forEach(function(card) {
       var jwpEl = card.querySelector('[id^="jwp-"]');
-      if (!jwpEl) return;
-      var id = jwpEl.id;
+      var ytEl  = card.querySelector('.yt-wrap iframe');
+      var id;
+      if (jwpEl) {
+        id = jwpEl.id;
+      } else if (ytEl) {
+        var m = ytEl.src.match(/embed\/([^?]+)/);
+        if (!m) return;
+        id = 'yt-' + m[1];
+      } else {
+        return;
+      }
 
       /* Restructure video-title to support flex layout */
       var titleEl = card.querySelector('.video-title');
@@ -1435,6 +1440,67 @@ if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseF
     }
   }
   sel.addEventListener('change', function() { applyFilter(this.value === 'exam'); });
+})();
+</script>
+<script>
+/* ── YouTube speed control (< / > keys) ── */
+(function() {
+  var RATES = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+  var currentRate = 1;
+  var ytPlayers = [];
+
+  /* Toast element for transient speed feedback */
+  var toast = document.createElement('div');
+  toast.className = 'yt-speed-toast';
+  document.body.appendChild(toast);
+  var toastTimer;
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() { toast.classList.remove('show'); }, 1200);
+  }
+
+  function updateIndicator(rate) {
+    var el = document.getElementById('yt-speed-val');
+    if (el) el.textContent = rate + '×';
+  }
+
+  function setAllRates(rate) {
+    currentRate = rate;
+    ytPlayers.forEach(function(p) { try { p.setPlaybackRate(rate); } catch(e) {} });
+    updateIndicator(rate);
+    showToast('Speed ' + rate + '×');
+  }
+
+  /* Assign IDs to iframes so YT API can reference them */
+  document.querySelectorAll('.yt-wrap iframe').forEach(function(iframe) {
+    var m = (iframe.src || '').match(/embed\/([^?]+)/);
+    if (m && !iframe.id) iframe.id = 'yt-' + m[1];
+  });
+
+  /* Load YouTube IFrame API */
+  var tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+
+  window.onYouTubeIframeAPIReady = function() {
+    document.querySelectorAll('.yt-wrap iframe[id]').forEach(function(iframe) {
+      ytPlayers.push(new YT.Player(iframe.id));
+    });
+  };
+
+  /* Keyboard shortcuts: < to slow down, > to speed up */
+  document.addEventListener('keydown', function(e) {
+    var tag = e.target.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || e.target.isContentEditable) return;
+    var idx = RATES.indexOf(currentRate);
+    if (e.key === '>') {
+      if (idx < RATES.length - 1) setAllRates(RATES[idx + 1]);
+    } else if (e.key === '<') {
+      if (idx > 0) setAllRates(RATES[idx - 1]);
+    }
+  });
 })();
 </script>
 </body>

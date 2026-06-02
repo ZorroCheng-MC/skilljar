@@ -667,6 +667,12 @@ let currentSpeed = 1.5;
   jwPlayers.push(jwplayer('jwp-10').setup({playlist:'https://cdn.jwplayer.com/v2/media/uVeYx90Y',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
 jwPlayers.forEach(p => {
   p.on('play', function() { try { this.setPlaybackRate(currentSpeed); } catch(e) {} });
+  p.on('levels', function(e) {
+    var lvls = e.levels; if (!lvls || !lvls.length) return;
+    var best = 0;
+    for (var i = 1; i < lvls.length; i++) { if ((lvls[i].height||0) > (lvls[best].height||0)) best = i; }
+    p.setCurrentQuality(best);
+  });
 });
 function applySpeed(rate) {
   currentSpeed = rate;
@@ -926,6 +932,7 @@ function applySpeed(rate) {
     }
     btn.classList.add('hidden');
     block.querySelector('.qs-retry').classList.remove('hidden');
+    saveQuizProgress();
   };
 
   window.qzRetry = function(btn) {
@@ -950,6 +957,7 @@ function applySpeed(rate) {
       });
     });
     btn.textContent = 'Answers Shown'; btn.disabled = true;
+    saveQuizProgress();
   };
 
   window.qzResetAll = function() {
@@ -969,7 +977,23 @@ function applySpeed(rate) {
     });
     var showBtn = document.querySelector('#tab-quiz .quiz-show-btn');
     if (showBtn) { showBtn.textContent = 'Show All Answers'; showBtn.disabled = false; }
+    saveQuizProgress();
   };
+
+  function saveQuizProgress() {
+    var c = 0, t = 0, any = false;
+    document.querySelectorAll('#tab-quiz .qs-card[data-correct]').forEach(function(card) {
+      if (!card.dataset.correct) return;
+      var isDone = card.classList.contains('done');
+      var isShown = !isDone && card.querySelector('.qs-choice.show-ans');
+      if (!isDone && !isShown) return;
+      any = true; t++;
+      if (isDone && card.querySelector('.qs-choice.correct')) c++;
+      else if (isShown) c++;
+    });
+    if (any) localStorage.setItem('sj:qz:' + location.pathname, JSON.stringify({c:c, t:t}));
+    else localStorage.removeItem('sj:qz:' + location.pathname);
+  }
 })();
 </script>
 

@@ -1396,7 +1396,7 @@ Get prompt = await self.session.get_prompt(prompt_name, arguments), return resul
 <ul>
 <li class="incorrect">A) Only the API key and your question</li>
 <li class="incorrect">B) Just your message text</li>
-<li class="incorrect">C) API key, model name, messages, and max tokens</li>
+<li class="correct">C) API key, model name, messages, and max tokens ✓</li>
 <li class="incorrect">D) Your name, email, and message</li>
 </ul>
 <p><strong>2. You ask Claude "What is pizza?" and it answers. Then you ask "What toppings are popular?" but Claude doesn't understand what you're referring to. What's the problem?</strong></p>
@@ -1404,40 +1404,40 @@ Get prompt = await self.session.get_prompt(prompt_name, arguments), return resul
 <li class="incorrect">A) Your internet connection is slow</li>
 <li class="incorrect">B) Claude is broken</li>
 <li class="incorrect">C) You asked too quickly</li>
-<li class="incorrect">D) Claude doesn't remember previous messages</li>
+<li class="correct">D) Claude doesn't remember previous messages ✓</li>
 </ul>
 <p><strong>3. When Claude processes your text, what's the first thing it does?</strong></p>
 <ul>
 <li class="incorrect">A) Generates a response immediately</li>
 <li class="incorrect">B) Checks if it's appropriate content</li>
-<li class="incorrect">C) Breaks it into smaller chunks called tokens</li>
+<li class="correct">C) Breaks it into smaller chunks called tokens ✓</li>
 <li class="incorrect">D) Translates it to another language</li>
 </ul>
 <p><strong>4. Users complain your chat app feels slow because they wait 20 seconds staring at a loading spinner, then all the generated text appears at once. What can fix this?</strong></p>
 <ul>
 <li class="incorrect">A) Asking shorter questions</li>
 <li class="incorrect">B) Using a faster internet connection</li>
-<li class="incorrect">C) Enabling response streaming</li>
+<li class="correct">C) Enabling response streaming ✓</li>
 <li class="incorrect">D) Using a different web browser</li>
 </ul>
 <p><strong>5. You're building a web app that talks to Claude. Where should you store your API key?</strong></p>
 <ul>
 <li class="incorrect">A) In your mobile app that users install</li>
 <li class="incorrect">B) In a text file on the user's computer</li>
-<li class="incorrect">C) On your server that users can't access</li>
+<li class="correct">C) On your server that users can't access ✓</li>
 <li class="incorrect">D) In your JavaScript code that users download</li>
 </ul>
 <p><strong>6. You're building a math tutor bot. You want Claude to give hints instead of direct answers. What should you use?</strong></p>
 <ul>
 <li class="incorrect">A) Setting a very low word limit</li>
 <li class="incorrect">B) Using all capital letters in your messages</li>
-<li class="incorrect">C) A system prompt explaining the tutor role</li>
+<li class="correct">C) A system prompt explaining the tutor role ✓</li>
 <li class="incorrect">D) Asking users to be more specific</li>
 </ul>
 <p><strong>7. You want Claude to give very predictable, consistent answers for a factual Q&amp;A app. What temperature setting should you use?</strong></p>
 <ul>
 <li class="incorrect">A) Temperature doesn't matter for facts</li>
-<li class="incorrect">B) Low temperature (near 0.0)</li>
+<li class="correct">B) Low temperature (near 0.0) ✓</li>
 <li class="incorrect">C) Medium temperature (around 0.5)</li>
 <li class="incorrect">D) High temperature (near 1.0)</li>
 </ul>
@@ -1445,7 +1445,7 @@ Get prompt = await self.session.get_prompt(prompt_name, arguments), return resul
 <ul>
 <li class="incorrect">A) Send the request multiple times and pick the best one</li>
 <li class="incorrect">B) Ask Claude very nicely to only return JSON</li>
-<li class="incorrect">C) Combine prefilled messages and stop sequences</li>
+<li class="correct">C) Combine prefilled messages and stop sequences ✓</li>
 <li class="incorrect">D) Use a very high temperature setting</li>
 </ul>
 <h2 id="prompt-evaluation">Prompt evaluation</h2>
@@ -1948,6 +1948,12 @@ let currentSpeed = 1.5;
   jwPlayers.push(jwplayer('jwp-73').setup({playlist:'https://cdn.jwplayer.com/v2/media/FlKckv4Z',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
 jwPlayers.forEach(p => {
   p.on('play', function() { try { this.setPlaybackRate(currentSpeed); } catch(e) {} });
+  p.on('levels', function(e) {
+    var lvls = e.levels; if (!lvls || !lvls.length) return;
+    var best = 0;
+    for (var i = 1; i < lvls.length; i++) { if ((lvls[i].height||0) > (lvls[best].height||0)) best = i; }
+    p.setCurrentQuality(best);
+  });
 });
 function applySpeed(rate) {
   currentSpeed = rate;
@@ -1993,7 +1999,12 @@ if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseF
     var _ht = document.querySelector(location.hash);
     if (_ht) {
       var _tc = _ht.closest('.tab-content');
-      if (_tc) activateTab(_tc.id.replace('tab-', ''));
+      if (_tc) {
+        var _tabName = _tc.id.replace('tab-', '');
+        activateTab(_tabName);
+        localStorage.setItem(TAB_KEY, _tabName);
+        history.replaceState(null, '', location.pathname + location.search);
+      }
       setTimeout(function() {
         var top = _ht.getBoundingClientRect().top + window.scrollY - 115;
         window.scrollTo(0, Math.max(0, top));
@@ -2220,6 +2231,7 @@ if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseF
     }
     btn.classList.add('hidden');
     block.querySelector('.qs-retry').classList.remove('hidden');
+    saveQuizProgress();
   };
 
   window.qzRetry = function(btn) {
@@ -2244,6 +2256,7 @@ if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseF
       });
     });
     btn.textContent = 'Answers Shown'; btn.disabled = true;
+    saveQuizProgress();
   };
 
   window.qzResetAll = function() {
@@ -2263,7 +2276,23 @@ if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseF
     });
     var showBtn = document.querySelector('#tab-quiz .quiz-show-btn');
     if (showBtn) { showBtn.textContent = 'Show All Answers'; showBtn.disabled = false; }
+    saveQuizProgress();
   };
+
+  function saveQuizProgress() {
+    var c = 0, t = 0, any = false;
+    document.querySelectorAll('#tab-quiz .qs-card[data-correct]').forEach(function(card) {
+      if (!card.dataset.correct) return;
+      var isDone = card.classList.contains('done');
+      var isShown = !isDone && card.querySelector('.qs-choice.show-ans');
+      if (!isDone && !isShown) return;
+      any = true; t++;
+      if (isDone && card.querySelector('.qs-choice.correct')) c++;
+      else if (isShown) c++;
+    });
+    if (any) localStorage.setItem('sj:qz:' + location.pathname, JSON.stringify({c:c, t:t}));
+    else localStorage.removeItem('sj:qz:' + location.pathname);
+  }
 })();
 </script>
 

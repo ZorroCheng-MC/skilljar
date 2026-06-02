@@ -209,6 +209,13 @@
   .sc-btn-reset:hover { background: var(--border); }
   .sc-btn-show { background: rgba(4,120,87,0.08); color: var(--d4); border-color: rgba(4,120,87,0.3); }
   .sc-btn-show:hover { background: rgba(4,120,87,0.18); }
+  .show-all-btn {
+    padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: 1px solid rgba(4,120,87,0.3); font-family: 'Open Sans', sans-serif;
+    background: rgba(4,120,87,0.08); color: var(--d4); transition: background 0.15s;
+  }
+  .show-all-btn:hover { background: rgba(4,120,87,0.18); }
+  .show-all-btn:disabled { opacity: 0.45; cursor: default; }
 </style>
 </head>
 <body>
@@ -238,11 +245,12 @@
   <div class="score-bar">
     <div>
       <div class="score-label">Score</div>
-      <div><span class="score-val" id="score-correct">0</span> <span class="score-pct">/ <span id="score-total">0</span> answered</span></div>
+      <div><span class="score-val" id="score-correct">0</span><span class="score-pct"> / 12 correct &nbsp;·&nbsp; <span id="score-total">0</span> answered</span></div>
     </div>
     <div class="progress-track">
       <div class="progress-fill" id="progress-fill" style="width:0%"></div>
     </div>
+    <button class="show-all-btn" id="show-all-btn" onclick="showAllAnswers()">👁 Show All Answers</button>
     <button class="reset-btn" onclick="resetAll()">Reset all</button>
   </div>
 
@@ -564,9 +572,8 @@
 </div><!-- /main -->
 
 <script>
-var answered = 0;
-var correct = 0;
 var TOTAL = 12;
+var _answers = {}; // cardId -> chosen letter (user-clicked only)
 
 function recalcScore() {
   var ans = 0, cor = 0;
@@ -577,10 +584,51 @@ function recalcScore() {
     var hasWrong = Array.from(btns).some(function(b) { return b.classList.contains('wrong'); });
     if (!hasWrong) cor++;
   });
-  answered = ans; correct = cor;
   document.getElementById('score-correct').textContent = cor;
   document.getElementById('score-total').textContent = ans;
   document.getElementById('progress-fill').style.width = Math.round(ans / TOTAL * 100) + '%';
+}
+
+function saveState() {
+  if (!Object.keys(_answers).length) { localStorage.removeItem('sj:pe'); return; }
+  var c = 0;
+  document.querySelectorAll('.q-card').forEach(function(card) {
+    if (!_answers[card.id]) return;
+    var hasWrong = Array.from(card.querySelectorAll('.choice')).some(function(b) { return b.classList.contains('wrong'); });
+    if (!hasWrong) c++;
+  });
+  localStorage.setItem('sj:pe', JSON.stringify({c: c, t: TOTAL, a: _answers}));
+}
+
+function restoreState() {
+  var raw = localStorage.getItem('sj:pe');
+  if (!raw) return;
+  try {
+    var state = JSON.parse(raw);
+    _answers = state.a || {};
+    Object.keys(_answers).forEach(function(cardId) {
+      var chosen = _answers[cardId];
+      var card = document.getElementById(cardId);
+      if (!card) return;
+      var btns = card.querySelectorAll('.choice');
+      if (!btns[0] || btns[0].disabled) return;
+      var m = btns[0].getAttribute('onclick').match(/answer\('[^']+','[^']+','([A-Z])'\)/);
+      if (!m) return;
+      var correctLetter = m[1];
+      btns.forEach(function(b) {
+        b.disabled = true;
+        var ltr = b.querySelector('.ltr').textContent.trim();
+        if (ltr === chosen && chosen === correctLetter) b.classList.add('correct');
+        else if (ltr === chosen) b.classList.add('wrong');
+        else if (ltr === correctLetter && chosen !== correctLetter) b.classList.add('correct');
+      });
+      var exp = document.getElementById(cardId + '-exp');
+      if (exp) exp.style.display = 'block';
+      var ref = document.getElementById(cardId + '-ref');
+      if (ref) ref.style.display = 'block';
+    });
+    recalcScore();
+  } catch(e) {}
 }
 
 function answer(cardId, chosen, correctLetter) {
@@ -605,10 +653,14 @@ function answer(cardId, chosen, correctLetter) {
 
   document.getElementById(cardId + '-exp').style.display = 'block';
   document.getElementById(cardId + '-ref').style.display = 'block';
+  _answers[cardId] = chosen;
   recalcScore();
+  saveState();
 }
 
 function resetAll() {
+  _answers = {};
+  localStorage.removeItem('sj:pe');
   document.querySelectorAll('.choice').forEach(function(b) {
     b.disabled = false;
     b.classList.remove('correct', 'wrong');
@@ -621,6 +673,7 @@ function resetAll() {
 
 function resetSection(sc) {
   document.querySelectorAll('.q-card[data-sc="' + sc + '"]').forEach(function(card) {
+    delete _answers[card.id];
     card.querySelectorAll('.choice').forEach(function(b) {
       b.disabled = false;
       b.classList.remove('correct', 'wrong');
@@ -631,6 +684,13 @@ function resetSection(sc) {
     if (ref) ref.style.display = 'none';
   });
   recalcScore();
+  saveState();
+}
+
+function showAllAnswers() {
+  [1,2,3,4].forEach(function(sc) { showAnswers(sc); });
+  var btn = document.getElementById('show-all-btn');
+  if (btn) { btn.textContent = 'Answers Shown'; btn.disabled = true; }
 }
 
 function showAnswers(sc) {
@@ -644,13 +704,17 @@ function showAnswers(sc) {
       b.disabled = true;
       if (b.querySelector('.ltr').textContent.trim() === correctLetter) b.classList.add('correct');
     });
+    _answers[card.id] = '_shown';
     var exp = document.getElementById(card.id + '-exp');
     if (exp) exp.style.display = 'block';
     var ref = document.getElementById(card.id + '-ref');
     if (ref) ref.style.display = 'block';
   });
   recalcScore();
+  saveState();
 }
+
+restoreState();
 </script>
 </body>
 </html>

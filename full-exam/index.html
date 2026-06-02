@@ -81,6 +81,13 @@
   .score-label { font-size: 13px; color: var(--text3); }
   .score-val { font-size: 22px; font-weight: 700; color: var(--coral); font-family: 'Playfair Display', serif; }
   .score-pct { font-size: 13px; color: var(--text2); }
+  .show-all-btn {
+    padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: 1px solid rgba(4,120,87,0.3); font-family: 'Open Sans', sans-serif;
+    background: rgba(4,120,87,0.08); color: var(--d4); transition: background 0.15s;
+  }
+  .show-all-btn:hover { background: rgba(4,120,87,0.18); }
+  .show-all-btn:disabled { opacity: 0.45; cursor: default; }
   .reset-btn {
     margin-left: auto; padding: 6px 14px; background: var(--bg3);
     border: 1px solid var(--border); border-radius: 6px; font-size: 12px;
@@ -107,7 +114,30 @@
   .q-card {
     background: var(--bg4); border: 1px solid var(--border);
     border-radius: 12px; padding: 24px 26px; margin-bottom: 20px;
+    position: relative; overflow: hidden;
   }
+  .q-card.answered-correct {
+    border-color: rgba(4,120,87,0.35);
+    background: rgba(4,120,87,0.03);
+  }
+  .q-card.answered-correct::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 4px; background: var(--d4);
+  }
+  .q-card.answered-wrong {
+    border-color: rgba(220,38,38,0.3);
+    background: rgba(220,38,38,0.03);
+  }
+  .q-card.answered-wrong::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 4px; background: #dc2626;
+  }
+  .q-status {
+    margin-left: auto; font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 8px; letter-spacing: 0.02em; flex-shrink: 0;
+  }
+  .q-status.correct { background: rgba(4,120,87,0.1); color: var(--d4); }
+  .q-status.wrong { background: rgba(220,38,38,0.1); color: #dc2626; }
   .q-meta {
     display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap;
   }
@@ -223,6 +253,68 @@
   .sc-btn-show { background: rgba(4,120,87,0.08); color: var(--d4); border-color: rgba(4,120,87,0.3); }
   .sc-btn-show:hover { background: rgba(4,120,87,0.18); }
 
+  /* Retry mode */
+  .retry-btn {
+    display: none; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    cursor: pointer; font-family: 'Open Sans', sans-serif; transition: background 0.15s;
+    border: 1px solid rgba(220,38,38,0.3); background: rgba(220,38,38,0.08); color: #b91c1c;
+  }
+  .retry-btn.exit-mode {
+    border-color: var(--border); background: var(--bg3); color: var(--text2);
+  }
+  .retry-btn:hover { opacity: 0.8; }
+  .retry-banner {
+    display: none; padding: 9px 18px; margin-bottom: 16px;
+    background: rgba(220,38,38,0.07); border: 1px solid rgba(220,38,38,0.2);
+    border-radius: 8px; font-size: 13px; color: #b91c1c;
+  }
+  .retry-banner.active { display: block; }
+
+  /* Test History */
+  .history-panel {
+    background: var(--bg4); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 22px; margin-bottom: 32px;
+  }
+  .history-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;
+  }
+  .history-title {
+    font-size: 12px; font-weight: 700; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 0.07em;
+  }
+  .record-btn {
+    padding: 5px 13px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    cursor: pointer; font-family: 'Open Sans', sans-serif; transition: background 0.15s;
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
+  }
+  .record-btn:hover { background: var(--border); }
+  .history-empty { font-size: 13px; color: var(--text3); padding: 10px 0 2px; }
+  .attempt-row {
+    padding: 10px 0 6px; border-top: 1px solid var(--border);
+  }
+  .attempt-meta {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; color: var(--text3); margin-bottom: 7px; flex-wrap: wrap;
+  }
+  .attempt-label { font-weight: 700; color: var(--ink); font-size: 12px; }
+  .attempt-score-val { font-weight: 700; color: var(--coral); }
+  .attempt-pct { color: var(--text2); }
+  .attempt-delete {
+    margin-left: auto; font-size: 11px; color: var(--text3); cursor: pointer;
+    background: none; border: none; font-family: 'Open Sans', sans-serif; padding: 0;
+  }
+  .attempt-delete:hover { color: #dc2626; }
+  .attempt-dots {
+    display: grid; grid-template-columns: repeat(10, 14px); gap: 3px;
+  }
+  .q-dot {
+    width: 14px; height: 14px; border-radius: 3px; cursor: default;
+    position: relative;
+  }
+  .q-dot.correct { background: var(--d4); }
+  .q-dot.wrong { background: #dc2626; }
+  .q-dot.skipped { background: var(--bg3); border: 1px solid var(--border); }
+
 </style>
 </head>
 <body>
@@ -252,12 +344,25 @@
   <div class="score-bar">
     <div>
       <div class="score-label">Score</div>
-      <div><span class="score-val" id="score-correct">0</span> <span class="score-pct">/ <span id="score-total">0</span> answered (of 60)</span></div>
+      <div><span class="score-val" id="score-correct">0</span><span class="score-pct"> / <span id="score-max">60</span> correct &nbsp;·&nbsp; <span id="score-total">0</span> answered</span></div>
     </div>
     <div class="progress-track">
       <div class="progress-fill" id="progress-fill" style="width:0%"></div>
     </div>
+    <button class="show-all-btn" id="show-all-btn" onclick="showAllAnswers()">👁 Show All Answers</button>
+    <button class="retry-btn" id="retry-btn" onclick="toggleRetry()">↺ Retry Wrong</button>
     <button class="reset-btn" onclick="resetAll()">Reset all</button>
+  </div>
+  <div class="retry-banner" id="retry-banner"></div>
+
+  <!-- Test History -->
+  <div class="history-panel" id="history-panel">
+    <div class="history-header">
+      <div class="history-title">Test History</div>
+      <button class="record-btn" onclick="recordAttempt()">⊕ Record attempt</button>
+    </div>
+    <div class="history-empty" id="history-empty">No attempts recorded yet — finish the exam and click Record.</div>
+    <div id="history-list"></div>
   </div>
 
   <div class="scenario-header">Scenario 1 — Customer Support Resolution Agent</div>
@@ -1794,23 +1899,227 @@ Developer surveys indicate growing distrust—many have started dismissing findi
 </div><!-- /main -->
 
 <script>
-var answered = 0;
-var correct = 0;
 var TOTAL = 60;
+var _answers = {};
+var _retryMode = false;
+var _retrySnapshot = null;
+var _retryTotal = 0;
+
+function setCardStatus(card, isCorrect) {
+  card.classList.remove('answered-correct', 'answered-wrong');
+  var existing = card.querySelector('.q-status');
+  if (existing) existing.remove();
+  if (isCorrect === null || isCorrect === undefined) return;
+  card.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+  var badge = document.createElement('span');
+  badge.className = 'q-status ' + (isCorrect ? 'correct' : 'wrong');
+  badge.textContent = isCorrect ? '✓ Correct' : '✗ Wrong';
+  card.querySelector('.q-meta').appendChild(badge);
+}
+
+function getWrongCards() {
+  return Array.from(document.querySelectorAll('.q-card')).filter(function(card) {
+    return card.querySelectorAll('.choice.wrong').length > 0;
+  });
+}
+
+function updateRetryBtn() {
+  var btn = document.getElementById('retry-btn');
+  if (!btn) return;
+  if (_retryMode) {
+    btn.style.display = 'inline-block';
+    btn.textContent = '✕ Exit Retry';
+    btn.classList.add('exit-mode');
+  } else {
+    var wrongs = getWrongCards().length;
+    if (wrongs > 0) {
+      btn.style.display = 'inline-block';
+      btn.textContent = '↺ Retry Wrong (' + wrongs + ')';
+      btn.classList.remove('exit-mode');
+    } else {
+      btn.style.display = 'none';
+    }
+  }
+}
+
+function toggleRetry() {
+  if (_retryMode) exitRetry(); else enterRetry();
+}
+
+function enterRetry() {
+  var wrongCards = getWrongCards();
+  if (!wrongCards.length) return;
+  _retrySnapshot = JSON.parse(JSON.stringify(_answers));
+  _retryTotal = wrongCards.length;
+  _retryMode = true;
+
+  document.getElementById('show-all-btn').style.display = 'none';
+  document.querySelectorAll('.scenario-actions').forEach(function(el) { el.style.display = 'none'; });
+  document.getElementById('score-max').textContent = _retryTotal;
+
+  document.querySelectorAll('.q-card').forEach(function(card) {
+    if (card.querySelectorAll('.choice.wrong').length > 0) {
+      card.querySelectorAll('.choice').forEach(function(b) {
+        b.disabled = false;
+        b.classList.remove('correct', 'wrong');
+      });
+      card.querySelectorAll('.choice-explanation').forEach(function(el) { el.remove(); });
+      setCardStatus(card, null);
+      var exp = document.getElementById(card.id + '-exp');
+      if (exp) exp.style.display = 'none';
+      delete _answers[card.id];
+    } else {
+      card.style.display = 'none';
+    }
+  });
+
+  document.querySelectorAll('.scenario-header').forEach(function(hdr) {
+    var next = hdr.nextElementSibling;
+    var hasVisible = false;
+    while (next && !next.classList.contains('scenario-header')) {
+      if (next.classList.contains('q-card') && next.style.display !== 'none') { hasVisible = true; break; }
+      next = next.nextElementSibling;
+    }
+    hdr.style.display = hasVisible ? '' : 'none';
+  });
+
+  var banner = document.getElementById('retry-banner');
+  banner.textContent = '↺ Retry mode — ' + _retryTotal + ' wrong answer' + (_retryTotal !== 1 ? 's' : '') + ' to practice. Your original progress is preserved.';
+  banner.classList.add('active');
+
+  recalcScore();
+}
+
+function exitRetry() {
+  _retryMode = false;
+
+  document.querySelectorAll('.q-card').forEach(function(card) { card.style.display = ''; });
+  document.querySelectorAll('.scenario-header').forEach(function(el) { el.style.display = ''; });
+  document.querySelectorAll('.scenario-actions').forEach(function(el) { el.style.display = ''; });
+
+  document.querySelectorAll('.choice').forEach(function(b) {
+    b.disabled = false;
+    b.classList.remove('correct', 'wrong');
+  });
+  document.querySelectorAll('.explanation').forEach(function(el) { el.style.display = 'none'; });
+  document.querySelectorAll('.choice-explanation').forEach(function(el) { el.remove(); });
+
+  _answers = _retrySnapshot;
+  _retrySnapshot = null;
+  _retryTotal = 0;
+
+  Object.keys(_answers).forEach(function(cardId) {
+    var chosen = _answers[cardId];
+    var card = document.getElementById(cardId);
+    if (!card) return;
+    var btns = card.querySelectorAll('.choice');
+    if (!btns[0]) return;
+    var m = btns[0].getAttribute('onclick').match(/answer\('[^']+','[^']+','([A-Z])'\)/);
+    if (!m) return;
+    var correctLetter = m[1];
+    btns.forEach(function(b) {
+      b.disabled = true;
+      var ltr = b.querySelector('.ltr').textContent.trim();
+      if (chosen === '_shown') {
+        if (ltr === correctLetter) b.classList.add('correct');
+      } else {
+        if (ltr === chosen && chosen === correctLetter) b.classList.add('correct');
+        else if (ltr === chosen) b.classList.add('wrong');
+        else if (ltr === correctLetter && chosen !== correctLetter) b.classList.add('correct');
+      }
+    });
+    if (chosen !== '_shown') {
+      addChoiceExplanations(card, correctLetter);
+      setCardStatus(card, chosen === correctLetter);
+    }
+    var exp = document.getElementById(cardId + '-exp');
+    if (exp) exp.style.display = 'block';
+  });
+
+  document.getElementById('retry-banner').classList.remove('active');
+  document.getElementById('score-max').textContent = TOTAL;
+
+  var showBtn = document.getElementById('show-all-btn');
+  if (showBtn) {
+    showBtn.style.display = '';
+    var allAnswered = Object.keys(_answers).length >= TOTAL;
+    showBtn.textContent = allAnswered ? 'Answers Shown' : '👁 Show All Answers';
+    showBtn.disabled = allAnswered;
+  }
+
+  recalcScore();
+}
 
 function recalcScore() {
   var ans = 0, cor = 0;
   document.querySelectorAll('.q-card').forEach(function(card) {
+    if (_retryMode && card.style.display === 'none') return;
     var btns = card.querySelectorAll('.choice');
     if (!btns[0] || !btns[0].disabled) return;
     ans++;
     var hasWrong = Array.from(btns).some(function(b) { return b.classList.contains('wrong'); });
     if (!hasWrong) cor++;
   });
-  answered = ans; correct = cor;
+  var total = _retryMode ? _retryTotal : TOTAL;
   document.getElementById('score-correct').textContent = cor;
   document.getElementById('score-total').textContent = ans;
-  document.getElementById('progress-fill').style.width = Math.round(ans / TOTAL * 100) + '%';
+  document.getElementById('progress-fill').style.width = Math.round(ans / total * 100) + '%';
+  updateRetryBtn();
+}
+
+function saveState() {
+  if (_retryMode) return;
+  if (!Object.keys(_answers).length) { localStorage.removeItem('sj:fe'); return; }
+  var c = 0;
+  document.querySelectorAll('.q-card').forEach(function(card) {
+    if (!_answers[card.id]) return;
+    var hasWrong = Array.from(card.querySelectorAll('.choice')).some(function(b) { return b.classList.contains('wrong'); });
+    if (!hasWrong) c++;
+  });
+  localStorage.setItem('sj:fe', JSON.stringify({c: c, t: TOTAL, a: _answers}));
+}
+
+function addChoiceExplanations(card, correctLetter) {
+  card.querySelectorAll('.choice').forEach(function(b) {
+    var ltr = b.querySelector('.ltr').textContent.trim();
+    var expText = b.getAttribute('data-exp');
+    if (!expText) return;
+    var expDiv = document.createElement('div');
+    expDiv.className = 'choice-explanation visible' + (ltr === correctLetter ? ' correct-exp' : ' wrong-exp');
+    expDiv.textContent = expText;
+    b.insertAdjacentElement('afterend', expDiv);
+  });
+}
+
+function restoreState() {
+  var raw = localStorage.getItem('sj:fe');
+  if (!raw) return;
+  try {
+    var state = JSON.parse(raw);
+    _answers = state.a || {};
+    Object.keys(_answers).forEach(function(cardId) {
+      var chosen = _answers[cardId];
+      var card = document.getElementById(cardId);
+      if (!card) return;
+      var btns = card.querySelectorAll('.choice');
+      if (!btns[0] || btns[0].disabled) return;
+      var m = btns[0].getAttribute('onclick').match(/answer\('[^']+','[^']+','([A-Z])'\)/);
+      if (!m) return;
+      var correctLetter = m[1];
+      btns.forEach(function(b) {
+        b.disabled = true;
+        var ltr = b.querySelector('.ltr').textContent.trim();
+        if (ltr === chosen && chosen === correctLetter) b.classList.add('correct');
+        else if (ltr === chosen) b.classList.add('wrong');
+        else if (ltr === correctLetter && chosen !== correctLetter) b.classList.add('correct');
+      });
+      addChoiceExplanations(card, correctLetter);
+      setCardStatus(card, chosen === correctLetter);
+      var exp = document.getElementById(cardId + '-exp');
+      if (exp) exp.style.display = 'block';
+    });
+    recalcScore();
+  } catch(e) {}
 }
 
 function answer(cardId, chosen, correctLetter) {
@@ -1833,45 +2142,59 @@ function answer(cardId, chosen, correctLetter) {
     });
   }
 
-  // Show per-choice explanations (full-exam feature)
-  buttons.forEach(function(b) {
-    var ltr = b.querySelector('.ltr').textContent.trim();
-    var expText = b.getAttribute('data-exp');
-    if (!expText) return;
-    var expDiv = document.createElement('div');
-    expDiv.className = 'choice-explanation visible';
-    expDiv.className += (ltr === correctLetter) ? ' correct-exp' : ' wrong-exp';
-    expDiv.textContent = expText;
-    b.insertAdjacentElement('afterend', expDiv);
-  });
-
+  addChoiceExplanations(card, correctLetter);
   document.getElementById(cardId + '-exp').style.display = 'block';
+  _answers[cardId] = chosen;
+  setCardStatus(card, isCorrect);
   recalcScore();
+  saveState();
 }
 
 function resetAll() {
+  if (_retryMode) {
+    _retryMode = false;
+    _retrySnapshot = null;
+    _retryTotal = 0;
+    document.getElementById('retry-banner').classList.remove('active');
+    document.getElementById('score-max').textContent = TOTAL;
+    document.querySelectorAll('.q-card').forEach(function(card) { card.style.display = ''; });
+    document.querySelectorAll('.scenario-header').forEach(function(el) { el.style.display = ''; });
+    document.querySelectorAll('.scenario-actions').forEach(function(el) { el.style.display = ''; });
+    var showBtn = document.getElementById('show-all-btn');
+    if (showBtn) { showBtn.style.display = ''; showBtn.textContent = '👁 Show All Answers'; showBtn.disabled = false; }
+  }
+  _answers = {};
+  localStorage.removeItem('sj:fe');
   document.querySelectorAll('.choice').forEach(function(b) {
     b.disabled = false;
     b.classList.remove('correct', 'wrong');
   });
-  document.querySelectorAll('.explanation').forEach(function(el) {
-    el.style.display = 'none';
-  });
+  document.querySelectorAll('.explanation').forEach(function(el) { el.style.display = 'none'; });
   document.querySelectorAll('.choice-explanation').forEach(function(el) { el.remove(); });
+  document.querySelectorAll('.q-card').forEach(function(card) { setCardStatus(card, null); });
   recalcScore();
 }
 
 function resetSection(sc) {
   document.querySelectorAll('.q-card[data-sc="' + sc + '"]').forEach(function(card) {
+    delete _answers[card.id];
     card.querySelectorAll('.choice').forEach(function(b) {
       b.disabled = false;
       b.classList.remove('correct', 'wrong');
     });
     card.querySelectorAll('.choice-explanation').forEach(function(el) { el.remove(); });
+    setCardStatus(card, null);
     var exp = document.getElementById(card.id + '-exp');
     if (exp) exp.style.display = 'none';
   });
   recalcScore();
+  saveState();
+}
+
+function showAllAnswers() {
+  [1,2,3,4].forEach(function(sc) { showAnswers(sc); });
+  var btn = document.getElementById('show-all-btn');
+  if (btn) { btn.textContent = 'Answers Shown'; btn.disabled = true; }
 }
 
 function showAnswers(sc) {
@@ -1885,11 +2208,83 @@ function showAnswers(sc) {
       b.disabled = true;
       if (b.querySelector('.ltr').textContent.trim() === correctLetter) b.classList.add('correct');
     });
+    addChoiceExplanations(card, correctLetter);
+    _answers[card.id] = '_shown';
     var exp = document.getElementById(card.id + '-exp');
     if (exp) exp.style.display = 'block';
   });
   recalcScore();
+  saveState();
 }
+
+var _history = [];
+
+function loadHistory() {
+  try {
+    var raw = localStorage.getItem('sj:fe:history');
+    _history = raw ? JSON.parse(raw) : [];
+  } catch(e) { _history = []; }
+  renderHistory();
+}
+
+function saveHistoryData() {
+  localStorage.setItem('sj:fe:history', JSON.stringify(_history));
+}
+
+function recordAttempt() {
+  var results = {};
+  for (var i = 1; i <= TOTAL; i++) {
+    var card = document.getElementById('q' + i);
+    if (!card) continue;
+    var btns = card.querySelectorAll('.choice');
+    if (!btns[0] || !btns[0].disabled) { results['q'+i] = null; continue; }
+    var hasWrong = Array.from(btns).some(function(b) { return b.classList.contains('wrong'); });
+    results['q'+i] = !hasWrong;
+  }
+  var correct = Object.keys(results).filter(function(k) { return results[k] === true; }).length;
+  var answered = Object.keys(results).filter(function(k) { return results[k] !== null; }).length;
+  var now = new Date();
+  var dateStr = now.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  _history.push({ date: dateStr, score: correct, answered: answered, total: TOTAL, results: results });
+  saveHistoryData();
+  renderHistory();
+}
+
+function deleteAttempt(idx) {
+  _history.splice(idx, 1);
+  saveHistoryData();
+  renderHistory();
+}
+
+function renderHistory() {
+  var list = document.getElementById('history-list');
+  var empty = document.getElementById('history-empty');
+  if (!_history.length) { empty.style.display = ''; list.innerHTML = ''; return; }
+  empty.style.display = 'none';
+  list.innerHTML = _history.map(function(a, idx) {
+    var dots = '';
+    for (var i = 1; i <= TOTAL; i++) {
+      var v = a.results['q'+i];
+      var cls = v === true ? 'correct' : v === false ? 'wrong' : 'skipped';
+      dots += '<span class="q-dot ' + cls + '" title="Q' + i + (v === true ? ' ✓' : v === false ? ' ✗' : ' —') + '"></span>';
+    }
+    var pct = Math.round(a.score / a.total * 100);
+    return '<div class="attempt-row">' +
+      '<div class="attempt-meta">' +
+        '<span class="attempt-label">Attempt ' + (idx+1) + '</span>' +
+        '<span>' + a.date + '</span>' +
+        '<span><span class="attempt-score-val">' + a.score + '/' + a.total + '</span>' +
+        ' <span class="attempt-pct">(' + pct + '%)</span></span>' +
+        (a.answered < a.total ? '<span style="color:var(--text3)">' + (a.total - a.answered) + ' unanswered</span>' : '') +
+        '<button class="attempt-delete" onclick="deleteAttempt(' + idx + ')">✕ remove</button>' +
+      '</div>' +
+      '<div class="attempt-dots">' + dots + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+restoreState();
+loadHistory();
 </script>
 </body>
 </html>

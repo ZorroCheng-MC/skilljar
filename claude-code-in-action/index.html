@@ -172,7 +172,7 @@
     border-left: 3px solid var(--accent); padding-left: 12px;
     margin-bottom: 14px;
   }
-  .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
+  .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
   .video-card {
     background: var(--bg2); border: 1px solid var(--border);
     border-radius: 10px; overflow: hidden;
@@ -762,6 +762,12 @@ let currentSpeed = 1.5;
   jwPlayers.push(jwplayer('jwp-14').setup({playlist:'https://cdn.jwplayer.com/v2/media/IiL1DO8v',width:'100%',aspectratio:'16:9',displaytitle:false,stretching:'uniform'}));
 jwPlayers.forEach(p => {
   p.on('play', function() { try { this.setPlaybackRate(currentSpeed); } catch(e) {} });
+  p.on('levels', function(e) {
+    var lvls = e.levels; if (!lvls || !lvls.length) return;
+    var best = 0;
+    for (var i = 1; i < lvls.length; i++) { if ((lvls[i].height||0) > (lvls[best].height||0)) best = i; }
+    p.setCurrentQuality(best);
+  });
 });
 function applySpeed(rate) {
   currentSpeed = rate;
@@ -807,7 +813,12 @@ if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseF
     var _ht = document.querySelector(location.hash);
     if (_ht) {
       var _tc = _ht.closest('.tab-content');
-      if (_tc) activateTab(_tc.id.replace('tab-', ''));
+      if (_tc) {
+        var _tabName = _tc.id.replace('tab-', '');
+        activateTab(_tabName);
+        localStorage.setItem(TAB_KEY, _tabName);
+        history.replaceState(null, '', location.pathname + location.search);
+      }
       setTimeout(function() {
         var top = _ht.getBoundingClientRect().top + window.scrollY - 115;
         window.scrollTo(0, Math.max(0, top));
@@ -1034,6 +1045,7 @@ if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseF
     }
     btn.classList.add('hidden');
     block.querySelector('.qs-retry').classList.remove('hidden');
+    saveQuizProgress();
   };
 
   window.qzRetry = function(btn) {
@@ -1058,6 +1070,7 @@ if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseF
       });
     });
     btn.textContent = 'Answers Shown'; btn.disabled = true;
+    saveQuizProgress();
   };
 
   window.qzResetAll = function() {
@@ -1077,7 +1090,23 @@ if (speedSel) speedSel.addEventListener('change', function() { applySpeed(parseF
     });
     var showBtn = document.querySelector('#tab-quiz .quiz-show-btn');
     if (showBtn) { showBtn.textContent = 'Show All Answers'; showBtn.disabled = false; }
+    saveQuizProgress();
   };
+
+  function saveQuizProgress() {
+    var c = 0, t = 0, any = false;
+    document.querySelectorAll('#tab-quiz .qs-card[data-correct]').forEach(function(card) {
+      if (!card.dataset.correct) return;
+      var isDone = card.classList.contains('done');
+      var isShown = !isDone && card.querySelector('.qs-choice.show-ans');
+      if (!isDone && !isShown) return;
+      any = true; t++;
+      if (isDone && card.querySelector('.qs-choice.correct')) c++;
+      else if (isShown) c++;
+    });
+    if (any) localStorage.setItem('sj:qz:' + location.pathname, JSON.stringify({c:c, t:t}));
+    else localStorage.removeItem('sj:qz:' + location.pathname);
+  }
 })();
 </script>
 
